@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Time Timesheet{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <h2>Welcome to Time Timesheet</h2>
+        <p>Sign in with your Microsoft 365 account to continue.</p>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+            Sign in with Microsoft
+        </a>
+    </div>
+</div>
+{% endblock %}

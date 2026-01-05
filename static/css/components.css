@@ -1,0 +1,488 @@
+/**
+ * Component Styles
+ * 
+ * Reusable UI components for the timesheet application.
+ */
+
+/* ============================================
+   App Container Layout
+   ============================================ */
+.app-container {
+    display: flex;
+    min-height: calc(100vh - var(--header-height));
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--color-white);
+    border-right: 1px solid var(--color-gray-200);
+    padding: var(--spacing-lg);
+    flex-shrink: 0;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    color: var(--color-gray-700);
+    transition: all var(--transition-fast);
+}
+
+.sidebar-link:hover {
+    background: var(--color-gray-100);
+    text-decoration: none;
+}
+
+.sidebar-link.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.sidebar-link .icon {
+    font-size: var(--font-size-lg);
+}
+
+.sidebar-divider {
+    margin: var(--spacing-md) 0;
+    border: none;
+    border-top: 1px solid var(--color-gray-200);
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.content-area {
+    flex: 1;
+    padding: var(--spacing-xl);
+    overflow-y: auto;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+.view-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.view-header h2 {
+    margin: 0;
+    flex: 1;
+}
+
+/* ============================================
+   Filters
+   ============================================ */
+.filters {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.filters .form-select {
+    width: auto;
+    min-width: 180px;
+}
+
+/* ============================================
+   Timesheets Grid
+   ============================================ */
+.timesheets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* ============================================
+   Timesheet Card
+   ============================================ */
+.timesheet-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-gray-200);
+    padding: var(--spacing-lg);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.timesheet-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary-light);
+}
+
+.timesheet-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.timesheet-card-week {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}
+
+.timesheet-card-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-NEW {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.status-SUBMITTED {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+}
+
+.status-APPROVED {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+}
+
+.status-NEEDS_APPROVAL {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.timesheet-card-meta {
+    display: flex;
+    gap: var(--spacing-lg);
+    color: var(--color-gray-600);
+    font-size: var(--font-size-sm);
+}
+
+.timesheet-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.timesheet-card-user {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-gray-100);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+}
+
+/* ============================================
+   Timesheet Form
+   ============================================ */
+.timesheet-form {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-gray-200);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    color: var(--color-gray-700);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+#delete-btn {
+    margin-right: auto;
+}
+
+/* ============================================
+   Entries Grid (Time Entry Table)
+   ============================================ */
+.entries-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(7, 1fr);
+    gap: 1px;
+    background: var(--color-gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.entries-grid .header-cell,
+.entries-grid .entry-cell {
+    padding: var(--spacing-sm);
+    background: var(--color-white);
+}
+
+.entries-grid .header-cell {
+    background: var(--color-gray-50);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.entries-grid .row-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+}
+
+.entries-grid .entry-input {
+    width: 100%;
+    padding: var(--spacing-xs);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: var(--font-size-sm);
+}
+
+.entries-grid .entry-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   Checkboxes
+   ============================================ */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+}
+
+/* ============================================
+   Attachments
+   ============================================ */
+.attachments-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.attachment-item .remove-btn {
+    background: none;
+    border: none;
+    color: var(--color-danger);
+    cursor: pointer;
+    padding: 0;
+    font-size: var(--font-size-lg);
+    line-height: 1;
+}
+
+.upload-zone {
+    border: 2px dashed var(--color-gray-300);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--color-gray-500);
+    transition: all var(--transition-fast);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--color-primary);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.upload-zone p {
+    margin: 0 0 var(--spacing-xs);
+}
+
+.upload-zone small {
+    font-size: var(--font-size-xs);
+}
+
+/* ============================================
+   Notes
+   ============================================ */
+.notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.note-item {
+    padding: var(--spacing-md);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-primary);
+}
+
+.note-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+}
+
+.note-item-content {
+    font-size: var(--font-size-sm);
+}
+
+/* ============================================
+   Admin-specific styles
+   ============================================ */
+.admin-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.timesheet-detail {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.detail-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.detail-section h4 {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.detail-item label {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+    font-weight: 500;
+}
+
+.detail-item .value {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-gray-500);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-gray-700);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .content-area {
+        padding: var(--spacing-md);
+    }
+    
+    .entries-grid {
+        grid-template-columns: 80px repeat(7, 1fr);
+        font-size: var(--font-size-xs);
+    }
+    
+    .timesheets-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    #delete-btn {
+        margin-right: 0;
+        order: 1;
+    }
+}
