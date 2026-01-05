@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Time Timesheet - Employee timesheet management application"
+    />
+    <title>{% block title %}Time Timesheet{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">Time Timesheet</h1>
+        {% if user %}
+        <nav class="nav">
+          <span class="user-name">{{ user.display_name }}</span>
+          {% if user.is_admin %}
+          <a href="#admin" class="nav-link" data-view="admin">Admin</a>
+          {% endif %}
+          <form
+            action="{{ url_for('auth.logout') }}"
+            method="post"
+            class="logout-form"
+          >
+            <button type="submit" class="btn btn-secondary btn-sm">
+              Logout
+            </button>
+          </form>
+        </nav>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="main-content">{% block content %}{% endblock %}</main>
+
+    <footer class="footer">
+      <p>&copy; 2026 Time Timesheet. All rights reserved.</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

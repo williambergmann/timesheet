@@ -1,0 +1,350 @@
+/**
+ * Admin Module
+ * 
+ * Admin-specific functionality for managing timesheets.
+ */
+
+// Store for loaded users
+let adminUsers = [];
+
+// ==========================================
+// Data Loading
+// ==========================================
+
+async function loadAdminTimesheets() {
+    const container = document.getElementById('admin-timesheets-list');
+    container.innerHTML = '<div class="loading">Loading timesheets...</div>';
+    
+    try {
+        const status = document.getElementById('admin-filter-status').value;
+        const userId = document.getElementById('admin-filter-user').value;
+        
+        const params = {};
+        if (status) params.status = status;
+        if (userId) params.user_id = userId;
+        
+        const data = await API.getAdminTimesheets(params);
+        
+        if (data.timesheets.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No timesheets found</h3>
+                    <p>No timesheets match the current filters.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = data.timesheets.map(ts => `
+            <div class="timesheet-card" onclick="openAdminTimesheet('${ts.id}')">
+                <div class="timesheet-card-header">
+                    <span class="timesheet-card-week">${TimesheetModule.formatWeekRange(ts.week_start)}</span>
+                    <span class="timesheet-card-status status-${ts.status}">${TimesheetModule.formatStatus(ts.status)}</span>
+                </div>
+                <div class="timesheet-card-meta">
+                    <span>⏱️ ${ts.totals.total}h total</span>
+                    <span>💼 ${ts.totals.billable}h billable</span>
+                    <span>💵 ${ts.totals.payable}h payable</span>
+                </div>
+                <div class="timesheet-card-user">
+                    👤 ${ts.user ? ts.user.display_name : 'Unknown User'}
+                </div>
+                <div class="admin-actions">
+                    ${ts.status === 'SUBMITTED' ? `
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); approveTimesheetAdmin('${ts.id}')">Approve</button>
+                        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); rejectTimesheetAdmin('${ts.id}')">Needs Attachment</button>
+                    ` : ''}
+                    ${ts.status === 'APPROVED' ? `
+                        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); unapproveTimesheetAdmin('${ts.id}')">Un-approve</button>
+                    ` : ''}
+                    ${ts.status === 'NEEDS_APPROVAL' ? `
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); approveTimesheetAdmin('${ts.id}')">Approve</button>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        showToast(error.message, 'error');
+        container.innerHTML = '<div class="empty-state"><p>Error loading timesheets</p></div>';
+    }
+}
+
+async function loadAdminUsers() {
+    try {
+        const data = await API.getUsers();
+        adminUsers = data.users;
+        
+        const select = document.getElementById('admin-filter-user');
+        if (select) {
+            select.innerHTML = '<option value="">All Users</option>';
+            adminUsers.forEach(user => {
+                select.innerHTML += `<option value="${user.id}">${user.display_name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load users:', error);
+    }
+}
+
+async function openAdminTimesheet(id) {
+    try {
+        const timesheet = await API.getAdminTimesheet(id);
+        showAdminTimesheetDetail(timesheet);
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// ==========================================
+// Detail View
+// ==========================================
+
+function showAdminTimesheetDetail(timesheet) {
+    const container = document.getElementById('admin-timesheets-list');
+    
+    container.innerHTML = `
+        <div class="timesheet-detail">
+            <button class="btn btn-back" onclick="loadAdminTimesheets()">← Back to list</button>
+            
+            <div class="detail-section">
+                <h3>
+                    ${TimesheetModule.formatWeekRange(timesheet.week_start)}
+                    <span class="timesheet-card-status status-${timesheet.status}">${TimesheetModule.formatStatus(timesheet.status)}</span>
+                </h3>
+            </div>
+            
+            <div class="detail-section">
+                <h4>Employee</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Name</label>
+                        <span class="value">${timesheet.user?.display_name || 'Unknown'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Email</label>
+                        <span class="value">${timesheet.user?.email || 'Unknown'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4>Hours Summary</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Total Hours</label>
+                        <span class="value">${timesheet.totals.total}h</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Payable Hours</label>
+                        <span class="value">${timesheet.totals.payable}h</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Billable Hours</label>
+                        <span class="value">${timesheet.totals.billable}h</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Unpaid Hours</label>
+                        <span class="value">${timesheet.totals.unpaid}h</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4>Time Entries</h4>
+                <div id="admin-entries-grid" class="entries-grid">
+                    <!-- Populated below -->
+                </div>
+            </div>
+            
+            ${timesheet.traveled || timesheet.has_expenses || timesheet.reimbursement_needed ? `
+            <div class="detail-section">
+                <h4>Additional Info</h4>
+                <div class="detail-grid">
+                    ${timesheet.traveled ? '<div class="detail-item"><span class="value">✈️ Traveled this week</span></div>' : ''}
+                    ${timesheet.has_expenses ? '<div class="detail-item"><span class="value">💰 Has Expenses</span></div>' : ''}
+                    ${timesheet.reimbursement_needed ? `
+                        <div class="detail-item">
+                            <label>Reimbursement</label>
+                            <span class="value">${timesheet.reimbursement_type}: $${timesheet.reimbursement_amount}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
+            ${timesheet.attachments && timesheet.attachments.length > 0 ? `
+            <div class="detail-section">
+                <h4>Attachments</h4>
+                <div class="attachments-list">
+                    ${timesheet.attachments.map(att => `
+                        <a href="/api/admin/timesheets/${timesheet.id}/attachments/${att.id}" 
+                           class="attachment-item" target="_blank">
+                            📎 ${att.filename}
+                        </a>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div class="detail-section">
+                <h4>Notes</h4>
+                <div class="notes-list">
+                    ${(timesheet.notes || []).map(note => `
+                        <div class="note-item">
+                            <div class="note-item-header">
+                                <span>${note.author_name || 'Unknown'}</span>
+                                <span>${new Date(note.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="note-item-content">${note.content}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="form-group">
+                    <textarea id="admin-note-input" class="form-textarea" rows="2" placeholder="Add a note..."></textarea>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="addAdminNote('${timesheet.id}')">Add Note</button>
+            </div>
+            
+            <div class="form-actions">
+                ${timesheet.status === 'SUBMITTED' || timesheet.status === 'NEEDS_APPROVAL' ? `
+                    <button class="btn btn-primary" onclick="approveTimesheetAdmin('${timesheet.id}')">Approve Timesheet</button>
+                ` : ''}
+                ${timesheet.status === 'SUBMITTED' ? `
+                    <button class="btn btn-secondary" onclick="rejectTimesheetAdmin('${timesheet.id}')">Request Attachment</button>
+                ` : ''}
+                ${timesheet.status === 'APPROVED' ? `
+                    <button class="btn btn-secondary" onclick="unapproveTimesheetAdmin('${timesheet.id}')">Un-approve</button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    // Render entries grid (read-only)
+    renderAdminEntriesGrid(timesheet);
+}
+
+function renderAdminEntriesGrid(timesheet) {
+    const grid = document.getElementById('admin-entries-grid');
+    if (!grid) return;
+    
+    const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const HOUR_TYPES = ['Field', 'Internal', 'Training', 'PTO', 'Unpaid', 'Holiday'];
+    
+    // Build entries map
+    const entriesMap = {};
+    (timesheet.entries || []).forEach(e => {
+        const key = `${e.entry_date}-${e.hour_type}`;
+        entriesMap[key] = e.hours;
+    });
+    
+    // Header row
+    let html = '<div class="header-cell row-label">Hour Type</div>';
+    const startDate = new Date(timesheet.week_start + 'T00:00:00');
+    
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
+        html += `<div class="header-cell">${DAYS[i]}<br><small>${date.getMonth() + 1}/${date.getDate()}</small></div>`;
+    }
+    
+    // Data rows
+    HOUR_TYPES.forEach(type => {
+        html += `<div class="entry-cell row-label">${type}</div>`;
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            const hours = entriesMap[`${dateStr}-${type}`] || 0;
+            
+            html += `<div class="entry-cell" style="text-align: center;">${hours || '-'}</div>`;
+        }
+    });
+    
+    grid.innerHTML = html;
+}
+
+// ==========================================
+// Admin Actions
+// ==========================================
+
+async function approveTimesheetAdmin(id) {
+    try {
+        await API.approveTimesheet(id);
+        showToast('Timesheet approved!', 'success');
+        loadAdminTimesheets();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function rejectTimesheetAdmin(id) {
+    const reason = prompt('Reason for requesting attachment (optional):');
+    
+    try {
+        await API.rejectTimesheet(id, reason || '');
+        showToast('Timesheet marked as needing attachment', 'success');
+        loadAdminTimesheets();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function unapproveTimesheetAdmin(id) {
+    if (!confirm('Are you sure you want to un-approve this timesheet?')) {
+        return;
+    }
+    
+    try {
+        await API.unapproveTimesheet(id);
+        showToast('Timesheet un-approved', 'success');
+        loadAdminTimesheets();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function addAdminNote(timesheetId) {
+    const input = document.getElementById('admin-note-input');
+    const content = input.value.trim();
+    
+    if (!content) {
+        showToast('Please enter a note', 'warning');
+        return;
+    }
+    
+    try {
+        await API.addAdminNote(timesheetId, content);
+        showToast('Note added', 'success');
+        input.value = '';
+        
+        // Reload timesheet to show new note
+        openAdminTimesheet(timesheetId);
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// ==========================================
+// Initialization
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load users for filter dropdown
+    if (window.currentUser && window.currentUser.is_admin) {
+        loadAdminUsers();
+    }
+    
+    // Setup filter handlers
+    const statusFilter = document.getElementById('admin-filter-status');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', loadAdminTimesheets);
+    }
+    
+    const userFilter = document.getElementById('admin-filter-user');
+    if (userFilter) {
+        userFilter.addEventListener('change', loadAdminTimesheets);
+    }
+});
