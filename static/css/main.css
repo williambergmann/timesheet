@@ -2,16 +2,21 @@
  * Main Stylesheet
  * 
  * Global styles, CSS variables, and layout foundations.
+ * Northstar Technologies branding - Forest Green theme.
  */
 
 /* ============================================
    CSS Variables (Design Tokens)
    ============================================ */
 :root {
-  /* Colors - Modern professional palette */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-light: #3b82f6;
+  /* Colors - Northstar Forest Green palette */
+  --color-primary: #006400;
+  --color-primary-dark: #004d00;
+  --color-primary-light: #228b22;
+  
+  /* Accent - Olive green for icons/highlights */
+  --color-accent: #7bb033;
+  --color-accent-dark: #5a8a1a;
 
   --color-secondary: #64748b;
   --color-secondary-dark: #475569;
@@ -36,7 +41,7 @@
 
   /* Status colors */
   --status-new: #64748b;
-  --status-submitted: #2563eb;
+  --status-submitted: #006400;
   --status-approved: #10b981;
   --status-needs-approval: #f59e0b;
 
@@ -342,7 +347,7 @@ a:hover {
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.15);
 }
 
 .form-row {
@@ -448,6 +453,27 @@ a:hover {
 }
 
 /* ============================================
+   Brand Logo - Fixed bottom right
+   ============================================ */
+.brand-logo {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 50;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.brand-logo:hover {
+  opacity: 1;
+}
+
+.brand-logo img {
+  width: 80px;
+  height: auto;
+}
+
+/* ============================================
    Responsive
    ============================================ */
 @media (max-width: 768px) {
@@ -466,4 +492,9 @@ a:hover {
   .user-name {
     display: none;
   }
+
+  .brand-logo img {
+    width: 50px;
+  }
 }
+
