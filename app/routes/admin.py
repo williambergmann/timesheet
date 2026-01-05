@@ -54,8 +54,8 @@ def list_timesheets():
     if week_start:
         query = query.filter_by(week_start=datetime.fromisoformat(week_start).date())
 
-    # Join with user for display name
-    query = query.join(User)
+    # Join with user for display name (explicit join due to multiple FKs)
+    query = query.join(User, Timesheet.user_id == User.id)
 
     # Order by submitted_at (newest first)
     query = query.order_by(Timesheet.submitted_at.desc())
