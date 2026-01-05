@@ -1,420 +1,157 @@
-# Timesheet Application - Implementation Plan
-
-Replacing the PowerApps timesheet solution with a modern Flask + vanilla JS/CSS application for ~60 users.
-
-## Screenshots
-
-### Reference: PowerApps Current UI
-
-![PowerApps Dashboard](docs/images/powerapps_dashboard.png)
-_Current PowerApps dashboard showing sidebar navigation, timesheet list, and star logo_
-
-![PowerApps Timesheet Detail](docs/images/powerapps_timesheet.png)
-_PowerApps timesheet entry form with time grid and action buttons_
-
-### New Implementation: Flask App
-
-![New Dashboard](docs/images/new_dashboard.png)
-_New Flask implementation with forest green theme and premium UI_
-
----
-
-## System Architecture
-
-```mermaid
-graph TB
-    subgraph Client
-        Browser[Browser - Vanilla JS/CSS/HTML]
-    end
-
-    subgraph Docker Container
-        Nginx[Nginx Reverse Proxy]
-        Gunicorn[Gunicorn + gevent workers]
-        Flask[Flask Application]
-    end
-
-    subgraph External Services
-        MSAL[Microsoft 365 / Azure AD]
-        Twilio[Twilio SMS]
-    end
-
-    subgraph Data Layer
-        Postgres[(PostgreSQL)]
-        Redis[(Redis - Optional Cache)]
-        Uploads[File Storage]
-    end
-
-    Browser --> Nginx
-    Nginx --> Gunicorn
-    Gunicorn --> Flask
-    Flask --> MSAL
-    Flask --> Twilio
-    Flask --> Postgres
-    Flask --> Redis
-    Flask --> Uploads
-    Flask -.-> |SSE| Browser
-```
-
-## User Review Required
-
-> [!IMPORTANT] > **File Storage Decision Pending**: Attachment storage (images/PDFs for field hours) needs to be decided. Options:
->
-> - Local filesystem (Docker volume) - simpler, but requires backup strategy
-> - Azure Blob Storage - scales better, integrates with O365
->
-> For initial implementation, we'll use local filesystem with a clear abstraction layer to swap later.
-
-> [!IMPORTANT] > **Field Hours Approval Document**: The purpose/format of the uploaded document for field hours needs clarification. Currently implementing as a generic file upload.
-
----
-
-## Database Schema
-
-```mermaid
-erDiagram
-    User ||--o{ Timesheet : creates
-    User ||--o{ Notification : receives
-    Timesheet ||--|{ TimesheetEntry : contains
-    Timesheet ||--o{ Attachment : has
-    Timesheet ||--o{ Note : has
-
-    User {
-        uuid id PK
-        string azure_id UK "Microsoft 365 ID"
-        string email UK
-        string display_name
-        string phone "For Twilio SMS"
-        boolean is_admin
-        boolean sms_opt_in
-        datetime created_at
-        datetime updated_at
-    }
-
-    Timesheet {
-        uuid id PK
-        uuid user_id FK
-        date week_start "Sunday of the week"
-        string status "NEW|SUBMITTED|APPROVED|NEEDS_APPROVAL"
-        boolean traveled
-        boolean has_expenses
-        boolean reimbursement_needed
-        string reimbursement_type "Car|Flight|Food|Other"
-        decimal reimbursement_amount
-        date stipend_date
-        datetime submitted_at
-        datetime approved_at
-        uuid approved_by FK
-        datetime created_at
-        datetime updated_at
-    }
-
-    TimesheetEntry {
-        uuid id PK
-        uuid timesheet_id FK
-        date entry_date
-        string hour_type "Field|Internal|Training|PTO|Unpaid|Holiday"
-        decimal hours
-        datetime created_at
-    }
-
-    Attachment {
-        uuid id PK
-        uuid timesheet_id FK
-        string filename
-        string original_filename
-        string mime_type
-        integer file_size
-        datetime uploaded_at
-    }
-
-    Note {
-        uuid id PK
-        uuid timesheet_id FK
-        uuid author_id FK
-        text content
-        datetime created_at
-    }
-
-    Notification {
-        uuid id PK
-        uuid user_id FK
-        uuid timesheet_id FK
-        string type "NEEDS_ATTACHMENT|APPROVED|REMINDER"
-        string message
-        boolean sent
-        datetime sent_at
-        datetime created_at
-    }
-```
-
----
-
-## API Endpoints
-
-### Authentication
-
-| Method | Endpoint         | Description                 |
-| ------ | ---------------- | --------------------------- |
-| GET    | `/auth/login`    | Redirect to Microsoft login |
-| GET    | `/auth/callback` | OAuth callback handler      |
-| POST   | `/auth/logout`   | End session                 |
-| GET    | `/api/me`        | Get current user info       |
-
-### Timesheets (Regular User)
-
-| Method | Endpoint                                 | Description                           |
-| ------ | ---------------------------------------- | ------------------------------------- |
-| GET    | `/api/timesheets`                        | List user's timesheets (with filters) |
-| POST   | `/api/timesheets`                        | Create new draft timesheet            |
-| GET    | `/api/timesheets/{id}`                   | Get timesheet with entries            |
-| PUT    | `/api/timesheets/{id}`                   | Update draft timesheet                |
-| DELETE | `/api/timesheets/{id}`                   | Delete draft timesheet                |
-| POST   | `/api/timesheets/{id}/submit`            | Submit timesheet for approval         |
-| POST   | `/api/timesheets/{id}/entries`           | Add/update time entries               |
-| POST   | `/api/timesheets/{id}/attachments`       | Upload attachment                     |
-| DELETE | `/api/timesheets/{id}/attachments/{aid}` | Remove attachment                     |
-| POST   | `/api/timesheets/{id}/notes`             | Add note                              |
-
-### Admin Endpoints
-
-| Method | Endpoint                                       | Description                   |
-| ------ | ---------------------------------------------- | ----------------------------- |
-| GET    | `/api/admin/timesheets`                        | List all submitted timesheets |
-| GET    | `/api/admin/timesheets/{id}`                   | Get timesheet details         |
-| POST   | `/api/admin/timesheets/{id}/approve`           | Approve timesheet             |
-| POST   | `/api/admin/timesheets/{id}/reject`            | Mark as needs approval        |
-| POST   | `/api/admin/timesheets/{id}/unapprove`         | Revert approval               |
-| GET    | `/api/admin/timesheets/{id}/attachments/{aid}` | Download attachment           |
-| POST   | `/api/admin/timesheets/{id}/notes`             | Add admin note                |
-| GET    | `/api/admin/users`                             | List all users                |
-
-### Real-time Updates
-
-| Method | Endpoint      | Description                      |
-| ------ | ------------- | -------------------------------- |
-| GET    | `/api/events` | SSE stream for real-time updates |
-
----
-
-## File Structure
-
-```
-timesheet/
-├── app/
-│   ├── __init__.py              # App factory
-│   ├── config.py                # Configuration classes
-│   ├── extensions.py            # Flask extensions (db, migrate, etc.)
-│   │
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── user.py              # User model
-│   │   ├── timesheet.py         # Timesheet + Entry models
-│   │   ├── attachment.py        # Attachment model
-│   │   ├── note.py              # Note model
-│   │   └── notification.py      # Notification model
-│   │
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── auth.py              # /auth/* endpoints
-│   │   ├── timesheets.py        # /api/timesheets/* endpoints
-│   │   ├── admin.py             # /api/admin/* endpoints
-│   │   └── events.py            # /api/events SSE endpoint
-│   │
-│   ├── services/
-│   │   ├── __init__.py
-│   │   ├── timesheet_service.py # Business logic for timesheets
-│   │   ├── auth_service.py      # MSAL authentication logic
-│   │   ├── notification_service.py # Twilio + notification logic
-│   │   └── storage_service.py   # File upload/download abstraction
-│   │
-│   └── utils/
-│       ├── __init__.py
-│       ├── decorators.py        # @login_required, @admin_required
-│       └── validators.py        # Input validation helpers
-│
-├── static/
-│   ├── css/
-│   │   ├── main.css             # Global styles
-│   │   ├── components.css       # Reusable components
-│   │   └── admin.css            # Admin-specific styles
-│   │
-│   ├── js/
-│   │   ├── app.js               # Main application
-│   │   ├── api.js               # API client wrapper
-│   │   ├── auth.js              # Authentication handling
-│   │   ├── timesheet.js         # Timesheet form logic
-│   │   ├── admin.js             # Admin dashboard logic
-│   │   └── sse.js               # Server-sent events handler
-│   │
-│   └── img/
-│       └── logo.svg             # Northstar logo
-│
-├── templates/
-│   ├── base.html                # Base template
-│   ├── index.html               # Main app (SPA-style)
-│   ├── login.html               # Login page
-│   └── error.html               # Error pages
-│
-├── tests/
-│   ├── conftest.py              # Test fixtures
-│   ├── test_models.py
-│   ├── test_timesheets.py
-│   └── test_admin.py
-│
-├── docker/
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   └── nginx.conf
-│
-├── docs/
-│   └── images/                  # Documentation images
-│
-├── migrations/                   # Alembic migrations
-├── uploads/                      # Local file storage
-│   └── .gitkeep
-├── requirements.txt
-├── requirements-dev.txt
-├── .env.example
-├── .gitignore
-├── README.md
-└── IMPLEMENTATION.md
-```
-
----
-
-## Authentication Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Browser
-    participant Flask
-    participant MSAL
-    participant AzureAD
-    participant Database
-
-    User->>Browser: Navigate to app
-    Browser->>Flask: GET /
-    Flask->>Browser: Redirect to /auth/login
-    Browser->>Flask: GET /auth/login
-    Flask->>MSAL: Build auth URL
-    MSAL-->>Flask: Auth URL
-    Flask->>Browser: Redirect to Azure AD
-    Browser->>AzureAD: Login page
-    User->>AzureAD: Enter credentials
-    AzureAD->>Browser: Redirect to /auth/callback?code=xxx
-    Browser->>Flask: GET /auth/callback?code=xxx
-    Flask->>MSAL: Exchange code for token
-    MSAL->>AzureAD: Token request
-    AzureAD-->>MSAL: Access token + ID token
-    MSAL-->>Flask: User claims
-    Flask->>Database: Find or create user
-    Database-->>Flask: User record
-    Flask->>Browser: Set session, redirect to app
-    Browser->>Flask: GET / (with session)
-    Flask->>Browser: Render main app
-```
-
----
-
-## Timesheet Workflow
-
-```mermaid
-stateDiagram-v2
-    [*] --> NEW: Create Draft
-    NEW --> NEW: Edit/Save
-    NEW --> [*]: Delete Draft
-    NEW --> SUBMITTED: Submit
-
-    SUBMITTED --> APPROVED: Admin Approves
-    SUBMITTED --> NEEDS_APPROVAL: Missing Attachment
-
-    NEEDS_APPROVAL --> SUBMITTED: User Uploads Attachment
-
-    APPROVED --> SUBMITTED: Admin Un-approves
-
-    note right of NEEDS_APPROVAL
-        Triggers SMS notification
-        to user
-    end note
-
-    note right of APPROVED
-        Triggers SMS notification
-        to user
-    end note
-```
-
----
-
-## Hour Types & Business Logic
-
-| Hour Type | Payable | Billable | Requires Attachment |
-| --------- | ------- | -------- | ------------------- |
-| Field     | ✅      | ✅       | ✅                  |
-| Internal  | ✅      | ❌       | ❌                  |
-| Training  | ❌      | ❌       | ❌                  |
-| PTO       | ✅      | ❌       | ❌                  |
-| Unpaid    | ❌      | ❌       | ❌                  |
-| Holiday   | ✅      | ❌       | ❌                  |
-
----
-
-## Development Phases
-
-### Phase 1: Foundation ✅ (Complete)
-
-- [x] Docker setup with Nginx + Gunicorn
-- [x] Flask app factory with blueprints
-- [x] PostgreSQL models with SQLAlchemy
-- [x] MSAL authentication integration (with dev bypass)
-- [x] Basic HTML templates and CSS
-
-### Phase 2: Core Features (In Progress)
-
-- [x] Timesheet CRUD API endpoints
-- [x] Time entry management
-- [x] Draft/Submit workflow
-- [x] File upload for attachments
-- [ ] JavaScript frontend for timesheet form (needs completion)
-
-### Phase 3: Admin Features
-
-- [x] Admin dashboard API
-- [x] Approval workflow
-- [ ] Filtering and reporting UI
-- [x] Admin notes
-
-### Phase 4: Notifications & Polish
-
-- [ ] Twilio SMS integration
-- [x] SSE real-time updates (basic)
-- [ ] Weekly reminder job
-- [ ] Auto-populate feature
-- [ ] Tooltips and UX refinements
-
----
-
-## Running the Application
-
-### Docker (Recommended)
+# Implementation Notes (Northstar Timesheet)
+
+## Overview
+
+This repo is a Flask + PostgreSQL timesheet application with a vanilla JS/HTML/CSS frontend. It’s intended to run behind Nginx, with Gunicorn (gevent) serving the Flask app and Redis backing Server-Sent Events (SSE) pub/sub.
+
+Core features implemented:
+- User timesheet CRUD (draft -> submit workflow)
+- Admin review/approve workflow
+- Attachments upload/download for field-hour approvals
+- Notes on timesheets
+- Real-time updates via SSE (Redis pub/sub)
+
+## Repo Layout
+
+- `app/`: Flask application code
+  - `app/__init__.py`: `create_app()` factory, blueprint registration
+  - `app/config.py`: env-driven configuration
+  - `app/extensions.py`: SQLAlchemy + Migrate instances
+  - `app/models/`: SQLAlchemy models
+  - `app/routes/`: Flask blueprints (auth, timesheets, admin, events, main)
+  - `app/utils/`: auth/admin decorators
+- `templates/`: Jinja templates (`base.html`, `index.html`, `login.html`)
+- `static/`: frontend assets (JS/CSS/images)
+- `docker/`: container definitions (`Dockerfile`, `docker-compose.yml`, `nginx.conf`)
+- `uploads/`: attachment storage (mounted volume in Docker)
+
+## Runtime Architecture
+
+In Docker, the request flow is:
+
+1. `nginx` serves as reverse proxy and handles SSE-friendly proxy settings for `/api/events`.
+2. `web` runs `gunicorn` with `gevent` workers and serves both API and static/template routes.
+3. `db` is PostgreSQL (persistent volume).
+4. `redis` supports SSE pub/sub (persistent volume).
+
+Key config files:
+- `docker/docker-compose.yml`: service wiring and environment defaults
+- `docker/nginx.conf`: reverse proxy + `/api/` rate limiting + `/api/events` SSE settings
+- `docker/Dockerfile`: Python 3.11 image, installs `requirements.txt`, runs Gunicorn
+
+## Configuration
+
+Configuration is read from environment variables (also loaded from `.env` via `python-dotenv` in non-container runs).
+
+Important env vars (see `.env.example` and `app/config.py`):
+- `SECRET_KEY`
+- `DATABASE_URL`
+- `REDIS_URL`
+- Azure AD (MSAL): `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_REDIRECT_URI`
+- Twilio (optional): `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+- Uploads: `UPLOAD_FOLDER`, `MAX_CONTENT_LENGTH`
+
+## Backend (Flask)
+
+### App Factory
+
+`app:create_app()` (see `app/__init__.py`) sets:
+- Template/static paths to repo root `templates/` and `static/`
+- SQLAlchemy + Migrate initialization
+- Blueprint registration
+- `db.create_all()` on startup (helpful for quick-start; consider relying on migrations for production)
+
+### Blueprints and Routes
+
+- `main` (`app/routes/main.py`)
+  - `GET /`: serves the SPA-like `templates/index.html` (requires session)
+  - `GET /health`: simple health endpoint
+
+- `auth` (`app/routes/auth.py`)
+  - `GET /auth/login`: starts MSAL flow; in “dev mode” creates a local admin session
+  - `GET /auth/callback`: OAuth callback, creates/updates `User` records
+  - `POST /auth/logout`: clears session
+  - `GET /auth/me`: returns session user
+
+- `timesheets` (`app/routes/timesheets.py`) (user-scoped)
+  - `GET /api/timesheets`: list current user timesheets
+  - `POST /api/timesheets`: create a draft timesheet (optionally auto-populate)
+  - `GET/PUT/DELETE /api/timesheets/<id>`: view/update/delete draft
+  - `POST /api/timesheets/<id>/entries`: replace all entries for the draft
+  - `POST /api/timesheets/<id>/submit`: submit; may become `NEEDS_APPROVAL` if missing required attachment
+  - `POST /api/timesheets/<id>/attachments`: upload attachment (draft-only)
+  - `DELETE /api/timesheets/<id>/attachments/<attachment_id>`: delete attachment (draft-only)
+  - `POST /api/timesheets/<id>/notes`: add a note
+
+- `admin` (`app/routes/admin.py`) (admin-scoped)
+  - `GET /api/admin/timesheets`: list all non-draft timesheets
+  - `GET /api/admin/timesheets/<id>`: view timesheet details
+  - `POST /api/admin/timesheets/<id>/approve`: approve
+  - `POST /api/admin/timesheets/<id>/reject`: mark `NEEDS_APPROVAL`
+  - `POST /api/admin/timesheets/<id>/unapprove`: revert approved -> submitted
+  - `GET /api/admin/timesheets/<id>/attachments/<attachment_id>`: download attachment
+  - `POST /api/admin/timesheets/<id>/notes`: add an admin note
+
+- `events` (`app/routes/events.py`)
+  - `GET /api/events`: SSE stream, backed by Redis pub/sub
+
+### Data Model
+
+Main models are in `app/models/`:
+- `User`: employees synced from Microsoft identity
+- `Timesheet`: weekly record (week starts Sunday), status workflow
+- `TimesheetEntry`: (date, hour_type, hours)
+- `Attachment`: stored filename + original filename + MIME + size
+- `Note`: comments attached to a timesheet
+- `Notification`: records for (future) Twilio SMS sending
 
+## Frontend
+
+The UI is rendered from `templates/index.html` and then driven by vanilla JS:
+- `static/js/api.js`: fetch wrapper + API calls
+- `static/js/app.js`: view switching + wiring event handlers + file upload UX
+- `static/js/timesheet.js`: timesheet form/grid logic
+- `static/js/admin.js`: admin list/detail workflows
+- `static/js/sse.js`: subscribes to `/api/events` and refreshes UI on updates
+
+The server injects `window.currentUser` in `templates/index.html` so the frontend can enable admin-only behaviors.
+
+## Local Development
+
+### Docker (recommended)
+
+From repo root:
 ```bash
 cd docker
-docker compose up --build -d
+docker-compose up --build
 ```
 
-Access at: http://localhost
+Then browse `http://localhost`.
 
-### Development Mode
+### Local venv (API-only / custom setup)
 
-The app has a development bypass when Azure AD credentials are not configured. It creates a test user with admin access automatically.
+Requires local Postgres/Redis and env vars configured:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export FLASK_APP=app:create_app
+flask run
+```
 
----
+## Code Quality Checks
 
-## Open Questions
+This repo includes dev dependencies for Python formatting/linting.
 
-1. **File Storage**: Local vs. cloud - to be decided after initial prototype
-2. **Field Hours Document**: What specific document is uploaded? Client sign-off sheet?
-3. **Reporting**: Any export requirements (CSV, PDF reports)?
-4. **Historical Data**: Need to migrate existing PowerApps data?
-5. **Backup Strategy**: How frequently should database be backed up?
+Commands:
+```bash
+source .venv/bin/activate
+black app
+flake8 app
+python -m compileall app
+```
+
+Notes:
+- `pytest` is installed but there are currently no tests collected.
+- `.flake8` is configured with `max-line-length = 88` to match Black.
+

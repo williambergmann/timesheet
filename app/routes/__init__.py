@@ -11,9 +11,9 @@ from .admin import admin_bp
 from .events import events_bp
 
 __all__ = [
-    'main_bp',
-    'auth_bp',
-    'timesheets_bp',
-    'admin_bp',
-    'events_bp',
+    "main_bp",
+    "auth_bp",
+    "timesheets_bp",
+    "admin_bp",
+    "events_bp",
 ]

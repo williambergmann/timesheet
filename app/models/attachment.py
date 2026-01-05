@@ -12,10 +12,10 @@ from ..extensions import db
 class Attachment(db.Model):
     """
     File attachment for a timesheet.
-    
+
     Stores metadata for uploaded files (images/PDFs).
     The actual files are stored in the filesystem.
-    
+
     Attributes:
         id: Primary key (UUID)
         timesheet_id: Foreign key to Timesheet
@@ -25,37 +25,31 @@ class Attachment(db.Model):
         file_size: Size in bytes
         uploaded_at: Upload timestamp
     """
-    __tablename__ = 'attachments'
-    
-    id = db.Column(
-        db.String(36),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+
+    __tablename__ = "attachments"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     timesheet_id = db.Column(
-        db.String(36),
-        db.ForeignKey('timesheets.id'),
-        nullable=False,
-        index=True
+        db.String(36), db.ForeignKey("timesheets.id"), nullable=False, index=True
     )
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     mime_type = db.Column(db.String(100), nullable=False)
     file_size = db.Column(db.Integer, nullable=False)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    
+
     # Relationships
-    timesheet = db.relationship('Timesheet', back_populates='attachments')
-    
+    timesheet = db.relationship("Timesheet", back_populates="attachments")
+
     def __repr__(self):
-        return f'<Attachment {self.original_filename}>'
-    
+        return f"<Attachment {self.original_filename}>"
+
     def to_dict(self):
         """Serialize attachment to dictionary."""
         return {
-            'id': self.id,
-            'filename': self.original_filename,
-            'mime_type': self.mime_type,
-            'file_size': self.file_size,
-            'uploaded_at': self.uploaded_at.isoformat(),
+            "id": self.id,
+            "filename": self.original_filename,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+            "uploaded_at": self.uploaded_at.isoformat(),
         }

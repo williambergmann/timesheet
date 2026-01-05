@@ -12,52 +12,55 @@ from ..extensions import db
 
 class TimesheetStatus:
     """Timesheet status constants."""
-    NEW = 'NEW'
-    SUBMITTED = 'SUBMITTED'
-    APPROVED = 'APPROVED'
-    NEEDS_APPROVAL = 'NEEDS_APPROVAL'
-    
+
+    NEW = "NEW"
+    SUBMITTED = "SUBMITTED"
+    APPROVED = "APPROVED"
+    NEEDS_APPROVAL = "NEEDS_APPROVAL"
+
     ALL = [NEW, SUBMITTED, APPROVED, NEEDS_APPROVAL]
 
 
 class HourType:
     """Hour type constants with their billing properties."""
-    FIELD = 'Field'
-    INTERNAL = 'Internal'
-    TRAINING = 'Training'
-    PTO = 'PTO'
-    UNPAID = 'Unpaid'
-    HOLIDAY = 'Holiday'
-    
+
+    FIELD = "Field"
+    INTERNAL = "Internal"
+    TRAINING = "Training"
+    PTO = "PTO"
+    UNPAID = "Unpaid"
+    HOLIDAY = "Holiday"
+
     ALL = [FIELD, INTERNAL, TRAINING, PTO, UNPAID, HOLIDAY]
-    
+
     # Billing configuration
     CONFIG = {
-        FIELD: {'payable': True, 'billable': True, 'requires_attachment': True},
-        INTERNAL: {'payable': True, 'billable': False, 'requires_attachment': False},
-        TRAINING: {'payable': False, 'billable': False, 'requires_attachment': False},
-        PTO: {'payable': True, 'billable': False, 'requires_attachment': False},
-        UNPAID: {'payable': False, 'billable': False, 'requires_attachment': False},
-        HOLIDAY: {'payable': True, 'billable': False, 'requires_attachment': False},
+        FIELD: {"payable": True, "billable": True, "requires_attachment": True},
+        INTERNAL: {"payable": True, "billable": False, "requires_attachment": False},
+        TRAINING: {"payable": False, "billable": False, "requires_attachment": False},
+        PTO: {"payable": True, "billable": False, "requires_attachment": False},
+        UNPAID: {"payable": False, "billable": False, "requires_attachment": False},
+        HOLIDAY: {"payable": True, "billable": False, "requires_attachment": False},
     }
 
 
 class ReimbursementType:
     """Reimbursement type constants."""
-    CAR = 'Car'
-    FLIGHT = 'Flight'
-    FOOD = 'Food'
-    OTHER = 'Other'
-    
+
+    CAR = "Car"
+    FLIGHT = "Flight"
+    FOOD = "Food"
+    OTHER = "Other"
+
     ALL = [CAR, FLIGHT, FOOD, OTHER]
 
 
 class Timesheet(db.Model):
     """
     Timesheet model.
-    
+
     Represents a weekly timesheet for a user. Week always starts on Sunday.
-    
+
     Attributes:
         id: Primary key (UUID)
         user_id: Foreign key to User
@@ -73,27 +76,18 @@ class Timesheet(db.Model):
         approved_at: When timesheet was approved
         approved_by: User ID of approving admin
     """
-    __tablename__ = 'timesheets'
-    
-    id = db.Column(
-        db.String(36),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+
+    __tablename__ = "timesheets"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(
-        db.String(36),
-        db.ForeignKey('users.id'),
-        nullable=False,
-        index=True
+        db.String(36), db.ForeignKey("users.id"), nullable=False, index=True
     )
     week_start = db.Column(db.Date, nullable=False, index=True)
     status = db.Column(
-        db.String(20),
-        default=TimesheetStatus.NEW,
-        nullable=False,
-        index=True
+        db.String(20), default=TimesheetStatus.NEW, nullable=False, index=True
     )
-    
+
     # Travel and expenses
     traveled = db.Column(db.Boolean, default=False, nullable=False)
     has_expenses = db.Column(db.Boolean, default=False, nullable=False)
@@ -101,150 +95,128 @@ class Timesheet(db.Model):
     reimbursement_type = db.Column(db.String(20), nullable=True)
     reimbursement_amount = db.Column(db.Numeric(10, 2), nullable=True)
     stipend_date = db.Column(db.Date, nullable=True)
-    
+
     # Timestamps
     submitted_at = db.Column(db.DateTime, nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
-    approved_by = db.Column(
-        db.String(36),
-        db.ForeignKey('users.id'),
-        nullable=True
-    )
+    approved_by = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-        nullable=False
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
-    
+
     # Relationships
-    user = db.relationship(
-        'User',
-        back_populates='timesheets',
-        foreign_keys=[user_id]
-    )
-    approver = db.relationship('User', foreign_keys=[approved_by])
+    user = db.relationship("User", back_populates="timesheets", foreign_keys=[user_id])
+    approver = db.relationship("User", foreign_keys=[approved_by])
     entries = db.relationship(
-        'TimesheetEntry',
-        back_populates='timesheet',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
+        "TimesheetEntry",
+        back_populates="timesheet",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
     attachments = db.relationship(
-        'Attachment',
-        back_populates='timesheet',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
+        "Attachment",
+        back_populates="timesheet",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
     notes = db.relationship(
-        'Note',
-        back_populates='timesheet',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
+        "Note", back_populates="timesheet", lazy="dynamic", cascade="all, delete-orphan"
     )
-    
+
     # Constraints
     __table_args__ = (
-        db.UniqueConstraint('user_id', 'week_start', name='uq_user_week'),
+        db.UniqueConstraint("user_id", "week_start", name="uq_user_week"),
     )
-    
+
     def __repr__(self):
-        return f'<Timesheet {self.id} - {self.week_start}>'
-    
+        return f"<Timesheet {self.id} - {self.week_start}>"
+
     def calculate_totals(self):
         """
         Calculate payable, billable, and unpaid hours.
-        
+
         Returns:
             dict: Totals for each category
         """
         totals = {
-            'payable': Decimal('0'),
-            'billable': Decimal('0'),
-            'unpaid': Decimal('0'),
-            'total': Decimal('0'),
+            "payable": Decimal("0"),
+            "billable": Decimal("0"),
+            "unpaid": Decimal("0"),
+            "total": Decimal("0"),
         }
-        
+
         for entry in self.entries:
             config = HourType.CONFIG.get(entry.hour_type, {})
             hours = Decimal(str(entry.hours))
-            
-            totals['total'] += hours
-            
-            if config.get('payable'):
-                totals['payable'] += hours
+
+            totals["total"] += hours
+
+            if config.get("payable"):
+                totals["payable"] += hours
             else:
-                totals['unpaid'] += hours
-                
-            if config.get('billable'):
-                totals['billable'] += hours
-        
+                totals["unpaid"] += hours
+
+            if config.get("billable"):
+                totals["billable"] += hours
+
         return totals
-    
+
     def requires_attachment(self):
         """
         Check if timesheet has field hours but no attachment.
-        
+
         Returns:
             bool: True if attachment is required but missing
         """
-        has_field_hours = any(
-            e.hour_type == HourType.FIELD for e in self.entries
-        )
+        has_field_hours = any(e.hour_type == HourType.FIELD for e in self.entries)
         has_attachment = self.attachments.count() > 0
-        
+
         return has_field_hours and not has_attachment
-    
+
     def to_dict(self, include_entries=True):
         """Serialize timesheet to dictionary."""
         data = {
-            'id': self.id,
-            'user_id': self.user_id,
-            'week_start': self.week_start.isoformat(),
-            'status': self.status,
-            'traveled': self.traveled,
-            'has_expenses': self.has_expenses,
-            'reimbursement_needed': self.reimbursement_needed,
-            'reimbursement_type': self.reimbursement_type,
-            'reimbursement_amount': (
-                float(self.reimbursement_amount) 
-                if self.reimbursement_amount else None
+            "id": self.id,
+            "user_id": self.user_id,
+            "week_start": self.week_start.isoformat(),
+            "status": self.status,
+            "traveled": self.traveled,
+            "has_expenses": self.has_expenses,
+            "reimbursement_needed": self.reimbursement_needed,
+            "reimbursement_type": self.reimbursement_type,
+            "reimbursement_amount": (
+                float(self.reimbursement_amount) if self.reimbursement_amount else None
             ),
-            'stipend_date': (
-                self.stipend_date.isoformat() 
-                if self.stipend_date else None
+            "stipend_date": (
+                self.stipend_date.isoformat() if self.stipend_date else None
             ),
-            'submitted_at': (
-                self.submitted_at.isoformat() 
-                if self.submitted_at else None
+            "submitted_at": (
+                self.submitted_at.isoformat() if self.submitted_at else None
             ),
-            'approved_at': (
-                self.approved_at.isoformat() 
-                if self.approved_at else None
-            ),
-            'created_at': self.created_at.isoformat(),
-            'totals': {
-                'payable': float(self.calculate_totals()['payable']),
-                'billable': float(self.calculate_totals()['billable']),
-                'unpaid': float(self.calculate_totals()['unpaid']),
-                'total': float(self.calculate_totals()['total']),
+            "approved_at": (self.approved_at.isoformat() if self.approved_at else None),
+            "created_at": self.created_at.isoformat(),
+            "totals": {
+                "payable": float(self.calculate_totals()["payable"]),
+                "billable": float(self.calculate_totals()["billable"]),
+                "unpaid": float(self.calculate_totals()["unpaid"]),
+                "total": float(self.calculate_totals()["total"]),
             },
         }
-        
+
         if include_entries:
-            data['entries'] = [e.to_dict() for e in self.entries]
-            data['attachments'] = [a.to_dict() for a in self.attachments]
-        
+            data["entries"] = [e.to_dict() for e in self.entries]
+            data["attachments"] = [a.to_dict() for a in self.attachments]
+
         return data
 
 
 class TimesheetEntry(db.Model):
     """
     Time entry within a timesheet.
-    
+
     Each entry represents hours worked on a specific day with a specific type.
-    
+
     Attributes:
         id: Primary key (UUID)
         timesheet_id: Foreign key to Timesheet
@@ -252,35 +224,29 @@ class TimesheetEntry(db.Model):
         hour_type: Type of hours (Field, Internal, etc.)
         hours: Number of hours
     """
-    __tablename__ = 'timesheet_entries'
-    
-    id = db.Column(
-        db.String(36),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+
+    __tablename__ = "timesheet_entries"
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     timesheet_id = db.Column(
-        db.String(36),
-        db.ForeignKey('timesheets.id'),
-        nullable=False,
-        index=True
+        db.String(36), db.ForeignKey("timesheets.id"), nullable=False, index=True
     )
     entry_date = db.Column(db.Date, nullable=False)
     hour_type = db.Column(db.String(20), nullable=False)
     hours = db.Column(db.Numeric(4, 2), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    
+
     # Relationships
-    timesheet = db.relationship('Timesheet', back_populates='entries')
-    
+    timesheet = db.relationship("Timesheet", back_populates="entries")
+
     def __repr__(self):
-        return f'<TimesheetEntry {self.entry_date} - {self.hour_type}: {self.hours}h>'
-    
+        return f"<TimesheetEntry {self.entry_date} - {self.hour_type}: {self.hours}h>"
+
     def to_dict(self):
         """Serialize entry to dictionary."""
         return {
-            'id': self.id,
-            'entry_date': self.entry_date.isoformat(),
-            'hour_type': self.hour_type,
-            'hours': float(self.hours),
+            "id": self.id,
+            "entry_date": self.entry_date.isoformat(),
+            "hour_type": self.hour_type,
+            "hours": float(self.hours),
         }
