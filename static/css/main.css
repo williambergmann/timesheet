@@ -13,7 +13,7 @@
   --color-primary: #006400;
   --color-primary-dark: #004d00;
   --color-primary-light: #228b22;
-  
+
   /* Accent - Olive green for icons/highlights */
   --color-accent: #7bb033;
   --color-accent-dark: #5a8a1a;
@@ -178,6 +178,17 @@ a:hover {
   font-size: var(--font-size-xl);
   font-weight: 700;
   margin: 0;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
 }
 
 .nav {
@@ -422,7 +433,7 @@ a:hover {
 
 .login-divider::before,
 .login-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-gray-200);
@@ -584,4 +595,3 @@ a:hover {
     width: 50px;
   }
 }
-

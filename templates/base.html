@@ -17,7 +17,10 @@
   <body>
     <header class="header">
       <div class="header-content">
-        <h1 class="logo">Northstar Time Timesheet</h1>
+        <div class="logo-container">
+          <img src="{{ url_for('static', filename='img/logo-inverted.png') }}" alt="Northstar Logo" class="header-logo" />
+          <h1 class="logo">Northstar Time Timesheet</h1>
+        </div>
         {% if user %}
         <nav class="nav">
           <span class="user-name">{{ user.display_name }}</span>
@@ -46,7 +49,7 @@
 
     <!-- Northstar Logo - Fixed bottom right -->
     <div class="brand-logo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Northstar" />
+      <img src="{{ url_for('static', filename='img/logo-inverted.png') }}" alt="Northstar" />
     </div>
 
     {% block extra_js %}{% endblock %}
