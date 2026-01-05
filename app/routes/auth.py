@@ -69,7 +69,7 @@ def login():
 
         session["user"] = test_user.to_dict()
         current_app.logger.warning("DEV MODE: Bypassing Azure AD authentication")
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.dashboard"))
 
     # Production: redirect to Azure AD
     auth_url = _get_auth_url()
@@ -142,7 +142,7 @@ def callback():
     session["user"] = user.to_dict()
     session["access_token"] = result.get("access_token")
 
-    return redirect(url_for("main.index"))
+    return redirect(url_for("main.dashboard"))
 
 
 @auth_bp.route("/logout", methods=["POST"])
@@ -153,7 +153,65 @@ def logout():
     Clears session and redirects to login page.
     """
     session.clear()
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("main.login_page"))
+
+
+@auth_bp.route("/dev-login", methods=["POST"])
+def dev_login():
+    """
+    Development login with username/password.
+    
+    Test accounts:
+    - user/user: Regular user
+    - admin/password: Admin user
+    """
+    from ..models import User
+    from ..extensions import db
+    from flask import render_template
+    
+    username = request.form.get("username", "").strip().lower()
+    password = request.form.get("password", "")
+    
+    # Test account credentials
+    TEST_ACCOUNTS = {
+        "user": {"password": "user", "is_admin": False, "display_name": "Test User"},
+        "admin": {"password": "password", "is_admin": True, "display_name": "Admin User"},
+    }
+    
+    # Validate credentials
+    if username not in TEST_ACCOUNTS:
+        return render_template("login.html", error="Invalid username or password")
+    
+    if TEST_ACCOUNTS[username]["password"] != password:
+        return render_template("login.html", error="Invalid username or password")
+    
+    account = TEST_ACCOUNTS[username]
+    
+    # Create or get user in database
+    email = f"{username}@localhost"
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        user = User(
+            azure_id=f"dev-{username}-001",
+            email=email,
+            display_name=account["display_name"],
+            is_admin=account["is_admin"],
+        )
+        db.session.add(user)
+        db.session.commit()
+        current_app.logger.info(f"Created dev user: {email}")
+    else:
+        # Update admin status if changed
+        user.is_admin = account["is_admin"]
+        user.display_name = account["display_name"]
+        db.session.commit()
+    
+    # Store user in session
+    session["user"] = user.to_dict()
+    current_app.logger.info(f"DEV LOGIN: {username} logged in (admin={account['is_admin']})")
+    
+    return redirect(url_for("main.dashboard"))
 
 
 @auth_bp.route("/me")
@@ -168,3 +226,4 @@ def me():
         return {"error": "Not authenticated"}, 401
 
     return session["user"]
+

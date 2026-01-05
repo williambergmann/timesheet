@@ -13,11 +13,15 @@ let adminUsers = [];
 
 async function loadAdminTimesheets() {
     const container = document.getElementById('admin-timesheets-list');
+    if (!container) return; // Guard against missing element
+    
     container.innerHTML = '<div class="loading">Loading timesheets...</div>';
     
     try {
-        const status = document.getElementById('admin-filter-status').value;
-        const userId = document.getElementById('admin-filter-user').value;
+        const statusEl = document.getElementById('admin-filter-status');
+        const userEl = document.getElementById('admin-filter-user');
+        const status = statusEl ? statusEl.value : '';
+        const userId = userEl ? userEl.value : '';
         
         const params = {};
         if (status) params.status = status;

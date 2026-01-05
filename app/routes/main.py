@@ -12,13 +12,48 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 def index():
     """
-    Main application page.
-
-    Renders the timesheet application. Redirects to login if not authenticated.
+    Root route - redirects to dashboard or login.
     """
     if "user" not in session:
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("main.login_page"))
+    
+    return redirect(url_for("main.dashboard"))
 
+
+@main_bp.route("/login")
+def login_page():
+    """
+    Login page with username/password form.
+    """
+    if "user" in session:
+        return redirect(url_for("main.dashboard"))
+    
+    return render_template("login.html")
+
+
+@main_bp.route("/dashboard")
+def dashboard():
+    """
+    Dashboard landing page after login.
+    
+    Shows welcome message and navigation cards.
+    """
+    if "user" not in session:
+        return redirect(url_for("main.login_page"))
+    
+    return render_template("dashboard.html", user=session["user"])
+
+
+@main_bp.route("/app")
+def app():
+    """
+    Main timesheet application page.
+    
+    Renders the full timesheet application.
+    """
+    if "user" not in session:
+        return redirect(url_for("main.login_page"))
+    
     return render_template("index.html", user=session["user"])
 
 

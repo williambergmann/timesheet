@@ -54,10 +54,13 @@ function showEditTimesheetView(timesheet) {
 
 async function loadTimesheets() {
     const container = document.getElementById('timesheets-list');
+    if (!container) return; // Guard against missing element
+    
     container.innerHTML = '<div class="loading">Loading timesheets...</div>';
     
     try {
-        const status = document.getElementById('filter-status').value;
+        const filterEl = document.getElementById('filter-status');
+        const status = filterEl ? filterEl.value : '';
         const params = status ? { status } : {};
         const data = await API.getTimesheets(params);
         

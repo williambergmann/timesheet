@@ -99,4 +99,4 @@ class TestLogout:
         """Test that logout redirects to login page."""
         response = auth_client.post("/auth/logout", follow_redirects=False)
         assert response.status_code == 302
-        assert "/auth/login" in response.location
+        assert "/login" in response.location
