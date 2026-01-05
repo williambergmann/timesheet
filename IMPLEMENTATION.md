@@ -19,6 +19,22 @@ _New Flask implementation with forest green theme and premium UI_
 
 ---
 
+> **⚠️ IMPORTANT: File Storage Decision Pending**
+>
+> Attachment storage (images/PDFs for field hours) needs to be decided. Options:
+>
+> - **Local filesystem** (Docker volume) - simpler, but requires backup strategy
+> - **Azure Blob Storage** - scales better, integrates with O365
+>
+> For initial implementation, we're using local filesystem with a clear abstraction layer to swap later.
+
+> **⚠️ IMPORTANT: Field Hours Approval Document**
+>
+> The purpose/format of the uploaded document for field hours needs clarification.
+> Currently implementing as a generic file upload (images/PDFs accepted).
+
+---
+
 ## System Architecture
 
 ```mermaid
@@ -334,6 +350,255 @@ stateDiagram-v2
 | PTO       | ✅      | ❌       | ❌                  |
 | Unpaid    | ❌      | ❌       | ❌                  |
 | Holiday   | ✅      | ❌       | ❌                  |
+
+### Hour Type Configuration
+
+```python
+HOUR_TYPE_CONFIG = {
+    'Field': {
+        'payable': True,
+        'billable': True,
+        'requires_attachment': True,  # Approval document required
+    },
+    'Internal': {
+        'payable': True,
+        'billable': False,
+        'requires_attachment': False,
+    },
+    'Training': {
+        'payable': False,
+        'billable': False,
+        'requires_attachment': False,
+    },
+    'PTO': {
+        'payable': True,
+        'billable': False,
+        'requires_attachment': False,
+    },
+    'Unpaid': {
+        'payable': False,
+        'billable': False,
+        'requires_attachment': False,
+    },
+    'Holiday': {
+        'payable': True,
+        'billable': False,
+        'requires_attachment': False,
+    },
+}
+```
+
+### Calculation Functions
+
+```python
+def calculate_totals(timesheet):
+    """Calculate payable, billable, unpaid hours"""
+    totals = {'payable': 0, 'billable': 0, 'unpaid': 0}
+
+    for entry in timesheet.entries:
+        config = HOUR_TYPE_CONFIG[entry.hour_type]
+        if config['payable']:
+            totals['payable'] += entry.hours
+        if config['billable']:
+            totals['billable'] += entry.hours
+        if not config['payable']:
+            totals['unpaid'] += entry.hours
+
+    return totals
+
+def check_requires_attachment(timesheet):
+    """Check if timesheet has field hours but no attachment"""
+    has_field_hours = any(
+        e.hour_type == 'Field' for e in timesheet.entries
+    )
+    has_attachment = len(timesheet.attachments) > 0
+
+    return has_field_hours and not has_attachment
+```
+
+---
+
+## Notification System
+
+### Twilio Integration
+
+```python
+class NotificationService:
+    def __init__(self, twilio_client, db):
+        self.twilio = twilio_client
+        self.db = db
+
+    def notify_needs_attachment(self, timesheet):
+        """Called when admin marks timesheet as NEEDS_APPROVAL"""
+        user = timesheet.user
+        if user.sms_opt_in and user.phone:
+            message = f"Your timesheet for week of {timesheet.week_start} requires an attachment. Please upload and resubmit."
+            self._send_sms(user.phone, message)
+            self._log_notification(user, timesheet, "NEEDS_ATTACHMENT", message)
+
+    def notify_approved(self, timesheet):
+        """Called when admin approves timesheet"""
+        user = timesheet.user
+        if user.sms_opt_in and user.phone:
+            message = f"Your timesheet for week of {timesheet.week_start} has been approved!"
+            self._send_sms(user.phone, message)
+            self._log_notification(user, timesheet, "APPROVED", message)
+
+    def send_weekly_reminders(self):
+        """Scheduled job - Friday afternoon"""
+        # Find users without submitted timesheet for current week
+        # Send reminder SMS to each
+        pass
+```
+
+See [TWILIO.md](TWILIO.md) for complete setup guide.
+
+---
+
+## Server-Sent Events (SSE)
+
+Real-time updates are delivered via SSE with Redis pub/sub:
+
+```python
+@events_bp.route('/api/events')
+@login_required
+def event_stream():
+    def generate():
+        pubsub = redis.pubsub()
+        pubsub.subscribe(f'user:{current_user.id}')
+
+        for message in pubsub.listen():
+            if message['type'] == 'message':
+                yield f"data: {message['data']}\n\n"
+
+    return Response(
+        generate(),
+        mimetype='text/event-stream',
+        headers={'Cache-Control': 'no-cache'}
+    )
+```
+
+### Event Types
+
+| Event                 | Recipient | Trigger                    |
+| --------------------- | --------- | -------------------------- |
+| `timesheet.approved`  | User      | Admin approves timesheet   |
+| `timesheet.rejected`  | User      | Admin marks needs approval |
+| `timesheet.submitted` | Admin(s)  | User submits timesheet     |
+
+---
+
+## Auto-Populate Feature
+
+Create draft timesheets pre-filled with standard 8-hour field days:
+
+```python
+def create_auto_populated_draft(user, week_start):
+    """Create draft with 8 hours Field per weekday"""
+    timesheet = Timesheet(
+        user_id=user.id,
+        week_start=week_start,
+        status='NEW'
+    )
+
+    # Add 8 hours Field for Mon-Fri
+    for day_offset in range(1, 6):  # Mon=1 through Fri=5
+        entry_date = week_start + timedelta(days=day_offset)
+        entry = TimesheetEntry(
+            timesheet=timesheet,
+            entry_date=entry_date,
+            hour_type='Field',
+            hours=8.0
+        )
+        timesheet.entries.append(entry)
+
+    return timesheet
+```
+
+---
+
+## Development Phases
+
+### Phase 1: Foundation (Week 1-2)
+
+- [x] Docker setup with Nginx + Gunicorn
+- [x] Flask app factory with blueprints
+- [x] PostgreSQL models with SQLAlchemy
+- [x] MSAL authentication integration
+- [x] Basic HTML templates and CSS
+- [ ] Alembic migrations
+
+### Phase 2: Core Features (Week 3-4)
+
+- [x] Timesheet CRUD API endpoints
+- [x] Time entry management
+- [x] Draft/Submit workflow
+- [x] File upload for attachments
+- [x] JavaScript frontend for timesheet form
+
+### Phase 3: Admin Features (Week 5)
+
+- [x] Admin dashboard
+- [x] Approval workflow
+- [x] Filtering and reporting
+- [x] Admin notes
+
+### Phase 4: Notifications & Polish (Week 6)
+
+- [ ] Twilio SMS integration
+- [x] SSE real-time updates
+- [ ] Weekly reminder job
+- [ ] Auto-populate feature
+- [x] Tooltips and UX refinements
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=app --cov-report=html
+```
+
+**Test categories:**
+
+- Unit tests for business logic (hour calculations, status transitions)
+- API integration tests (endpoint responses, auth requirements)
+- Database tests (model relationships, constraints)
+
+### Manual Verification
+
+#### Authentication Flow
+
+- [ ] Login with Microsoft 365 account
+- [ ] Verify session persists across page refreshes
+- [ ] Logout and confirm session cleared
+
+#### Timesheet Workflow
+
+- [ ] Create new draft timesheet
+- [ ] Add entries for each hour type
+- [ ] Save draft, refresh, verify data persists
+- [ ] Upload attachment for field hours
+- [ ] Submit timesheet, verify status changes
+
+#### Admin Workflow
+
+- [ ] Login as admin
+- [ ] View submitted timesheets (drafts should not appear)
+- [ ] Approve a timesheet
+- [ ] Mark one as "Needs Approval"
+- [ ] Verify SMS sent (if Twilio configured)
+
+#### Browser Compatibility
+
+- [ ] Test in Chrome, Firefox, Safari
+- [ ] Test responsive design on mobile viewport
 
 ---
 
