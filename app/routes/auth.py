@@ -13,14 +13,15 @@ auth_bp = Blueprint("auth", __name__)
 def _is_dev_mode():
     """Check if we're in development mode without valid Azure credentials."""
     client_id = current_app.config.get("AZURE_CLIENT_ID")
-    tenant_id = current_app.config.get("AZURE_TENANT_ID")
+    client_secret = current_app.config.get("AZURE_CLIENT_SECRET")
 
     # Check if credentials are placeholder values or missing
+    # Note: tenant_id can be 'common' for multi-tenant apps, so we don't check it
     return (
         not client_id
-        or not tenant_id
+        or not client_secret
         or "your-azure" in str(client_id).lower()
-        or "your-azure" in str(tenant_id).lower()
+        or "your-azure" in str(client_secret).lower()
     )
 
 

@@ -25,12 +25,14 @@ class Config:
     # Azure AD / MSAL
     AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
     AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
-    AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
+    # Use 'common' for multi-tenant (any Microsoft account), or specific tenant ID
+    AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID", "common")
     AZURE_REDIRECT_URI = os.environ.get(
         "AZURE_REDIRECT_URI", "http://localhost:5000/auth/callback"
     )
     AZURE_AUTHORITY = f"https://login.microsoftonline.com/{AZURE_TENANT_ID}"
-    AZURE_SCOPES = ["User.Read"]
+    # OpenID Connect scopes for proper authentication
+    AZURE_SCOPES = ["openid", "profile", "email", "User.Read"]
 
     # Twilio
     TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
