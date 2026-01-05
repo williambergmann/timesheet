@@ -311,11 +311,42 @@ sequenceDiagram
 
 ---
 
-## 🔒 OAuth Reference: spicyGuac Implementation
+## 🔒 OAuth Implementation: Microsoft 365 Authentication
 
-> **Status: AWAITING FURTHER INSTRUCTION**
+> **Status: ✅ IMPLEMENTED**
 >
-> These notes document how Microsoft 365 authorization is implemented in the spicyGuac application for reference when completing the timesheet 365 auth integration.
+> Microsoft 365 authentication is now fully working with MSAL and multi-tenant support.
+
+### Current Implementation
+
+The timesheet app uses **MSAL** (Microsoft Authentication Library) for OAuth2/OpenID Connect:
+
+| Setting          | Value                                           |
+| ---------------- | ----------------------------------------------- |
+| **Library**      | `msal.ConfidentialClientApplication`            |
+| **Tenant**       | `common` (multi-tenant - any Microsoft account) |
+| **Scopes**       | `openid`, `profile`, `email`, `User.Read`       |
+| **Redirect URI** | `http://localhost/auth/callback`                |
+
+### Configuration
+
+Set these environment variables in `.env`:
+
+```bash
+AZURE_CLIENT_ID=your-app-client-id
+AZURE_CLIENT_SECRET=your-client-secret-value
+AZURE_TENANT_ID=common                        # Use 'common' for any MS account
+AZURE_REDIRECT_URI=http://localhost/auth/callback
+```
+
+**To restrict to organization users only**: Change `AZURE_TENANT_ID` to your specific tenant ID.
+
+### Dev Mode
+
+When `AZURE_CLIENT_ID` or `AZURE_CLIENT_SECRET` are missing or contain placeholder values, the app falls back to development mode with test accounts:
+
+- `user` / `user` → Regular user
+- `admin` / `password` → Admin user
 
 ### Key Differences: spicyGuac vs Timesheet
 
@@ -324,120 +355,13 @@ sequenceDiagram
 | **Library**            | **Authlib** (`authlib.integrations.flask_client`)           | **MSAL** (`msal.ConfidentialClientApplication`)              |
 | **OAuth Registration** | Uses `OAuth.register()` with named providers                | Manual MSAL app creation per-request                         |
 | **Token Parsing**      | `oauth.azure.parse_id_token(token, nonce=nonce)`            | `result.get("id_token_claims")`                              |
-| **Nonce Handling**     | Explicit nonce generation & session storage                 | No nonce handling                                            |
+| **Nonce Handling**     | Explicit nonce generation & session storage                 | No nonce handling (future enhancement)                       |
 | **Redirect Flow**      | `oauth.azure.authorize_redirect(redirect_uri, nonce=nonce)` | `msal_app.get_authorization_request_url()` → manual redirect |
 
-### spicyGuac's Approach (Authlib)
+### Future Enhancements
 
-#### 1. OAuth Setup (one-time, at app initialization)
-
-```python
-from authlib.integrations.flask_client import OAuth
-
-oauth = OAuth(app)
-oauth.register(
-    name='azure',
-    client_id=OAUTH2_CLIENT_ID,
-    client_secret=OAUTH2_CLIENT_SECRET,
-    authorize_url=f'https://login.microsoftonline.com/{OAUTH2_TENANT_ID}/oauth2/v2.0/authorize',
-    access_token_url=f'https://login.microsoftonline.com/{OAUTH2_TENANT_ID}/oauth2/v2.0/token',
-    jwks_uri=f'https://login.microsoftonline.com/{OAUTH2_TENANT_ID}/discovery/v2.0/keys',
-    api_base_url='https://graph.microsoft.com/v1.0',
-    client_kwargs={
-        'scope': 'openid email profile https://graph.microsoft.com/User.Read https://graph.microsoft.com/GroupMember.Read.All'
-    }
-)
-```
-
-#### 2. Login Route
-
-```python
-@app.route('/login')
-def login():
-    if 'user' in session:
-        return redirect(url_for('index'))
-
-    redirect_uri = url_for('auth_callback', _external=True)
-
-    # Generate and store nonce for OpenID Connect security
-    import secrets
-    nonce = secrets.token_urlsafe(32)
-    session['oauth_nonce'] = nonce
-
-    return oauth.azure.authorize_redirect(redirect_uri, nonce=nonce)
-```
-
-#### 3. Callback Route
-
-```python
-@app.route('/auth/callback')
-def auth_callback():
-    try:
-        # Get the stored nonce
-        nonce = session.pop('oauth_nonce', None)
-        if not nonce:
-            flash('Authentication session expired.', 'error')
-            return redirect(url_for('login'))
-
-        # Exchange code for token automatically
-        token = oauth.azure.authorize_access_token()
-
-        # Parse ID token with nonce verification
-        user_info = oauth.azure.parse_id_token(token, nonce=nonce)
-
-        # Extract user email
-        user_email = user_info.get('email') or user_info.get('preferred_username')
-
-        # Store in session
-        session['user'] = {
-            'email': user_email,
-            'name': user_info.get('name', user_email),
-            'groups': user_info.get('groups', [])
-        }
-
-        return redirect(url_for('index'))
-
-    except Exception as e:
-        flash(f'Authentication failed: {str(e)}', 'error')
-        return redirect(url_for('login'))
-```
-
-### Why spicyGuac Uses Authlib
-
-1. **Simpler API** - Less boilerplate code
-2. **Built-in nonce handling** - More secure OpenID Connect flow
-3. **Automatic token refresh** - Handles token lifecycle
-4. **Provider abstraction** - Could easily add more OAuth providers
-
-### Current Timesheet Approach (MSAL)
-
-The timesheet app uses Microsoft's official MSAL library, which is:
-
-- **More Microsoft-specific** - Better integration with Microsoft Graph API
-- **More verbose** - You handle more of the OAuth flow manually
-- **Currently missing nonce verification** - May cause security issues
-
-### Required Configuration
-
-Both approaches need these Azure AD values:
-
-```bash
-AZURE_CLIENT_ID=your-actual-client-id
-AZURE_CLIENT_SECRET=your-actual-secret
-AZURE_TENANT_ID=94b9b97a-c107-40a4-ab6e-1323c7ba2159
-AZURE_REDIRECT_URI=http://127.0.0.1:5001/auth/callback
-```
-
-### Source Files (spicyGuac)
-
-- `/Users/lappy/Developer/northstar/spicyGuac/NorthstarLabs/admin-gui/admin_gui.py` (lines 64-93, 252-336)
-- `/Users/lappy/Developer/northstar/spicyGuac/NorthstarLabs/admin-gui/app/auth/routes.py` (modular version)
-- `/Users/lappy/Developer/northstar/spicyGuac/AZURE_AD_SETUP.md` (setup guide)
-
-### Decision Pending
-
-**Option A**: Continue with MSAL, add nonce verification  
-**Option B**: Switch to Authlib like spicyGuac for consistency across projects
+- Add nonce verification for additional security
+- Consider switching to Authlib for consistency with spicyGuac
 
 ---
 

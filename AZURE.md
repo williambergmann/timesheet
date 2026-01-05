@@ -17,12 +17,14 @@ This guide walks through setting up Microsoft 365 / Azure AD authentication for 
 
 ### Registration Settings
 
-| Field                       | Value                                                            |
-| --------------------------- | ---------------------------------------------------------------- |
-| **Name**                    | `Northstar Timesheet`                                            |
-| **Supported account types** | `Accounts in this organizational directory only` (single tenant) |
-| **Redirect URI - Platform** | `Web`                                                            |
-| **Redirect URI - URL**      | See table below                                                  |
+| Field                       | Value                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| **Name**                    | `Northstar Timesheet`                                                                     |
+| **Supported account types** | `Accounts in any organizational directory and personal Microsoft accounts` (multi-tenant) |
+| **Redirect URI - Platform** | `Web`                                                                                     |
+| **Redirect URI - URL**      | See table below                                                                           |
+
+> **Note**: For organization-only access, choose `Accounts in this organizational directory only` instead.
 
 ### Redirect URIs by Environment
 
