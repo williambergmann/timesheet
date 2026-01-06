@@ -639,61 +639,92 @@ def create_auto_populated_draft(user, week_start):
 
 All feature documentation, planning guides, and reference materials are stored in the `docs/` folder.
 
+### Document Purpose Guide
+
+> **Confused about which doc to read?** Here's a quick guide:
+>
+> - **New developer?** Start with `README.md` → `WALKTHROUGH.md` → `IMPLEMENTATION.md`
+> - **Setting up auth/SMS?** See `AZURE.md` or `TWILIO.md`
+> - **Working on UI?** See `DARKMODE.md`, `UI.md`, or `POWERAPPS.md`
+> - **Planning production deploy?** See `roadmap.md`
+> - **Tracking what's done?** See the "Development Phases" section in this file
+
 ### Core Documentation
 
-| File                                   | Description                                          | Status       |
-| -------------------------------------- | ---------------------------------------------------- | ------------ |
-| [../README.md](../README.md)           | Project overview and quick start                     | ✅ Current   |
-| [IMPLEMENTATION.md](IMPLEMENTATION.md) | Technical architecture and API reference (this file) | ✅ Current   |
-| [TESTING.md](TESTING.md)               | Test suite documentation and coverage goals          | ✅ Current   |
-| [WALKTHROUGH.md](WALKTHROUGH.md)       | Step-by-step user walkthrough of the application     | ✅ Available |
-| [PROGRESS.md](PROGRESS.md)             | Development progress tracking                        | ✅ Available |
+| File                                   | Purpose                                                                                                                                                                        | Phase   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| [../README.md](../README.md)           | **Project overview and quick start.** High-level features, installation, and getting started guide.                                                                            | All     |
+| [IMPLEMENTATION.md](IMPLEMENTATION.md) | **Technical architecture and API reference (this file).** Database schema, endpoints, development phases, and checklist. This is the canonical source for project status.      | All     |
+| [TESTING.md](TESTING.md)               | **Test suite documentation.** How to run tests, coverage goals, and testing strategy.                                                                                          | Phase 1 |
+| [WALKTHROUGH.md](WALKTHROUGH.md)       | **End-user documentation.** Step-by-step guide to using the app: login flow, creating timesheets, admin functions. Screenshots and UI descriptions. Good for onboarding users. | All     |
 
 ### Feature Documentation
 
-| File                         | Description                                                             | Status         |
-| ---------------------------- | ----------------------------------------------------------------------- | -------------- |
-| [DARKMODE.md](DARKMODE.md)   | Dark mode implementation plan with YouTube/Material Design color system | ✅ Implemented |
-| [LOGIN.md](LOGIN.md)         | Microsoft-style login page design and implementation                    | 📋 Planned     |
-| [UI.md](UI.md)               | UI refactor notes - "Add Row" UX for time entries                       | 🚧 In Progress |
-| [POWERAPPS.md](POWERAPPS.md) | Complete PowerApps feature reference for parity                         | 📋 Reference   |
-| [BOT.md](BOT.md)             | Microsoft Teams chatbot planning and architecture                       | 📋 Planned     |
+| File                         | Purpose                                                                                                                                                                                  | Phase   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| [DARKMODE.md](DARKMODE.md)   | **Dark mode implementation plan.** YouTube/Material Design color system, elevation overlays, CSS variable strategy.                                                                      | Phase 5 |
+| [UI.md](UI.md)               | **UI refactor notes.** Documents the "Add Row" pattern for time entries, replacing the original grid layout.                                                                             | Phase 5 |
+| [POWERAPPS.md](POWERAPPS.md) | **Original PowerApps feature reference.** Complete documentation of the legacy app's UI, colors, workflows, and features for achieving parity. Used as a checklist for missing features. | Phase 5 |
+| [LOGIN.md](LOGIN.md)         | **Microsoft-style login page design.** Mockups and implementation notes for matching Microsoft's login aesthetic.                                                                        | Phase 5 |
+| [BOT.md](BOT.md)             | **Microsoft Teams chatbot planning.** Architecture, commands, Adaptive Cards, proactive notifications.                                                                                   | Phase 6 |
 
 ### Integration Guides
 
-| File                   | Description                                   | Status         |
-| ---------------------- | --------------------------------------------- | -------------- |
-| [AZURE.md](AZURE.md)   | Azure AD / Microsoft 365 authentication setup | ✅ Implemented |
-| [TWILIO.md](TWILIO.md) | Twilio SMS notification setup guide           | ✅ Implemented |
+| File                   | Purpose                                                                                                                                                 | Phase      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [AZURE.md](AZURE.md)   | **Azure AD / Microsoft 365 setup.** App registration, redirect URIs, environment variables, permission scopes.                                          | Phase 1, 6 |
+| [TWILIO.md](TWILIO.md) | **Twilio SMS notification setup.** Account configuration, testing, message templates, webhook handling, and the Unsubmitted Timesheet Reminder feature. | Phase 4    |
 
-### Planning & Roadmap
+### Planning & Status
 
-| File                     | Description                                                | Status       |
-| ------------------------ | ---------------------------------------------------------- | ------------ |
-| [roadmap.md](roadmap.md) | Production hardening, security, deployment recommendations | 📋 Reference |
+| File                       | Purpose                                                                                                                                                                                                                                                         | When to Use              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| [roadmap.md](roadmap.md)   | **Production hardening recommendations.** Security, scalability, deployment patterns, and architectural decisions for going to production. Forward-looking technical debt and best practices.                                                                   | Before production deploy |
+| [PROGRESS.md](PROGRESS.md) | **Legacy: Development changelog.** ⚠️ _Partially redundant with IMPLEMENTATION.md's Development Phases section._ Contains historical commit logs and quick command reference. Consider this file deprecated in favor of tracking progress in IMPLEMENTATION.md. | Historical reference     |
+
+### File Purpose Comparison
+
+| Question                                   | Document                               |
+| ------------------------------------------ | -------------------------------------- |
+| What features does the app have?           | README.md, WALKTHROUGH.md              |
+| What's the database schema?                | IMPLEMENTATION.md                      |
+| What API endpoints exist?                  | IMPLEMENTATION.md                      |
+| What's done vs. remaining?                 | IMPLEMENTATION.md (Development Phases) |
+| How do I set up Azure AD?                  | AZURE.md                               |
+| How do I set up Twilio SMS?                | TWILIO.md                              |
+| What did the original PowerApps look like? | POWERAPPS.md                           |
+| How should we deploy to production?        | roadmap.md                             |
+| What tests exist?                          | TESTING.md                             |
 
 ### File Organization
 
 ```
 timesheet/
-├── README.md              # Project overview (root)
+├── README.md                # Project overview (root)
 │
-└── docs/                  # All documentation
-    ├── IMPLEMENTATION.md  # Technical architecture (this file)
-    ├── TESTING.md         # Test suite and coverage guide
-    ├── WALKTHROUGH.md     # User walkthrough
-    ├── PROGRESS.md        # Development progress
+└── docs/                    # All documentation
     │
-    ├── DARKMODE.md        # Dark mode implementation ✅
-    ├── LOGIN.md           # Microsoft-style login page 📋
-    ├── UI.md              # UI refactor notes 🚧
-    ├── POWERAPPS.md       # PowerApps feature reference
-    ├── BOT.md             # Teams bot planning
+    │── IMPLEMENTATION.md    # 📋 Technical architecture (this file)
+    │                        #    - Database schema
+    │                        #    - API endpoints
+    │                        #    - Development phases & status
     │
-    ├── AZURE.md           # Azure AD setup guide
-    ├── TWILIO.md          # Twilio SMS setup guide
+    │── TESTING.md           # 🧪 Test suite guide
+    │── WALKTHROUGH.md       # 👤 End-user guide
     │
-    └── roadmap.md         # Production roadmap
+    │── DARKMODE.md          # 🌙 Dark mode implementation (Phase 5)
+    │── LOGIN.md             # 🔐 Microsoft login page design
+    │── UI.md                # 🎨 UI refactor documentation
+    │── POWERAPPS.md         # 📱 Original app feature reference
+    │── BOT.md               # 🤖 Teams bot planning (Phase 6)
+    │
+    │── AZURE.md             # ☁️ Azure AD setup guide
+    │── TWILIO.md            # 📱 Twilio SMS setup guide
+    │
+    │── roadmap.md           # 🚀 Production hardening recommendations
+    │── PROGRESS.md          # 📜 Legacy: development changelog
+    │
+    └── images/              # 📸 Screenshots and diagrams
 ```
 
 ---
