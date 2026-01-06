@@ -225,6 +225,7 @@ pytest tests/test_models.py -v
 | [BOT.md](BOT.md)                       | Microsoft Teams bot planning document          |
 | [UI.md](UI.md)                         | UI refactor documentation                      |
 | [DARKMODE.md](DARKMODE.md)             | Dark mode implementation planning              |
+| [POWERAPPS.md](POWERAPPS.md)           | Original PowerApps reference documentation     |
 
 ## License
 

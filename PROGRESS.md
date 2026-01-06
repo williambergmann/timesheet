@@ -70,6 +70,7 @@ The app supports Microsoft 365 authentication, timesheet CRUD operations, admin 
   - [x] BOT.md - Microsoft Teams chatbot planning
   - [x] UI.md - UI refactor documentation
   - [x] DARKMODE.md - Dark mode planning document
+  - [x] POWERAPPS.md - Original PowerApps reference (feature parity guide)
 
 ---
 
@@ -87,6 +88,21 @@ Planning a UI overhaul to default to dark mode, following Google/YouTube design 
 - [ ] Test accessibility (WCAG contrast)
 
 See `DARKMODE.md` for full implementation plan.
+
+### PowerApps Feature Parity
+
+Documented all features from original PowerApps for implementation:
+
+- [x] Analyze PowerApps UI and document all elements
+- [x] Create POWERAPPS.md with complete feature reference
+- [ ] **P0:** Add red warning "Field engineers must submit at least one image."
+- [ ] **P0:** Add User Notes field (255 char max)
+- [ ] **P0:** Add Admin Notes field (read-only for users)
+- [ ] **P1:** Add Time Code help popup (?)
+- [ ] **P1:** Add row totals column
+- [ ] **P2:** Add status definitions popup
+
+See `POWERAPPS.md` for complete feature comparison.
 
 ### Teams Bot Integration (Planned)
 
