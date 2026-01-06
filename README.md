@@ -204,6 +204,19 @@ pytest tests/test_models.py -v
 | Server        | Nginx + Gunicorn (gevent)     |
 | Container     | Docker                        |
 
+## Documentation
+
+All detailed documentation is in the [`docs/`](docs/) folder:
+
+| Document                                    | Description                                            |
+| ------------------------------------------- | ------------------------------------------------------ |
+| [IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Technical architecture, API reference, database schema |
+| [WALKTHROUGH.md](docs/WALKTHROUGH.md)       | Step-by-step user guide                                |
+| [AZURE.md](docs/AZURE.md)                   | Azure AD / Microsoft 365 authentication setup          |
+| [TWILIO.md](docs/TWILIO.md)                 | Twilio SMS notification configuration                  |
+| [POWERAPPS.md](docs/POWERAPPS.md)           | Legacy PowerApps feature reference                     |
+| [roadmap.md](docs/roadmap.md)               | Production deployment recommendations                  |
+
 ## License
 
 Copyright (c) 2026 Northstar Technologies. All rights reserved.

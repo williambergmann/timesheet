@@ -627,13 +627,13 @@ def create_auto_populated_draft(user, week_start):
 
 ## Documentation Index
 
-All feature documentation, planning guides, and reference materials are stored as `.md` files in the project root.
+All feature documentation, planning guides, and reference materials are stored in the `docs/` folder.
 
 ### Core Documentation
 
 | File                                   | Description                                          | Status       |
 | -------------------------------------- | ---------------------------------------------------- | ------------ |
-| [README.md](README.md)                 | Project overview and quick start                     | ✅ Current   |
+| [../README.md](../README.md)           | Project overview and quick start                     | ✅ Current   |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | Technical architecture and API reference (this file) | ✅ Current   |
 | [WALKTHROUGH.md](WALKTHROUGH.md)       | Step-by-step user walkthrough of the application     | ✅ Available |
 | [PROGRESS.md](PROGRESS.md)             | Development progress tracking                        | ✅ Available |
@@ -652,7 +652,7 @@ All feature documentation, planning guides, and reference materials are stored a
 | File                   | Description                                   | Status         |
 | ---------------------- | --------------------------------------------- | -------------- |
 | [AZURE.md](AZURE.md)   | Azure AD / Microsoft 365 authentication setup | ✅ Implemented |
-| [TWILIO.md](TWILIO.md) | Twilio SMS notification setup guide           | 📋 Planned     |
+| [TWILIO.md](TWILIO.md) | Twilio SMS notification setup guide           | ✅ Implemented |
 
 ### Planning & Roadmap
 
@@ -664,20 +664,22 @@ All feature documentation, planning guides, and reference materials are stored a
 
 ```
 timesheet/
-├── README.md              # Project overview
-├── IMPLEMENTATION.md      # Technical architecture (this file)
-├── WALKTHROUGH.md         # User walkthrough
-├── PROGRESS.md            # Development progress
+├── README.md              # Project overview (root)
 │
-├── DARKMODE.md            # Dark mode implementation ✅
-├── UI.md                  # UI refactor notes 🚧
-├── POWERAPPS.md           # PowerApps feature reference
-├── BOT.md                 # Teams bot planning
-│
-├── AZURE.md               # Azure AD setup guide
-├── TWILIO.md              # Twilio SMS setup guide
-│
-└── roadmap.md             # Production roadmap
+└── docs/                  # All documentation
+    ├── IMPLEMENTATION.md  # Technical architecture (this file)
+    ├── WALKTHROUGH.md     # User walkthrough
+    ├── PROGRESS.md        # Development progress
+    │
+    ├── DARKMODE.md        # Dark mode implementation ✅
+    ├── UI.md              # UI refactor notes 🚧
+    ├── POWERAPPS.md       # PowerApps feature reference
+    ├── BOT.md             # Teams bot planning
+    │
+    ├── AZURE.md           # Azure AD setup guide
+    ├── TWILIO.md          # Twilio SMS setup guide
+    │
+    └── roadmap.md         # Production roadmap
 ```
 
 ---
