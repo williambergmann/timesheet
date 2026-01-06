@@ -2,12 +2,13 @@
  * Timesheet Module
  * 
  * Handles timesheet form rendering and interactions.
- * Supports multiple hour types per timesheet with add/edit/remove UX.
+ * Uses the new "Add Row" UX pattern as specified in UI.md
  */
 
 const TimesheetModule = {
     currentTimesheet: null,
     currentWeekStart: null,
+    addedHourTypes: new Set(), // Track which hour types have been added
     
     // Hour types with their labels
     HOUR_TYPES: {
@@ -22,18 +23,188 @@ const TimesheetModule = {
     // Days of the week (Sunday first)
     DAYS: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     
-    // Track which hour types have been added
-    addedHourTypes: new Set(),
-    
     /**
-     * Initialize for a given week
+     * Initialize the module for a specific week
      */
     initForWeek(weekStart) {
         this.currentWeekStart = weekStart;
         this.addedHourTypes.clear();
-        document.getElementById('hour-type-rows').innerHTML = '';
-        this.updateHourTypeSelector();
-        this.updateNoEntriesHint();
+        
+        // Clear existing rows
+        const rowsContainer = document.getElementById('hour-type-rows');
+        if (rowsContainer) {
+            rowsContainer.innerHTML = '';
+        }
+        
+        // Update header with dates
+        this.updateHeaderDates(weekStart);
+        
+        // Setup add button handler
+        this.setupAddButton();
+    },
+    
+    /**
+     * Update the table header with actual dates
+     */
+    updateHeaderDates(weekStart) {
+        const header = document.querySelector('.hour-type-header');
+        if (!header) return;
+        
+        const startDate = new Date(weekStart + 'T00:00:00');
+        const dayCells = header.querySelectorAll('.hour-type-day-cell');
+        
+        dayCells.forEach((cell, i) => {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            const dayLabel = this.DAYS[i];
+            const dateLabel = `${date.getMonth() + 1}/${date.getDate()}`;
+            cell.innerHTML = `${dayLabel}<br><small>${dateLabel}</small>`;
+        });
+    },
+    
+    /**
+     * Setup the add button click handler
+     */
+    setupAddButton() {
+        const addBtn = document.getElementById('add-hour-type-btn');
+        const selector = document.getElementById('hour-type-selector');
+        
+        if (addBtn && selector) {
+            // Remove existing listener to prevent duplicates
+            addBtn.replaceWith(addBtn.cloneNode(true));
+            const newBtn = document.getElementById('add-hour-type-btn');
+            
+            newBtn.addEventListener('click', () => {
+                const hourType = selector.value;
+                if (hourType && !this.addedHourTypes.has(hourType)) {
+                    this.addHourTypeRow(hourType);
+                    selector.value = ''; // Reset selector
+                }
+            });
+        }
+    },
+    
+    /**
+     * Add a new hour type row to the table
+     */
+    addHourTypeRow(hourType, existingData = null) {
+        if (this.addedHourTypes.has(hourType)) {
+            return; // Already added
+        }
+        
+        this.addedHourTypes.add(hourType);
+        
+        const rowsContainer = document.getElementById('hour-type-rows');
+        if (!rowsContainer) return;
+        
+        const startDate = new Date(this.currentWeekStart + 'T00:00:00');
+        const label = this.HOUR_TYPES[hourType] || hourType;
+        
+        // Create row element
+        const row = document.createElement('div');
+        row.className = 'hour-type-row editing';
+        row.dataset.hourType = hourType;
+        
+        // Hour type label cell
+        let html = `<div class="hour-type-label-cell">${label}</div>`;
+        
+        // Day input cells
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            const value = existingData ? (existingData[dateStr] || 0) : 0;
+            
+            html += `
+                <div class="hour-type-day-cell">
+                    <input type="number" 
+                           class="hour-input"
+                           data-date="${dateStr}" 
+                           data-type="${hourType}"
+                           value="${value}"
+                           min="0" 
+                           max="24" 
+                           step="0.5"
+                           placeholder="0">
+                </div>
+            `;
+        }
+        
+        // Actions cell
+        html += `
+            <div class="hour-type-actions-cell">
+                <button type="button" class="btn-action btn-done" onclick="TimesheetModule.toggleEditRow('${hourType}')">✓ Done</button>
+                <button type="button" class="btn-remove" onclick="TimesheetModule.removeHourTypeRow('${hourType}')">&times;</button>
+            </div>
+        `;
+        
+        row.innerHTML = html;
+        rowsContainer.appendChild(row);
+        
+        // Update selector to disable this option
+        this.updateSelectorOptions();
+    },
+    
+    /**
+     * Remove an hour type row
+     */
+    removeHourTypeRow(hourType) {
+        const row = document.querySelector(`.hour-type-row[data-hour-type="${hourType}"]`);
+        if (row) {
+            row.remove();
+            this.addedHourTypes.delete(hourType);
+            this.updateSelectorOptions();
+        }
+    },
+    
+    /**
+     * Toggle row between editing and locked state
+     */
+    toggleEditRow(hourType) {
+        const row = document.querySelector(`.hour-type-row[data-hour-type="${hourType}"]`);
+        if (!row) return;
+        
+        const isEditing = row.classList.contains('editing');
+        const inputs = row.querySelectorAll('.hour-input');
+        const actionsCell = row.querySelector('.hour-type-actions-cell');
+        
+        if (isEditing) {
+            // Lock the row
+            row.classList.remove('editing');
+            row.classList.add('locked');
+            inputs.forEach(input => input.disabled = true);
+            actionsCell.innerHTML = `
+                <button type="button" class="btn-action btn-edit" onclick="TimesheetModule.toggleEditRow('${hourType}')">✏️ Edit</button>
+                <button type="button" class="btn-remove" onclick="TimesheetModule.removeHourTypeRow('${hourType}')">&times;</button>
+            `;
+        } else {
+            // Unlock the row
+            row.classList.remove('locked');
+            row.classList.add('editing');
+            inputs.forEach(input => input.disabled = false);
+            actionsCell.innerHTML = `
+                <button type="button" class="btn-action btn-done" onclick="TimesheetModule.toggleEditRow('${hourType}')">✓ Done</button>
+                <button type="button" class="btn-remove" onclick="TimesheetModule.removeHourTypeRow('${hourType}')">&times;</button>
+            `;
+        }
+    },
+    
+    /**
+     * Update selector to show/hide already added options
+     */
+    updateSelectorOptions() {
+        const selector = document.getElementById('hour-type-selector');
+        if (!selector) return;
+        
+        Array.from(selector.options).forEach(option => {
+            if (option.value && this.addedHourTypes.has(option.value)) {
+                option.disabled = true;
+                option.textContent = this.HOUR_TYPES[option.value] + ' (added)';
+            } else if (option.value) {
+                option.disabled = false;
+                option.textContent = this.HOUR_TYPES[option.value];
+            }
+        });
     },
     
     /**
@@ -54,169 +225,11 @@ const TimesheetModule = {
     },
     
     /**
-     * Update the hour type selector to hide already-added types
-     */
-    updateHourTypeSelector() {
-        const selector = document.getElementById('hour-type-selector');
-        if (!selector) return;
-        
-        Array.from(selector.options).forEach(option => {
-            if (option.value) {
-                option.disabled = this.addedHourTypes.has(option.value);
-                option.style.display = this.addedHourTypes.has(option.value) ? 'none' : '';
-            }
-        });
-        
-        // Reset selection
-        selector.value = '';
-    },
-    
-    /**
-     * Update the "no entries" hint visibility
-     */
-    updateNoEntriesHint() {
-        const hint = document.getElementById('no-entries-hint');
-        if (hint) {
-            hint.style.display = this.addedHourTypes.size === 0 ? 'block' : 'none';
-        }
-    },
-    
-    /**
-     * Generate date headers HTML
-     */
-    generateDateHeaders() {
-        const startDate = new Date(this.currentWeekStart + 'T00:00:00');
-        let html = '';
-        
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + i);
-            const dayLabel = this.DAYS[i];
-            const dateLabel = `${date.getMonth() + 1}/${date.getDate()}`;
-            html += `<div class="header-cell">${dayLabel}<br><small>${dateLabel}</small></div>`;
-        }
-        
-        return html;
-    },
-    
-    /**
-     * Add a new hour type row
-     */
-    addHourTypeRow(hourType, entries = [], isEditing = true) {
-        if (this.addedHourTypes.has(hourType)) {
-            return; // Already added
-        }
-        
-        this.addedHourTypes.add(hourType);
-        
-        const container = document.getElementById('hour-type-rows');
-        const startDate = new Date(this.currentWeekStart + 'T00:00:00');
-        const label = this.HOUR_TYPES[hourType] || hourType;
-        
-        // Build entry cells
-        let entryCells = '';
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + i);
-            const dateStr = date.toISOString().split('T')[0];
-            
-            // Find existing entry for this date
-            const existingEntry = entries.find(e => e.entry_date === dateStr);
-            const hours = existingEntry ? existingEntry.hours : '';
-            
-            entryCells += `
-                <div class="entry-cell">
-                    <input type="number" 
-                           class="entry-input" 
-                           data-date="${dateStr}"
-                           data-type="${hourType}"
-                           min="0" 
-                           max="24" 
-                           step="0.5"
-                           value="${hours}"
-                           placeholder="0"
-                           ${!isEditing ? 'readonly' : ''}>
-                </div>
-            `;
-        }
-        
-        const rowHtml = `
-            <div class="hour-type-row" data-hour-type="${hourType}" data-editing="${isEditing}">
-                <div class="hour-type-row-header">
-                    <span class="hour-type-label">${label}</span>
-                    <div class="hour-type-actions">
-                        <button type="button" class="btn btn-sm btn-ghost edit-row-btn" 
-                                onclick="TimesheetModule.toggleEditRow('${hourType}')"
-                                style="${isEditing ? 'display:none' : ''}">
-                            ✏️ Edit
-                        </button>
-                        <button type="button" class="btn btn-sm btn-ghost done-row-btn" 
-                                onclick="TimesheetModule.toggleEditRow('${hourType}')"
-                                style="${!isEditing ? 'display:none' : ''}">
-                            ✓ Done
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger-ghost remove-row-btn" 
-                                onclick="TimesheetModule.removeHourTypeRow('${hourType}')">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-                <div class="hour-type-row-grid">
-                    <div class="entries-grid-row">
-                        ${this.generateDateHeaders()}
-                    </div>
-                    <div class="entries-grid-row entries-row">
-                        ${entryCells}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        container.insertAdjacentHTML('beforeend', rowHtml);
-        this.updateHourTypeSelector();
-        this.updateNoEntriesHint();
-    },
-    
-    /**
-     * Toggle edit mode for a row
-     */
-    toggleEditRow(hourType) {
-        const row = document.querySelector(`.hour-type-row[data-hour-type="${hourType}"]`);
-        if (!row) return;
-        
-        const isEditing = row.dataset.editing === 'true';
-        row.dataset.editing = (!isEditing).toString();
-        
-        // Toggle input readonly
-        row.querySelectorAll('.entry-input').forEach(input => {
-            input.readOnly = isEditing; // Toggle: was editing, now readonly
-        });
-        
-        // Toggle buttons
-        row.querySelector('.edit-row-btn').style.display = isEditing ? '' : 'none';
-        row.querySelector('.done-row-btn').style.display = isEditing ? 'none' : '';
-    },
-    
-    /**
-     * Remove a hour type row
-     */
-    removeHourTypeRow(hourType) {
-        const row = document.querySelector(`.hour-type-row[data-hour-type="${hourType}"]`);
-        if (row) {
-            row.remove();
-        }
-        
-        this.addedHourTypes.delete(hourType);
-        this.updateHourTypeSelector();
-        this.updateNoEntriesHint();
-    },
-    
-    /**
-     * Collect all entries from all rows
+     * Collect entries from all rows
      */
     collectEntries() {
         const entries = [];
-        const inputs = document.querySelectorAll('.hour-type-row .entry-input');
+        const inputs = document.querySelectorAll('.hour-type-row .hour-input');
         
         inputs.forEach(input => {
             const hours = parseFloat(input.value) || 0;
@@ -233,21 +246,23 @@ const TimesheetModule = {
     },
     
     /**
-     * Populate form with existing entries (grouped by hour type)
+     * Populate rows with existing entry data
      */
     populateEntries(entries) {
         // Group entries by hour type
-        const byType = {};
+        const grouped = {};
         entries.forEach(entry => {
-            if (!byType[entry.hour_type]) {
-                byType[entry.hour_type] = [];
+            if (!grouped[entry.hour_type]) {
+                grouped[entry.hour_type] = {};
             }
-            byType[entry.hour_type].push(entry);
+            grouped[entry.hour_type][entry.entry_date] = entry.hours;
         });
         
-        // Add a row for each hour type
-        Object.keys(byType).forEach(hourType => {
-            this.addHourTypeRow(hourType, byType[hourType], false); // Not editing by default
+        // Add rows for each hour type that has data
+        Object.keys(grouped).forEach(hourType => {
+            this.addHourTypeRow(hourType, grouped[hourType]);
+            // Lock the row after populating
+            this.toggleEditRow(hourType);
         });
     },
     
@@ -255,13 +270,20 @@ const TimesheetModule = {
      * Collect form data for saving
      */
     collectFormData() {
+        const traveled = document.getElementById('traveled');
+        const hasExpenses = document.getElementById('has-expenses');
+        const reimbursementNeeded = document.getElementById('reimbursement-needed');
+        const reimbursementType = document.getElementById('reimbursement-type');
+        const reimbursementAmount = document.getElementById('reimbursement-amount');
+        const stipendDate = document.getElementById('stipend-date');
+        
         return {
-            traveled: document.getElementById('traveled').checked,
-            has_expenses: document.getElementById('has-expenses').checked,
-            reimbursement_needed: document.getElementById('reimbursement-needed').checked,
-            reimbursement_type: document.getElementById('reimbursement-type').value,
-            reimbursement_amount: parseFloat(document.getElementById('reimbursement-amount').value) || null,
-            stipend_date: document.getElementById('stipend-date').value || null,
+            traveled: traveled ? traveled.checked : false,
+            has_expenses: hasExpenses ? hasExpenses.checked : false,
+            reimbursement_needed: reimbursementNeeded ? reimbursementNeeded.checked : false,
+            reimbursement_type: reimbursementType ? reimbursementType.value : '',
+            reimbursement_amount: reimbursementAmount ? (parseFloat(reimbursementAmount.value) || null) : null,
+            stipend_date: stipendDate ? (stipendDate.value || null) : null,
         };
     },
     
@@ -271,29 +293,38 @@ const TimesheetModule = {
     populateForm(timesheet) {
         this.currentTimesheet = timesheet;
         
-        document.getElementById('timesheet-id').value = timesheet.id;
-        document.getElementById('week-start').value = timesheet.week_start;
-        document.getElementById('traveled').checked = timesheet.traveled;
-        document.getElementById('has-expenses').checked = timesheet.has_expenses;
-        document.getElementById('reimbursement-needed').checked = timesheet.reimbursement_needed;
+        const timesheetId = document.getElementById('timesheet-id');
+        const weekStart = document.getElementById('week-start');
+        const traveled = document.getElementById('traveled');
+        const hasExpenses = document.getElementById('has-expenses');
+        const reimbursementNeeded = document.getElementById('reimbursement-needed');
+        const reimbursementType = document.getElementById('reimbursement-type');
+        const reimbursementAmount = document.getElementById('reimbursement-amount');
+        const stipendDate = document.getElementById('stipend-date');
         
-        if (timesheet.reimbursement_type) {
-            document.getElementById('reimbursement-type').value = timesheet.reimbursement_type;
+        if (timesheetId) timesheetId.value = timesheet.id;
+        if (weekStart) weekStart.value = timesheet.week_start;
+        if (traveled) traveled.checked = timesheet.traveled;
+        if (hasExpenses) hasExpenses.checked = timesheet.has_expenses;
+        if (reimbursementNeeded) reimbursementNeeded.checked = timesheet.reimbursement_needed;
+        
+        if (timesheet.reimbursement_type && reimbursementType) {
+            reimbursementType.value = timesheet.reimbursement_type;
         }
-        if (timesheet.reimbursement_amount) {
-            document.getElementById('reimbursement-amount').value = timesheet.reimbursement_amount;
+        if (timesheet.reimbursement_amount && reimbursementAmount) {
+            reimbursementAmount.value = timesheet.reimbursement_amount;
         }
-        if (timesheet.stipend_date) {
-            document.getElementById('stipend-date').value = timesheet.stipend_date;
+        if (timesheet.stipend_date && stipendDate) {
+            stipendDate.value = timesheet.stipend_date;
         }
         
         // Show/hide reimbursement section
         this.toggleReimbursementSection();
         
-        // Initialize for this week
+        // Initialize entries for this week
         this.initForWeek(timesheet.week_start);
         
-        // Populate entries (creates rows for each hour type)
+        // Populate entries
         if (timesheet.entries && timesheet.entries.length > 0) {
             this.populateEntries(timesheet.entries);
         }
@@ -303,7 +334,9 @@ const TimesheetModule = {
         
         // Show/hide delete button based on status
         const deleteBtn = document.getElementById('delete-btn');
-        deleteBtn.style.display = timesheet.status === 'NEW' ? 'block' : 'none';
+        if (deleteBtn) {
+            deleteBtn.style.display = timesheet.status === 'NEW' ? 'block' : 'none';
+        }
         
         // Disable form if not a draft
         this.setFormReadOnly(timesheet.status !== 'NEW');
@@ -316,10 +349,12 @@ const TimesheetModule = {
         const checkbox = document.getElementById('reimbursement-needed');
         const section = document.getElementById('reimbursement-section');
         
-        if (checkbox.checked) {
-            section.classList.remove('hidden');
-        } else {
-            section.classList.add('hidden');
+        if (checkbox && section) {
+            if (checkbox.checked) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
         }
     },
     
@@ -328,6 +363,8 @@ const TimesheetModule = {
      */
     renderAttachments(attachments) {
         const container = document.getElementById('attachments-list');
+        if (!container) return;
+        
         container.innerHTML = '';
         
         attachments.forEach(att => {
@@ -345,19 +382,12 @@ const TimesheetModule = {
      */
     setFormReadOnly(readOnly) {
         const form = document.getElementById('timesheet-form');
+        if (!form) return;
+        
         const inputs = form.querySelectorAll('input, select, textarea');
         
         inputs.forEach(input => {
             input.disabled = readOnly;
-        });
-        
-        // Hide add controls
-        const addRow = document.querySelector('.add-hour-type-row');
-        if (addRow) addRow.style.display = readOnly ? 'none' : 'flex';
-        
-        // Hide action buttons on rows
-        document.querySelectorAll('.hour-type-actions').forEach(el => {
-            el.style.display = readOnly ? 'none' : 'flex';
         });
         
         // Hide action buttons
@@ -366,8 +396,19 @@ const TimesheetModule = {
         if (saveBtn) saveBtn.style.display = readOnly ? 'none' : 'block';
         if (submitBtn) submitBtn.style.display = readOnly ? 'none' : 'block';
         
-        // Hide upload zone
-        document.getElementById('upload-zone').style.display = readOnly ? 'none' : 'block';
+        // Hide upload zone and add button
+        const uploadZone = document.getElementById('upload-zone');
+        const addBtn = document.getElementById('add-hour-type-btn');
+        const selector = document.getElementById('hour-type-selector');
+        
+        if (uploadZone) uploadZone.style.display = readOnly ? 'none' : 'block';
+        if (addBtn) addBtn.style.display = readOnly ? 'none' : 'flex';
+        if (selector) selector.disabled = readOnly;
+        
+        // Hide remove buttons on rows
+        document.querySelectorAll('.hour-type-row .btn-remove').forEach(btn => {
+            btn.style.display = readOnly ? 'none' : 'inline-block';
+        });
     },
     
     /**
@@ -376,24 +417,39 @@ const TimesheetModule = {
     clearForm() {
         this.currentTimesheet = null;
         
-        document.getElementById('timesheet-id').value = '';
-        const weekStart = this.getCurrentWeekStart();
-        document.getElementById('week-start').value = weekStart;
-        document.getElementById('traveled').checked = false;
-        document.getElementById('has-expenses').checked = false;
-        document.getElementById('reimbursement-needed').checked = false;
-        document.getElementById('reimbursement-type').value = '';
-        document.getElementById('reimbursement-amount').value = '';
-        document.getElementById('stipend-date').value = '';
-        document.getElementById('new-note').value = '';
+        const timesheetId = document.getElementById('timesheet-id');
+        const weekStart = document.getElementById('week-start');
+        const traveled = document.getElementById('traveled');
+        const hasExpenses = document.getElementById('has-expenses');
+        const reimbursementNeeded = document.getElementById('reimbursement-needed');
+        const reimbursementType = document.getElementById('reimbursement-type');
+        const reimbursementAmount = document.getElementById('reimbursement-amount');
+        const stipendDate = document.getElementById('stipend-date');
+        const newNote = document.getElementById('new-note');
+        const reimbursementSection = document.getElementById('reimbursement-section');
+        const attachmentsList = document.getElementById('attachments-list');
+        const notesList = document.getElementById('notes-list');
+        const deleteBtn = document.getElementById('delete-btn');
         
-        document.getElementById('reimbursement-section').classList.add('hidden');
-        document.getElementById('attachments-list').innerHTML = '';
-        document.getElementById('notes-list').innerHTML = '';
-        document.getElementById('delete-btn').style.display = 'none';
+        if (timesheetId) timesheetId.value = '';
         
-        // Initialize for current week (clears rows)
-        this.initForWeek(weekStart);
+        const currentWeek = this.getCurrentWeekStart();
+        if (weekStart) weekStart.value = currentWeek;
+        if (traveled) traveled.checked = false;
+        if (hasExpenses) hasExpenses.checked = false;
+        if (reimbursementNeeded) reimbursementNeeded.checked = false;
+        if (reimbursementType) reimbursementType.value = 'Car';
+        if (reimbursementAmount) reimbursementAmount.value = '';
+        if (stipendDate) stipendDate.value = '';
+        if (newNote) newNote.value = '';
+        
+        if (reimbursementSection) reimbursementSection.classList.add('hidden');
+        if (attachmentsList) attachmentsList.innerHTML = '';
+        if (notesList) notesList.innerHTML = '';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        
+        // Initialize grid for current week
+        this.initForWeek(currentWeek);
         
         // Ensure form is editable
         this.setFormReadOnly(false);
@@ -439,34 +495,8 @@ const TimesheetModule = {
     },
 };
 
-// Event handlers
+// Bind event handlers when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // Add hour type button
-    const addBtn = document.getElementById('add-hour-type-btn');
-    if (addBtn) {
-        addBtn.addEventListener('click', () => {
-            const selector = document.getElementById('hour-type-selector');
-            const hourType = selector.value;
-            
-            if (!hourType) {
-                return; // No type selected
-            }
-            
-            // Initialize week if not set
-            if (!TimesheetModule.currentWeekStart) {
-                const weekStartInput = document.getElementById('week-start');
-                if (weekStartInput && weekStartInput.value) {
-                    TimesheetModule.currentWeekStart = TimesheetModule.getWeekStart(weekStartInput.value);
-                } else {
-                    TimesheetModule.currentWeekStart = TimesheetModule.getCurrentWeekStart();
-                }
-            }
-            
-            TimesheetModule.addHourTypeRow(hourType, [], true);
-        });
-    }
-    
-    // Reimbursement toggle
     const checkbox = document.getElementById('reimbursement-needed');
     if (checkbox) {
         checkbox.addEventListener('change', () => TimesheetModule.toggleReimbursementSection());
@@ -478,13 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         weekStartInput.addEventListener('change', (e) => {
             const weekStart = TimesheetModule.getWeekStart(e.target.value);
             e.target.value = weekStart;
-            
-            // Re-initialize for new week (clears existing rows)
-            if (confirm('Changing the week will clear existing entries. Continue?')) {
-                TimesheetModule.initForWeek(weekStart);
-            } else {
-                e.target.value = TimesheetModule.currentWeekStart;
-            }
+            TimesheetModule.initForWeek(weekStart);
         });
     }
 });

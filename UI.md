@@ -43,19 +43,27 @@ The core functionality is implemented but needs additional polish before merging
 
 ## UX Flow
 
-```
-1. Select "Field Hours" from dropdown
-         ↓
-2. Click [+] button
-         ↓
-3. Row appears: [Field Hours] [Sun][Mon][Tue][Wed][Thu][Fri][Sat] [✓ Done] [✕]
-         ↓
-4. Enter hours → Click "✓ Done" (row becomes read-only)
-         ↓
-5. Repeat steps 1-4 for additional hour types (PTO, Training, etc.)
-         ↓
-6. Save Draft / Submit
-```
+### Adding a New Hour Type Row
+
+1. Select hour type from dropdown (e.g., "Field Hours")
+2. Click the **[+]** button
+3. A new row appears in the grid:
+
+| Hour Type   | Sun | Mon | Tue | Wed | Thu | Fri | Sat | Actions  |
+| ----------- | --- | --- | --- | --- | --- | --- | --- | -------- |
+| Field Hours | `0` | `0` | `0` | `0` | `0` | `0` | `0` | ✓ Done ✕ |
+
+4. Enter hours for each day → Click **✓ Done** (row becomes read-only)
+5. Repeat for additional hour types (PTO, Training, etc.)
+6. **Save Draft** or **Submit**
+
+### Example: Completed Week
+
+| Hour Type   | Sun | Mon | Tue | Wed | Thu | Fri | Sat | Actions   |
+| ----------- | --- | --- | --- | --- | --- | --- | --- | --------- |
+| Field Hours | 0   | 8   | 8   | 8   | 8   | 8   | 0   | ✏️ Edit ✕ |
+| PTO         | 0   | 0   | 0   | 0   | 0   | 0   | 0   | ✏️ Edit ✕ |
+| Training    | 0   | 0   | 0   | 0   | 0   | 0   | 4   | ✏️ Edit ✕ |
 
 ---
 
