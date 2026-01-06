@@ -654,6 +654,7 @@ All feature documentation, planning guides, and reference materials are stored i
 | File                         | Description                                                             | Status         |
 | ---------------------------- | ----------------------------------------------------------------------- | -------------- |
 | [DARKMODE.md](DARKMODE.md)   | Dark mode implementation plan with YouTube/Material Design color system | ✅ Implemented |
+| [LOGIN.md](LOGIN.md)         | Microsoft-style login page design and implementation                    | 📋 Planned     |
 | [UI.md](UI.md)               | UI refactor notes - "Add Row" UX for time entries                       | 🚧 In Progress |
 | [POWERAPPS.md](POWERAPPS.md) | Complete PowerApps feature reference for parity                         | 📋 Reference   |
 | [BOT.md](BOT.md)             | Microsoft Teams chatbot planning and architecture                       | 📋 Planned     |
@@ -679,10 +680,12 @@ timesheet/
 │
 └── docs/                  # All documentation
     ├── IMPLEMENTATION.md  # Technical architecture (this file)
+    ├── TESTING.md         # Test suite and coverage guide
     ├── WALKTHROUGH.md     # User walkthrough
     ├── PROGRESS.md        # Development progress
     │
     ├── DARKMODE.md        # Dark mode implementation ✅
+    ├── LOGIN.md           # Microsoft-style login page 📋
     ├── UI.md              # UI refactor notes 🚧
     ├── POWERAPPS.md       # PowerApps feature reference
     ├── BOT.md             # Teams bot planning
@@ -834,13 +837,30 @@ python -m compileall app
   - [ ] Confirm user creation/update on first login
   - [ ] See [AZURE.md](AZURE.md) for setup guide
 
-- [ ] **Twilio SMS Notifications**
+- [x] **Twilio SMS Notifications** ✅ Completed Jan 6, 2026
 
-  - [ ] Implement `send_sms()` utility function
-  - [ ] Test approval notification delivery
-  - [ ] Test "needs attention" notification delivery
-  - [ ] Add error handling and logging for failed SMS
-  - [ ] See [TWILIO.md](TWILIO.md) for setup guide
+  - [x] Implement `send_sms()` utility function
+  - [x] Implement NotificationService
+  - [x] Test approval notification delivery
+  - [x] Test "needs attention" notification delivery
+  - [x] Add error handling and logging for failed SMS
+  - [x] See [TWILIO.md](TWILIO.md) for setup guide
+
+- [ ] **Test Suite Improvements** → See [TESTING.md](TESTING.md)
+
+  - [ ] Add tests for `app/utils/sms.py` (P0 - 0% → 100%)
+  - [ ] Add tests for `app/services/notification.py` (P0 - 0% → 90%)
+  - [ ] Add tests for attachment upload/download
+  - [ ] Add tests for SSE events endpoint
+  - [ ] Reach 85%+ code coverage (currently 74%)
+
+- [ ] **Microsoft-Style Login Page** → See [LOGIN.md](LOGIN.md)
+
+  - [ ] Create login.css with Microsoft brand styles
+  - [ ] Update login.html template to match Microsoft design
+  - [ ] Add gradient background, sharp-corner cards
+  - [ ] Extract Microsoft logo SVG
+  - [ ] Test responsive design on mobile
 
 - [ ] **Database Migrations**
 
