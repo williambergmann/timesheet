@@ -722,7 +722,7 @@ timesheet/
     │
     │── roadmap.md           # 🚀 Production hardening recommendations
     │
-    └── images/              # � Screenshots and diagrams
+    └── images/              # 📸 Screenshots and diagrams
 ```
 
 ---
