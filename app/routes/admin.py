@@ -150,7 +150,7 @@ def reject_timesheet(timesheet_id):
     Mark a timesheet as needing approval (missing attachment).
 
     Request body:
-        reason: Optional rejection reason
+        reason: Optional rejection reason (also sets admin_notes)
 
     Returns:
         dict: Updated timesheet
@@ -165,11 +165,14 @@ def reject_timesheet(timesheet_id):
 
     timesheet.status = TimesheetStatus.NEEDS_APPROVAL
 
-    # Add note if reason provided
+    # Add note if reason provided - also set admin_notes field
     data = request.get_json() or {}
     reason = data.get("reason", "").strip()
     if reason:
         admin_id = session["user"]["id"]
+        # Set the admin_notes field
+        timesheet.admin_notes = reason
+        # Also create a Note record for history
         note = Note(
             timesheet_id=timesheet_id,
             author_id=admin_id,
@@ -183,6 +186,35 @@ def reject_timesheet(timesheet_id):
     from ..services.notification import NotificationService
 
     NotificationService.notify_needs_attention(timesheet, reason)
+
+    return timesheet.to_dict()
+
+
+@admin_bp.route("/timesheets/<timesheet_id>/admin-notes", methods=["PUT"])
+@login_required
+@admin_required
+def update_admin_notes(timesheet_id):
+    """
+    Update admin notes on a timesheet.
+
+    Request body:
+        admin_notes: The admin notes text
+
+    Returns:
+        dict: Updated timesheet
+    """
+    timesheet = Timesheet.query.filter_by(id=timesheet_id).first()
+
+    if not timesheet:
+        return {"error": "Timesheet not found"}, 404
+
+    # Admins cannot edit drafts
+    if timesheet.status == TimesheetStatus.NEW:
+        return {"error": "Timesheet not found"}, 404
+
+    data = request.get_json() or {}
+    timesheet.admin_notes = data.get("admin_notes", "").strip() or None
+    db.session.commit()
 
     return timesheet.to_dict()
 

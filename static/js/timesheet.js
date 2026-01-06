@@ -143,6 +143,11 @@ const TimesheetModule = {
         
         // Update selector to disable this option
         this.updateSelectorOptions();
+        
+        // Update field hours warning if Field type was added
+        if (hourType === 'Field') {
+            this.updateFieldHoursWarning();
+        }
     },
     
     /**
@@ -154,6 +159,11 @@ const TimesheetModule = {
             row.remove();
             this.addedHourTypes.delete(hourType);
             this.updateSelectorOptions();
+            
+            // Update field hours warning if Field type was removed
+            if (hourType === 'Field') {
+                this.updateFieldHoursWarning();
+            }
         }
     },
     
@@ -250,9 +260,14 @@ const TimesheetModule = {
     },
     
     /**
-     * Check if any field hours have been entered
+     * Check if any field hours row exists or has been entered
      */
     hasFieldHours() {
+        // Check if Field row exists (even if no hours entered yet)
+        if (this.addedHourTypes.has('Field')) {
+            return true;
+        }
+        // Also check entries for saved timesheets
         const entries = this.collectEntries();
         return entries.some(entry => entry.hour_type === 'Field' && entry.hours > 0);
     },
@@ -297,6 +312,7 @@ const TimesheetModule = {
         const reimbursementType = document.getElementById('reimbursement-type');
         const reimbursementAmount = document.getElementById('reimbursement-amount');
         const stipendDate = document.getElementById('stipend-date');
+        const userNotes = document.getElementById('user-notes');
         
         return {
             traveled: traveled ? traveled.checked : false,
@@ -305,6 +321,7 @@ const TimesheetModule = {
             reimbursement_type: reimbursementType ? reimbursementType.value : '',
             reimbursement_amount: reimbursementAmount ? (parseFloat(reimbursementAmount.value) || null) : null,
             stipend_date: stipendDate ? (stipendDate.value || null) : null,
+            user_notes: userNotes ? userNotes.value : '',
         };
     },
     
@@ -352,6 +369,28 @@ const TimesheetModule = {
         
         // Populate attachments
         this.renderAttachments(timesheet.attachments || []);
+        
+        // Populate user notes
+        const userNotes = document.getElementById('user-notes');
+        if (userNotes) {
+            userNotes.value = timesheet.user_notes || '';
+            this.updateCharCounter();
+        }
+        
+        // Populate admin notes (read-only for users)
+        const adminNotesSection = document.getElementById('admin-notes-section');
+        const adminNotesDisplay = document.getElementById('admin-notes-display');
+        if (adminNotesSection && adminNotesDisplay) {
+            if (timesheet.admin_notes) {
+                adminNotesDisplay.textContent = timesheet.admin_notes;
+                adminNotesSection.classList.remove('hidden');
+            } else {
+                adminNotesSection.classList.add('hidden');
+            }
+        }
+        
+        // Update field hours warning
+        this.updateFieldHoursWarning();
         
         // Show/hide delete button based on status
         const deleteBtn = document.getElementById('delete-btn');
@@ -446,10 +485,10 @@ const TimesheetModule = {
         const reimbursementType = document.getElementById('reimbursement-type');
         const reimbursementAmount = document.getElementById('reimbursement-amount');
         const stipendDate = document.getElementById('stipend-date');
-        const newNote = document.getElementById('new-note');
+        const userNotes = document.getElementById('user-notes');
         const reimbursementSection = document.getElementById('reimbursement-section');
         const attachmentsList = document.getElementById('attachments-list');
-        const notesList = document.getElementById('notes-list');
+        const adminNotesSection = document.getElementById('admin-notes-section');
         const deleteBtn = document.getElementById('delete-btn');
         
         if (timesheetId) timesheetId.value = '';
@@ -462,12 +501,18 @@ const TimesheetModule = {
         if (reimbursementType) reimbursementType.value = 'Car';
         if (reimbursementAmount) reimbursementAmount.value = '';
         if (stipendDate) stipendDate.value = '';
-        if (newNote) newNote.value = '';
+        if (userNotes) {
+            userNotes.value = '';
+            this.updateCharCounter();
+        }
         
         if (reimbursementSection) reimbursementSection.classList.add('hidden');
         if (attachmentsList) attachmentsList.innerHTML = '';
-        if (notesList) notesList.innerHTML = '';
+        if (adminNotesSection) adminNotesSection.classList.add('hidden');
         if (deleteBtn) deleteBtn.style.display = 'none';
+        
+        // Hide field hours warning
+        this.updateFieldHoursWarning();
         
         // Initialize grid for current week
         this.initForWeek(currentWeek);
@@ -514,6 +559,43 @@ const TimesheetModule = {
         
         return `${startStr} - ${endStr}`;
     },
+    
+    /**
+     * Update field hours warning visibility
+     */
+    updateFieldHoursWarning() {
+        const warning = document.getElementById('field-hours-warning');
+        if (!warning) return;
+        
+        const hasField = this.hasFieldHours();
+        const hasAttachments = this.hasAttachments();
+        
+        if (hasField && !hasAttachments) {
+            warning.classList.remove('hidden');
+        } else {
+            warning.classList.add('hidden');
+        }
+    },
+    
+    /**
+     * Update character counter for user notes
+     */
+    updateCharCounter() {
+        const userNotes = document.getElementById('user-notes');
+        const counter = document.getElementById('user-notes-counter');
+        if (!userNotes || !counter) return;
+        
+        const length = userNotes.value.length;
+        const max = 255;
+        counter.textContent = `${length}/${max}`;
+        
+        counter.classList.remove('near-limit', 'at-limit');
+        if (length >= max) {
+            counter.classList.add('at-limit');
+        } else if (length >= max * 0.8) {
+            counter.classList.add('near-limit');
+        }
+    },
 };
 
 // Bind event handlers when DOM is ready
@@ -532,4 +614,17 @@ document.addEventListener('DOMContentLoaded', () => {
             TimesheetModule.initForWeek(weekStart);
         });
     }
+    
+    // User notes character counter
+    const userNotes = document.getElementById('user-notes');
+    if (userNotes) {
+        userNotes.addEventListener('input', () => TimesheetModule.updateCharCounter());
+    }
+    
+    // Listen for hour input changes to update field hours warning
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('hour-input')) {
+            TimesheetModule.updateFieldHoursWarning();
+        }
+    });
 });

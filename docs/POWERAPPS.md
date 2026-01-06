@@ -7,6 +7,24 @@
 
 ---
 
+Missing Features from PowerApps
+🔴 P0 - Critical (Core Functionality)
+Feature Status Notes
+Field Hours Red Warning ⚠️ Partial We have a confirmation dialog, but PowerApps shows a persistent RED text warning above attachments
+User Notes Field ❌ Missing 255 char multi-line text area for user comments
+Admin Notes Field ❌ Missing Read-only for users, editable by admins for feedback
+🟡 P1 - Important (UX Polish)
+Feature Status Notes
+Time Code Help Popup ❌ Missing (?) icon that explains each hour type
+Row Totals ❌ Missing Per-row sum column in the time entry table
+Status Definitions Popup ❌ Missing Help icon explaining what each status means
+Empty Attachments Text ❌ Missing "There is nothing attached." placeholder
+🟢 P2 - Nice to Have
+Feature Status Notes
+Welcome Screen ❌ Missing Personalized greeting with nav cards
+Unsaved Changes Warning ❌ Missing Blue text when there are unsaved changes
+Refresh Button ❌ Missing Manual refresh icon
+
 ## 🎨 Visual Identity & Color Palette
 
 | Element            | Color        | Hex Code  | Usage                               |

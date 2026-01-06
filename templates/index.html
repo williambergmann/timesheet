@@ -3,7 +3,7 @@
 {% block title %}Northstar Time Timesheet - Dashboard{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=11" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20260106" />
 {% endblock %}
 
 {% block content %}
@@ -198,6 +198,10 @@
             <div class="form-section-icon">📎</div>
             <h3>Attachments</h3>
           </div>
+          <!-- Field Hours Warning -->
+          <div id="field-hours-warning" class="field-hours-warning hidden">
+            ⚠️ Field engineers must submit at least one image.
+          </div>
           <div class="attachments-section">
             <div id="attachments-list" class="attachments-list"></div>
             <div id="upload-zone" class="upload-zone">
@@ -209,16 +213,26 @@
           </div>
         </div>
 
-        <!-- Notes -->
+        <!-- User Notes -->
         <div class="form-section">
           <div class="form-section-header">
             <div class="form-section-icon">💬</div>
             <h3>Notes</h3>
           </div>
-          <div id="notes-list" class="notes-list"></div>
           <div class="form-group">
-            <label for="new-note">Add a note</label>
-            <textarea id="new-note" name="new_note" class="form-textarea" rows="3" placeholder="Enter any comments or notes..."></textarea>
+            <label for="user-notes">Your Notes <span class="char-counter" id="user-notes-counter">0/255</span></label>
+            <textarea id="user-notes" name="user_notes" class="form-textarea" rows="3" maxlength="255" placeholder="Enter any comments (255 characters max)..."></textarea>
+          </div>
+        </div>
+
+        <!-- Admin Notes (read-only for users) -->
+        <div id="admin-notes-section" class="form-section hidden">
+          <div class="form-section-header">
+            <div class="form-section-icon">👤</div>
+            <h3>Admin Notes</h3>
+          </div>
+          <div class="form-group">
+            <div id="admin-notes-display" class="admin-notes-display"></div>
           </div>
         </div>
 
@@ -309,9 +323,9 @@
 <script>
   window.currentUser = {{ user|tojson }};
 </script>
-<script src="{{ url_for('static', filename='js/api.js') }}?v=3"></script>
-<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=3"></script>
-<script src="{{ url_for('static', filename='js/admin.js') }}?v=3"></script>
-<script src="{{ url_for('static', filename='js/sse.js') }}?v=3"></script>
-<script src="{{ url_for('static', filename='js/app.js') }}?v=4"></script>
+<script src="{{ url_for('static', filename='js/api.js') }}?v=20260106"></script>
+<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260106"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260106"></script>
+<script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=20260106"></script>
 {% endblock %}

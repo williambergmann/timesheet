@@ -198,6 +198,10 @@ def update_timesheet(timesheet_id):
         timesheet.reimbursement_amount = data["reimbursement_amount"]
     if "stipend_date" in data and data["stipend_date"]:
         timesheet.stipend_date = datetime.fromisoformat(data["stipend_date"]).date()
+    if "user_notes" in data:
+        # Limit to 255 characters per PowerApps spec
+        notes = data["user_notes"] or ""
+        timesheet.user_notes = notes[:255] if notes else None
 
     db.session.commit()
 

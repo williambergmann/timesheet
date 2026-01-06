@@ -537,6 +537,55 @@
 }
 
 /* ============================================
+   Field Hours Warning (PowerApps parity)
+   ============================================ */
+.field-hours-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    color: var(--color-danger);
+    font-weight: 500;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Character Counter for User Notes */
+.char-counter {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-disabled);
+    font-weight: 400;
+    margin-left: var(--spacing-sm);
+}
+
+.char-counter.near-limit {
+    color: var(--color-warning);
+}
+
+.char-counter.at-limit {
+    color: var(--color-danger);
+}
+
+/* Admin Notes Display (read-only) */
+.admin-notes-display {
+    background: var(--color-bg-overlay);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-left: 3px solid var(--color-warning);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    min-height: 60px;
+}
+
+.admin-notes-display:empty::after {
+    content: "No admin notes.";
+    font-style: italic;
+    color: var(--color-text-disabled);
+}
+
+/* ============================================
    Notes
    ============================================ */
 .notes-list {

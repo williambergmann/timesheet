@@ -96,6 +96,10 @@ class Timesheet(db.Model):
     reimbursement_amount = db.Column(db.Numeric(10, 2), nullable=True)
     stipend_date = db.Column(db.Date, nullable=True)
 
+    # Notes (PowerApps parity)
+    user_notes = db.Column(db.String(255), nullable=True)  # User comments, 255 char max
+    admin_notes = db.Column(db.Text, nullable=True)  # Admin feedback, read-only for users
+
     # Timestamps
     submitted_at = db.Column(db.DateTime, nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
@@ -191,6 +195,8 @@ class Timesheet(db.Model):
             "stipend_date": (
                 self.stipend_date.isoformat() if self.stipend_date else None
             ),
+            "user_notes": self.user_notes,
+            "admin_notes": self.admin_notes,
             "submitted_at": (
                 self.submitted_at.isoformat() if self.submitted_at else None
             ),
