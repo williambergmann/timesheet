@@ -645,6 +645,7 @@ All feature documentation, planning guides, and reference materials are stored i
 | -------------------------------------- | ---------------------------------------------------- | ------------ |
 | [../README.md](../README.md)           | Project overview and quick start                     | ✅ Current   |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | Technical architecture and API reference (this file) | ✅ Current   |
+| [TESTING.md](TESTING.md)               | Test suite documentation and coverage goals          | ✅ Current   |
 | [WALKTHROUGH.md](WALKTHROUGH.md)       | Step-by-step user walkthrough of the application     | ✅ Available |
 | [PROGRESS.md](PROGRESS.md)             | Development progress tracking                        | ✅ Available |
 
