@@ -1,6 +1,6 @@
 # Timesheet App - Development Progress
 
-**Last Updated:** January 5, 2026
+**Last Updated:** January 6, 2026
 
 ## Project Overview
 
@@ -10,7 +10,7 @@ Replace PowerApps timesheet application with Flask + vanilla JS/CSS solution.
 
 ✅ **Core application is functional and deployed locally**
 
-The app supports Microsoft 365 authentication, timesheet CRUD operations, admin approval workflow, and the basic UI is complete.
+The app supports Microsoft 365 authentication, timesheet CRUD operations, admin approval workflow, and the UI is complete with the new "Add Row" pattern for hour entry.
 
 ---
 
@@ -52,32 +52,43 @@ The app supports Microsoft 365 authentication, timesheet CRUD operations, admin 
   - [x] Session management
   - [x] Dev mode bypass for local development
 
+- [x] **UI Refactor (Hour Entry)**
+
+  - [x] Replace static multi-row grid with dropdown + add button
+  - [x] Dynamic row creation per hour type
+  - [x] Edit/Done/Remove row actions (lock/unlock pattern)
+  - [x] Consistent button styling
+  - [x] Week starts on Sunday (timezone-safe calculation)
+  - [x] Field hours attachment warning with confirmation dialog
+
 - [x] **Documentation**
   - [x] AZURE.md - Azure AD configuration guide
   - [x] TWILIO.md - Twilio SMS integration guide
   - [x] IMPLEMENTATION.md - Full implementation plan with phases
   - [x] WALKTHROUGH.md - App walkthrough with screenshots
   - [x] roadmap.md - Future improvements and design decisions
-  - [x] BOT.md - Microsoft Teams chatbot planning (branch: `bot`)
+  - [x] BOT.md - Microsoft Teams chatbot planning
+  - [x] UI.md - UI refactor documentation
+  - [x] DARKMODE.md - Dark mode planning document
 
 ---
 
 ## In Progress
 
-### UI Refactor (branch: `UI`)
+### Dark Mode (Planning)
 
-Simplifying the timesheet hour entry interface to match PowerApps style:
+Planning a UI overhaul to default to dark mode, following Google/YouTube design guidelines:
 
-- [x] Replace static multi-row grid with dropdown + add button
-- [x] Dynamic row creation per hour type
-- [x] Edit/Done/Remove row actions
-- [ ] Fix static file caching issue
-- [ ] Fix view navigation
-- [ ] Mobile responsive testing
+- [x] Research Material Design dark theme principles
+- [x] Document color palette (DARKMODE.md)
+- [x] Define elevation overlay system
+- [ ] Implement dark mode CSS variables
+- [ ] Update all components
+- [ ] Test accessibility (WCAG contrast)
 
-See `UI.md` for full details.
+See `DARKMODE.md` for full implementation plan.
 
-### Teams Bot Integration (branch: `bot`)
+### Teams Bot Integration (Planned)
 
 Planning document complete for Microsoft Teams chatbot:
 
@@ -96,6 +107,7 @@ See `BOT.md` for implementation plan.
 
 - [ ] Alembic database migrations (currently using db.create_all())
 - [ ] Twilio SMS notification implementation
+- [ ] Dark mode UI implementation
 - [ ] End-to-end workflow testing
 - [ ] Production deployment testing
 
@@ -108,13 +120,20 @@ See `BOT.md` for implementation plan.
 
 ---
 
+## Recent Changes (January 6, 2026)
+
+| Commit    | Description                                                               |
+| --------- | ------------------------------------------------------------------------- |
+| `2202c99` | Fix: Timezone bug in getWeekStart() - weeks now correctly start on Sunday |
+| `ebe89cf` | Style: Normalize hour-type-row button styling                             |
+
+---
+
 ## Branches
 
-| Branch | Purpose                             | Status        |
-| ------ | ----------------------------------- | ------------- |
-| `main` | Stable, working code                | ✅ Up to date |
-| `UI`   | Timesheet hour entry UI refactor    | 🚧 WIP        |
-| `bot`  | Microsoft Teams chatbot integration | 📋 Planned    |
+| Branch | Purpose              | Status        |
+| ------ | -------------------- | ------------- |
+| `main` | Stable, working code | ✅ Up to date |
 
 ---
 
@@ -130,10 +149,8 @@ pytest tests/ -v
 # View logs
 docker compose logs -f web
 
-# Switch branches
-git checkout main    # Stable version
-git checkout UI      # UI refactor work
-git checkout bot     # Teams bot work
+# Hard refresh browser (bypass cache)
+Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
 ```
 
 ## Notes
@@ -142,3 +159,4 @@ git checkout bot     # Teams bot work
 - Week starts on Sunday
 - Full week timesheets only
 - Two roles: Admin and Regular User
+- Dark mode coming soon (see DARKMODE.md)

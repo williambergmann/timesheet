@@ -223,6 +223,8 @@ pytest tests/test_models.py -v
 | [AZURE.md](AZURE.md)                   | Azure AD configuration guide                   |
 | [TWILIO.md](TWILIO.md)                 | Twilio SMS integration guide                   |
 | [BOT.md](BOT.md)                       | Microsoft Teams bot planning document          |
+| [UI.md](UI.md)                         | UI refactor documentation                      |
+| [DARKMODE.md](DARKMODE.md)             | Dark mode implementation planning              |
 
 ## License
 
