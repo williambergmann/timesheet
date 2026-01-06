@@ -28,11 +28,11 @@
 
 ### 🟢 P2 - Nice to Have
 
-| Feature                 | Status     | Notes                                    |
-| ----------------------- | ---------- | ---------------------------------------- |
-| Welcome Screen          | ❌ Missing | Personalized greeting with nav cards     |
-| Unsaved Changes Warning | ❌ Missing | Blue text when there are unsaved changes |
-| Refresh Button          | ❌ Missing | Manual refresh icon                      |
+| Feature                 | Status      | Notes                                           |
+| ----------------------- | ----------- | ----------------------------------------------- |
+| Welcome Screen          | ✅ Complete | Personalized greeting on dashboard with cards   |
+| Unsaved Changes Warning | ✅ Complete | Blue pulsing text when form has unsaved changes |
+| Refresh Button          | ✅ Complete | Manual refresh button in My Timesheets header   |
 
 ## 🎨 Visual Identity & Color Palette
 
