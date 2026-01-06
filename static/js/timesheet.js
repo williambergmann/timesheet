@@ -211,10 +211,14 @@ const TimesheetModule = {
      * Get week start date (Sunday) from a date
      */
     getWeekStart(date) {
-        const d = new Date(date);
+        const d = new Date(date + 'T00:00:00'); // Parse as local time
         const day = d.getDay(); // 0 = Sunday
         d.setDate(d.getDate() - day);
-        return d.toISOString().split('T')[0];
+        // Format as YYYY-MM-DD using local date (not UTC)
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const dayOfMonth = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${dayOfMonth}`;
     },
     
     /**
