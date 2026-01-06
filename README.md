@@ -204,28 +204,18 @@ pytest tests/test_models.py -v
 | Server        | Nginx + Gunicorn (gevent)     |
 | Container     | Docker                        |
 
-## Development Branches
-
-| Branch | Description                                        | Status     |
-| ------ | -------------------------------------------------- | ---------- |
-| `main` | Stable, production-ready code                      | ✅ Active  |
-| `UI`   | Timesheet hour entry UI refactor (PowerApps-style) | 🚧 WIP     |
-| `bot`  | Microsoft Teams chatbot integration                | 📋 Planned |
-
 ## Documentation
 
-| File                                   | Description                                    |
-| -------------------------------------- | ---------------------------------------------- |
-| [IMPLEMENTATION.md](IMPLEMENTATION.md) | Full technical implementation guide            |
-| [WALKTHROUGH.md](WALKTHROUGH.md)       | App walkthrough with screenshots               |
-| [PROGRESS.md](PROGRESS.md)             | Development progress tracking                  |
-| [roadmap.md](roadmap.md)               | Future improvements and architecture decisions |
-| [AZURE.md](AZURE.md)                   | Azure AD configuration guide                   |
-| [TWILIO.md](TWILIO.md)                 | Twilio SMS integration guide                   |
-| [BOT.md](BOT.md)                       | Microsoft Teams bot planning document          |
-| [UI.md](UI.md)                         | UI refactor documentation                      |
-| [DARKMODE.md](DARKMODE.md)             | Dark mode implementation planning              |
-| [POWERAPPS.md](POWERAPPS.md)           | Original PowerApps reference documentation     |
+All detailed documentation is in the [`docs/`](docs/) folder:
+
+| Document                                    | Description                                            |
+| ------------------------------------------- | ------------------------------------------------------ |
+| [IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Technical architecture, API reference, database schema |
+| [WALKTHROUGH.md](docs/WALKTHROUGH.md)       | Step-by-step user guide                                |
+| [AZURE.md](docs/AZURE.md)                   | Azure AD / Microsoft 365 authentication setup          |
+| [TWILIO.md](docs/TWILIO.md)                 | Twilio SMS notification configuration                  |
+| [POWERAPPS.md](docs/POWERAPPS.md)           | Legacy PowerApps feature reference                     |
+| [roadmap.md](docs/roadmap.md)               | Production deployment recommendations                  |
 
 ## License
 

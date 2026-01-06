@@ -2,75 +2,48 @@
  * Main Stylesheet
  * 
  * Global styles, CSS variables, and layout foundations.
- * Northstar Technologies branding - Dark Mode Theme (YouTube/Material Design inspired)
+ * Northstar Technologies branding - Forest Green theme.
  */
 
 /* ============================================
-   CSS Variables (Design Tokens) - DARK MODE
+   CSS Variables (Design Tokens)
    ============================================ */
 :root {
-  /* === DARK MODE BASE PALETTE === */
-  
-  /* Backgrounds (darkest to lighter) */
-  --color-bg-page: #0f0f0f;        /* Main page background */
-  --color-bg-surface: #121212;     /* Cards, sidebar */
-  --color-bg-elevated: #181818;    /* Raised cards, modals */
-  --color-bg-overlay: #1e1e1e;     /* Dropdowns, popovers */
-  
-  /* Borders & Dividers */
-  --color-border-subtle: #2a2a2a;  /* Faint dividers */
-  --color-border-default: #3a3a3a; /* Standard borders */
-  --color-border-strong: #4a4a4a;  /* Emphasized borders */
-  
-  /* Text */
-  --color-text-primary: #e8eaed;   /* Primary text (93%) */
-  --color-text-secondary: #9aa0a6; /* Secondary text (60%) */
-  --color-text-disabled: #5f6368;  /* Disabled text (38%) */
-  --color-text-inverse: #121212;   /* Text on light bg */
-  
-  /* === BRAND COLORS (Lightened for Dark Mode) === */
-  --color-primary: #4ade80;        /* Bright green for accents */
-  --color-primary-hover: #22c55e;  /* Hover state */
-  --color-primary-muted: #166534;  /* Muted/background green */
-  --color-primary-dark: #15803d;   /* Darker green variant */
-  --color-primary-light: #86efac;  /* Lighter green variant */
+  /* Colors - Northstar Forest Green palette */
+  --color-primary: #006400;
+  --color-primary-dark: #004d00;
+  --color-primary-light: #228b22;
 
   /* Accent - Olive green for icons/highlights */
-  --color-accent: #a3e635;
-  --color-accent-dark: #84cc16;
+  --color-accent: #7bb033;
+  --color-accent-dark: #5a8a1a;
 
-  --color-secondary: #9aa0a6;
-  --color-secondary-dark: #5f6368;
+  --color-secondary: #64748b;
+  --color-secondary-dark: #475569;
 
-  /* === STATUS COLORS (Lightened for dark backgrounds) === */
-  --color-success: #34d399;        /* Emerald 400 */
-  --color-warning: #fbbf24;        /* Amber 400 */
-  --color-danger: #f87171;         /* Red 400 */
-  --color-info: #22d3ee;           /* Cyan 400 */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #06b6d4;
 
-  /* Legacy neutral mappings (for backward compatibility) */
-  --color-white: #e8eaed;
-  --color-gray-50: #0f0f0f;
-  --color-gray-100: #121212;
-  --color-gray-200: #1e1e1e;
-  --color-gray-300: #2a2a2a;
-  --color-gray-400: #3a3a3a;
-  --color-gray-500: #5f6368;
-  --color-gray-600: #9aa0a6;
-  --color-gray-700: #bdc1c6;
-  --color-gray-800: #e8eaed;
-  --color-gray-900: #f1f3f4;
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
 
   /* Status colors */
-  --status-new: #9aa0a6;
-  --status-submitted: #4ade80;
-  --status-approved: #34d399;
-  --status-needs-approval: #fbbf24;
-
-  /* === INTERACTIVE STATES === */
-  --color-hover: rgba(255, 255, 255, 0.08);
-  --color-active: rgba(255, 255, 255, 0.12);
-  --color-focus-ring: rgba(74, 222, 128, 0.4);  /* Green glow */
+  --status-new: #64748b;
+  --status-submitted: #006400;
+  --status-approved: #10b981;
+  --status-needs-approval: #f59e0b;
 
   /* Typography */
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -98,11 +71,11 @@
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
 
-  /* Shadows (muted for dark mode) */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4),
-    0 4px 6px -4px rgb(0 0 0 / 0.3);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -181,9 +154,13 @@ a:hover {
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-  border-bottom: 1px solid var(--color-border-subtle);
-  color: var(--color-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  color: var(--color-white);
+  box-shadow: var(--shadow-md);
   z-index: 100;
 }
 
@@ -289,22 +266,20 @@ a:hover {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
+  background-color: var(--color-primary-dark);
 }
 
 .btn-secondary {
-  background-color: var(--color-bg-overlay);
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-primary);
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-700);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-hover);
-  border-color: var(--color-border-strong);
+  background-color: var(--color-gray-300);
 }
 
 .btn-danger {
@@ -371,17 +346,11 @@ a:hover {
   padding: var(--spacing-sm) var(--spacing-md);
   font-family: inherit;
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-border-default);
+  border: 1px solid var(--color-gray-300);
   border-radius: var(--radius-md);
-  background-color: var(--color-bg-overlay);
-  color: var(--color-text-primary);
+  background-color: var(--color-white);
   transition: border-color var(--transition-fast),
     box-shadow var(--transition-fast);
-}
-
-.form-input::placeholder,
-.form-textarea::placeholder {
-  color: var(--color-text-disabled);
 }
 
 .form-input:focus,
@@ -389,7 +358,7 @@ a:hover {
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
+  box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.15);
 }
 
 .form-row {
@@ -410,10 +379,10 @@ a:hover {
 }
 
 .login-card {
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--color-white);
   padding: var(--spacing-2xl);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 420px;
   width: 100%;

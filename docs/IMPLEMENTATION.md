@@ -583,7 +583,7 @@ def create_auto_populated_draft(user, week_start):
 
 ## Development Phases
 
-### Phase 1: Foundation (Week 1-2)
+### Phase 1: Foundation (Week 1-2) ✅ Complete
 
 - [x] Docker setup with Nginx + Gunicorn
 - [x] Flask app factory with blueprints
@@ -592,7 +592,7 @@ def create_auto_populated_draft(user, week_start):
 - [x] Basic HTML templates and CSS
 - [ ] Alembic migrations
 
-### Phase 2: Core Features (Week 3-4)
+### Phase 2: Core Features (Week 3-4) ✅ Complete
 
 - [x] Timesheet CRUD API endpoints
 - [x] Time entry management
@@ -600,7 +600,7 @@ def create_auto_populated_draft(user, week_start):
 - [x] File upload for attachments
 - [x] JavaScript frontend for timesheet form
 
-### Phase 3: Admin Features (Week 5)
+### Phase 3: Admin Features (Week 5) ✅ Complete
 
 - [x] Admin dashboard
 - [x] Approval workflow
@@ -609,11 +609,88 @@ def create_auto_populated_draft(user, week_start):
 
 ### Phase 4: Notifications & Polish (Week 6)
 
-- [ ] Twilio SMS integration
+- [ ] Twilio SMS integration → See [TWILIO.md](TWILIO.md)
 - [x] SSE real-time updates
 - [ ] Weekly reminder job
 - [ ] Auto-populate feature
 - [x] Tooltips and UX refinements
+
+### Phase 5: UI Refactor (Current - `UI` Branch) 🚧 In Progress
+
+> **Branch:** `UI`  
+> **Status:** Active development
+
+- [x] Time entry "Add Row" UX (dropdown + add button) → See [UI.md](UI.md)
+- [x] Horizontal table layout for hour types
+- [x] Dark mode implementation → See [DARKMODE.md](DARKMODE.md)
+- [x] Field hours attachment warning
+- [ ] Feature parity with PowerApps → See [POWERAPPS.md](POWERAPPS.md)
+- [ ] Light mode CSS backup created
+
+### Phase 6: Integrations (Planned)
+
+- [ ] Microsoft Teams Bot → See [BOT.md](BOT.md)
+- [ ] Azure AD setup → See [AZURE.md](AZURE.md)
+- [ ] Production deployment → See [roadmap.md](roadmap.md)
+
+---
+
+## Documentation Index
+
+All feature documentation, planning guides, and reference materials are stored in the `docs/` folder.
+
+### Core Documentation
+
+| File                                   | Description                                          | Status       |
+| -------------------------------------- | ---------------------------------------------------- | ------------ |
+| [../README.md](../README.md)           | Project overview and quick start                     | ✅ Current   |
+| [IMPLEMENTATION.md](IMPLEMENTATION.md) | Technical architecture and API reference (this file) | ✅ Current   |
+| [WALKTHROUGH.md](WALKTHROUGH.md)       | Step-by-step user walkthrough of the application     | ✅ Available |
+| [PROGRESS.md](PROGRESS.md)             | Development progress tracking                        | ✅ Available |
+
+### Feature Documentation
+
+| File                         | Description                                                             | Status         |
+| ---------------------------- | ----------------------------------------------------------------------- | -------------- |
+| [DARKMODE.md](DARKMODE.md)   | Dark mode implementation plan with YouTube/Material Design color system | ✅ Implemented |
+| [UI.md](UI.md)               | UI refactor notes - "Add Row" UX for time entries                       | 🚧 In Progress |
+| [POWERAPPS.md](POWERAPPS.md) | Complete PowerApps feature reference for parity                         | 📋 Reference   |
+| [BOT.md](BOT.md)             | Microsoft Teams chatbot planning and architecture                       | 📋 Planned     |
+
+### Integration Guides
+
+| File                   | Description                                   | Status         |
+| ---------------------- | --------------------------------------------- | -------------- |
+| [AZURE.md](AZURE.md)   | Azure AD / Microsoft 365 authentication setup | ✅ Implemented |
+| [TWILIO.md](TWILIO.md) | Twilio SMS notification setup guide           | ✅ Implemented |
+
+### Planning & Roadmap
+
+| File                     | Description                                                | Status       |
+| ------------------------ | ---------------------------------------------------------- | ------------ |
+| [roadmap.md](roadmap.md) | Production hardening, security, deployment recommendations | 📋 Reference |
+
+### File Organization
+
+```
+timesheet/
+├── README.md              # Project overview (root)
+│
+└── docs/                  # All documentation
+    ├── IMPLEMENTATION.md  # Technical architecture (this file)
+    ├── WALKTHROUGH.md     # User walkthrough
+    ├── PROGRESS.md        # Development progress
+    │
+    ├── DARKMODE.md        # Dark mode implementation ✅
+    ├── UI.md              # UI refactor notes 🚧
+    ├── POWERAPPS.md       # PowerApps feature reference
+    ├── BOT.md             # Teams bot planning
+    │
+    ├── AZURE.md           # Azure AD setup guide
+    ├── TWILIO.md          # Twilio SMS setup guide
+    │
+    └── roadmap.md         # Production roadmap
+```
 
 ---
 
