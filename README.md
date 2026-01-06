@@ -204,6 +204,26 @@ pytest tests/test_models.py -v
 | Server        | Nginx + Gunicorn (gevent)     |
 | Container     | Docker                        |
 
+## Development Branches
+
+| Branch | Description                                        | Status     |
+| ------ | -------------------------------------------------- | ---------- |
+| `main` | Stable, production-ready code                      | ✅ Active  |
+| `UI`   | Timesheet hour entry UI refactor (PowerApps-style) | 🚧 WIP     |
+| `bot`  | Microsoft Teams chatbot integration                | 📋 Planned |
+
+## Documentation
+
+| File                                   | Description                                    |
+| -------------------------------------- | ---------------------------------------------- |
+| [IMPLEMENTATION.md](IMPLEMENTATION.md) | Full technical implementation guide            |
+| [WALKTHROUGH.md](WALKTHROUGH.md)       | App walkthrough with screenshots               |
+| [PROGRESS.md](PROGRESS.md)             | Development progress tracking                  |
+| [roadmap.md](roadmap.md)               | Future improvements and architecture decisions |
+| [AZURE.md](AZURE.md)                   | Azure AD configuration guide                   |
+| [TWILIO.md](TWILIO.md)                 | Twilio SMS integration guide                   |
+| [BOT.md](BOT.md)                       | Microsoft Teams bot planning document          |
+
 ## License
 
 Copyright (c) 2026 Northstar Technologies. All rights reserved.

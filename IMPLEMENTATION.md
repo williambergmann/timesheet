@@ -2,6 +2,20 @@
 
 Replacing the PowerApps timesheet solution with a modern Flask + vanilla JS/CSS application for ~60 users.
 
+## Current Status
+
+| Component          | Status                                            |
+| ------------------ | ------------------------------------------------- |
+| **Core App**       | ✅ Functional - CRUD, attachments, admin workflow |
+| **Authentication** | ✅ Microsoft 365 / MSAL integrated                |
+| **UI/UX**          | ✅ Forest green theme, premium design             |
+| **Test Suite**     | ✅ 85 tests, 74% coverage                         |
+| **Deployment**     | ✅ Docker Compose (local)                         |
+| **UI Refactor**    | 🚧 In progress (`UI` branch)                      |
+| **Teams Bot**      | 📋 Planned (`bot` branch)                         |
+
+---
+
 ## Screenshots
 
 ### Reference: PowerApps Current UI
@@ -19,19 +33,15 @@ _New Flask implementation with forest green theme and premium UI_
 
 ---
 
-> **⚠️ IMPORTANT: File Storage Decision Pending**
+> **📁 File Storage: Local Filesystem**
 >
-> Attachment storage (images/PDFs for field hours) needs to be decided. Options:
->
-> - **Local filesystem** (Docker volume) - simpler, but requires backup strategy
-> - **Azure Blob Storage** - scales better, integrates with O365
->
-> For initial implementation, we're using local filesystem with a clear abstraction layer to swap later.
+> Attachments (images/PDFs for field hours) are currently stored on the local filesystem via Docker volume.
+> For production scaling, consider migrating to Azure Blob Storage or S3/R2.
 
-> **⚠️ IMPORTANT: Field Hours Approval Document**
+> **📎 Field Hours Attachments**
 >
-> The purpose/format of the uploaded document for field hours needs clarification.
-> Currently implementing as a generic file upload (images/PDFs accepted).
+> Field hours require an uploaded approval document (images/PDFs accepted).
+> This is enforced during timesheet submission.
 
 ---
 
