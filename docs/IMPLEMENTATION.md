@@ -4,15 +4,16 @@ Replacing the PowerApps timesheet solution with a modern Flask + vanilla JS/CSS 
 
 ## Current Status
 
-| Component          | Status                                            |
-| ------------------ | ------------------------------------------------- |
-| **Core App**       | ✅ Functional - CRUD, attachments, admin workflow |
-| **Authentication** | ✅ Microsoft 365 / MSAL integrated                |
-| **UI/UX**          | ✅ Forest green theme, premium design             |
-| **Test Suite**     | ✅ 85 tests, 74% coverage                         |
-| **Deployment**     | ✅ Docker Compose (local)                         |
-| **UI Refactor**    | 🚧 In progress (`UI` branch)                      |
-| **Teams Bot**      | 📋 Planned (`bot` branch)                         |
+| Component            | Status                                            |
+| -------------------- | ------------------------------------------------- |
+| **Core App**         | ✅ Functional - CRUD, attachments, admin workflow |
+| **Authentication**   | ✅ Microsoft 365 / MSAL integrated                |
+| **UI/UX**            | ✅ Forest green theme, premium design             |
+| **Test Suite**       | ✅ 85 tests, 74% coverage                         |
+| **Deployment**       | ✅ Docker Compose (local)                         |
+| **UI Refactor**      | ✅ Complete (`main` branch)                       |
+| **PowerApps Parity** | ✅ All P0/P1/P2 features complete                 |
+| **Teams Bot**        | 📋 Planned (`bot` branch)                         |
 
 ---
 
@@ -615,17 +616,20 @@ def create_auto_populated_draft(user, week_start):
 - [x] Auto-populate feature
 - [x] Tooltips and UX refinements
 
-### Phase 5: UI Refactor (Current - `UI` Branch) 🚧 In Progress
+### Phase 5: UI Refactor ✅ Complete
 
-> **Branch:** `UI`  
-> **Status:** Active development
+> **Branch:** `main` (merged from `UI`)
+> **Status:** Complete - All PowerApps parity features implemented
 
 - [x] Time entry "Add Row" UX (dropdown + add button) → See [UI.md](UI.md)
 - [x] Horizontal table layout for hour types
 - [x] Dark mode implementation → See [DARKMODE.md](DARKMODE.md)
 - [x] Field hours attachment warning
-- [ ] Feature parity with PowerApps → See [POWERAPPS.md](POWERAPPS.md)
-- [ ] Light mode CSS backup created
+- [x] Feature parity with PowerApps → See [POWERAPPS.md](POWERAPPS.md)
+  - [x] P0: Field Hours Warning, User Notes, Admin Notes
+  - [x] P1: Time Code Help, Row Totals, Status Definitions, Empty Attachments
+  - [x] P2: Welcome Screen, Unsaved Changes Warning, Refresh Button
+- [x] Light mode CSS backup created
 
 ### Phase 6: Integrations (Planned)
 
