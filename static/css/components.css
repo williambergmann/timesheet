@@ -17,8 +17,8 @@
    ============================================ */
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--color-white);
-    border-right: 1px solid var(--color-gray-200);
+    background: var(--color-bg-surface);
+    border-right: 1px solid var(--color-border-subtle);
     padding: var(--spacing-lg);
     flex-shrink: 0;
 }
@@ -35,18 +35,19 @@
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
-    color: var(--color-gray-700);
+    color: var(--color-text-secondary);
     transition: all var(--transition-fast);
 }
 
 .sidebar-link:hover {
-    background: var(--color-gray-100);
+    background: var(--color-hover);
+    color: var(--color-text-primary);
     text-decoration: none;
 }
 
 .sidebar-link.active {
-    background: var(--color-primary);
-    color: var(--color-white);
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
 }
 
 .sidebar-link .icon {
@@ -56,7 +57,7 @@
 .sidebar-divider {
     margin: var(--spacing-md) 0;
     border: none;
-    border-top: 1px solid var(--color-gray-200);
+    border-top: 1px solid var(--color-border-subtle);
 }
 
 /* ============================================
@@ -116,18 +117,17 @@
    Timesheet Card
    ============================================ */
 .timesheet-card {
-    background: var(--color-white);
+    background: var(--color-bg-elevated);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--color-border-subtle);
     padding: var(--spacing-lg);
     transition: all var(--transition-fast);
     cursor: pointer;
 }
 
 .timesheet-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-primary-light);
+    border-color: var(--color-primary);
+    background: #1e1e1e;
 }
 
 .timesheet-card-header {
@@ -197,11 +197,36 @@
    Timesheet Form
    ============================================ */
 .timesheet-form {
-    background: var(--color-white);
+    background: var(--color-bg-elevated);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--color-border-subtle);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border-subtle);
 }
 
 .form-section {
@@ -260,14 +285,14 @@
     font-weight: 600;
     border-radius: var(--radius-md);
     background: var(--color-primary);
-    color: var(--color-white);
+    color: var(--color-text-inverse);
     border: none;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .btn-icon:hover {
-    background: var(--color-primary-dark);
+    background: var(--color-primary-hover);
     transform: scale(1.05);
 }
 
@@ -275,10 +300,10 @@
    Hour Type Table (Horizontal Layout)
    ============================================ */
 .hour-type-table {
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
     overflow: hidden;
-    background: var(--color-white);
+    background: var(--color-bg-surface);
 }
 
 .hour-type-header,
@@ -286,20 +311,20 @@
     display: grid;
     grid-template-columns: 140px repeat(7, 1fr) 100px;
     gap: 1px;
-    background: var(--color-gray-200);
+    background: var(--color-border-subtle);
 }
 
 .hour-type-header {
-    background: var(--color-gray-100);
+    background: var(--color-bg-overlay);
 }
 
 .hour-type-header > div {
-    background: var(--color-gray-50);
+    background: var(--color-bg-overlay);
     padding: var(--spacing-sm) var(--spacing-xs);
     font-weight: 600;
     font-size: var(--font-size-sm);
     text-align: center;
-    color: var(--color-gray-700);
+    color: var(--color-text-secondary);
 }
 
 .hour-type-label-cell {
@@ -308,11 +333,11 @@
 }
 
 .hour-type-row {
-    background: var(--color-gray-200);
+    background: var(--color-border-subtle);
 }
 
 .hour-type-row > div {
-    background: var(--color-white);
+    background: var(--color-bg-elevated);
     padding: var(--spacing-sm) var(--spacing-xs);
 }
 
@@ -334,21 +359,23 @@
     width: 100%;
     max-width: 60px;
     padding: var(--spacing-xs);
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     text-align: center;
     font-size: var(--font-size-sm);
+    background: var(--color-bg-overlay);
+    color: var(--color-text-primary);
 }
 
 .hour-type-row .hour-type-day-cell input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 .hour-type-row .hour-type-day-cell input:disabled {
-    background: var(--color-gray-50);
-    color: var(--color-gray-600);
+    background: var(--color-bg-surface);
+    color: var(--color-text-disabled);
     cursor: not-allowed;
 }
 
@@ -370,20 +397,20 @@
 
 .hour-type-row .btn-done {
     background: var(--color-success);
-    color: var(--color-white);
+    color: var(--color-text-inverse);
 }
 
 .hour-type-row .btn-done:hover {
-    background: #059669;
+    background: #10b981;
 }
 
 .hour-type-row .btn-edit {
     background: var(--color-primary);
-    color: var(--color-white);
+    color: var(--color-text-inverse);
 }
 
 .hour-type-row .btn-edit:hover {
-    background: var(--color-primary-dark);
+    background: var(--color-primary-hover);
 }
 
 .hour-type-row .btn-remove {
@@ -398,11 +425,11 @@
 }
 
 .hour-type-row.editing {
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(74, 222, 128, 0.05);
 }
 
 .hour-type-row.locked .hour-type-day-cell {
-    background: var(--color-gray-50);
+    background: var(--color-bg-surface);
 }
 
 /* Empty state for no rows */
@@ -411,10 +438,10 @@
     display: block;
     padding: var(--spacing-lg);
     text-align: center;
-    color: var(--color-gray-500);
+    color: var(--color-text-disabled);
     font-size: var(--font-size-sm);
     font-style: italic;
-    background: var(--color-white);
+    background: var(--color-bg-elevated);
 }
 
 /* ============================================
@@ -455,7 +482,7 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-gray-100);
+    background: var(--color-bg-overlay);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
 }
@@ -471,18 +498,18 @@
 }
 
 .upload-zone {
-    border: 2px dashed var(--color-gray-300);
+    border: 2px dashed var(--color-border-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-xl);
     text-align: center;
-    color: var(--color-gray-500);
+    color: var(--color-text-disabled);
     transition: all var(--transition-fast);
 }
 
 .upload-zone:hover,
 .upload-zone.dragover {
     border-color: var(--color-primary);
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(74, 222, 128, 0.05);
 }
 
 .upload-zone p {
@@ -521,7 +548,7 @@
 
 .note-item {
     padding: var(--spacing-md);
-    background: var(--color-gray-50);
+    background: var(--color-bg-overlay);
     border-radius: var(--radius-md);
     border-left: 3px solid var(--color-primary);
 }
@@ -531,7 +558,7 @@
     justify-content: space-between;
     margin-bottom: var(--spacing-xs);
     font-size: var(--font-size-sm);
-    color: var(--color-gray-600);
+    color: var(--color-text-secondary);
 }
 
 .note-item-content {
@@ -548,10 +575,10 @@
 }
 
 .timesheet-detail {
-    background: var(--color-white);
+    background: var(--color-bg-elevated);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border-subtle);
 }
 
 .detail-section {
@@ -561,7 +588,7 @@
 .detail-section h4 {
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .detail-grid {
