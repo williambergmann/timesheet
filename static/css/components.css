@@ -416,6 +416,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
+    height: 40px;
 }
 
 .hour-type-row .btn-action {
@@ -426,6 +427,11 @@
     cursor: pointer;
     transition: all var(--transition-fast);
     min-width: 55px;
+    height: 28px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     background: #86efac;
     color: #1a1a1a;
