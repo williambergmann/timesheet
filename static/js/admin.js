@@ -95,6 +95,60 @@ async function loadAdminUsers() {
     }
 }
 
+async function loadAdminStats() {
+    try {
+        // Fetch all timesheets (no filters) to calculate stats
+        const data = await API.getAdminTimesheets({});
+        const timesheets = data.timesheets || [];
+        
+        // Calculate counts
+        const pendingCount = timesheets.filter(ts => ts.status === 'SUBMITTED').length;
+        const needsAttentionCount = timesheets.filter(ts => ts.status === 'NEEDS_APPROVAL').length;
+        
+        // Approved this week - check if approved within last 7 days
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const approvedThisWeek = timesheets.filter(ts => {
+            if (ts.status !== 'APPROVED') return false;
+            // Use updated_at as the approval timestamp
+            const approvedDate = new Date(ts.updated_at || ts.created_at);
+            return approvedDate >= oneWeekAgo;
+        }).length;
+        
+        // Update the stat cards
+        const pendingEl = document.getElementById('stat-pending');
+        const approvedEl = document.getElementById('stat-approved');
+        const needsAttentionEl = document.getElementById('stat-needs-attention');
+        
+        if (pendingEl) pendingEl.textContent = pendingCount;
+        if (approvedEl) approvedEl.textContent = approvedThisWeek;
+        if (needsAttentionEl) needsAttentionEl.textContent = needsAttentionCount;
+        
+        // Add pulse effect if needs attention has items
+        const attentionCard = document.getElementById('stat-card-attention');
+        if (attentionCard) {
+            if (needsAttentionCount > 0) {
+                attentionCard.classList.add('needs-attention');
+            } else {
+                attentionCard.classList.remove('needs-attention');
+            }
+        }
+        
+        // Add pending indicator if items waiting
+        const pendingCard = document.getElementById('stat-card-pending');
+        if (pendingCard) {
+            if (pendingCount > 0) {
+                pendingCard.classList.add('has-pending');
+            } else {
+                pendingCard.classList.remove('has-pending');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Failed to load admin stats:', error);
+    }
+}
+
 async function openAdminTimesheet(id) {
     try {
         const timesheet = await API.getAdminTimesheet(id);
@@ -344,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load users for filter dropdown
     if (window.currentUser && window.currentUser.is_admin) {
         loadAdminUsers();
+        loadAdminStats(); // Load stats for KPI cards
     }
     
     // Setup filter handlers
@@ -374,6 +429,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userEl) userEl.value = '';
             if (weekEl) weekEl.value = '';
             
+            // Remove active state from stat cards
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
             loadAdminTimesheets();
         });
     }
@@ -383,6 +443,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (exportBtn) {
         exportBtn.addEventListener('click', exportTimesheetsToCSV);
     }
+    
+    // Stat card click handlers (quick filters)
+    document.querySelectorAll('.stat-card.clickable').forEach(card => {
+        card.addEventListener('click', () => {
+            const filterValue = card.dataset.filter;
+            const statusEl = document.getElementById('admin-filter-status');
+            const userEl = document.getElementById('admin-filter-user');
+            const weekEl = document.getElementById('admin-filter-week');
+            
+            // Clear other filters
+            if (userEl) userEl.value = '';
+            if (weekEl) weekEl.value = '';
+            
+            // Set status filter
+            if (statusEl) {
+                statusEl.value = filterValue;
+            }
+            
+            // Update active state on cards
+            document.querySelectorAll('.stat-card').forEach(c => {
+                c.classList.remove('active');
+            });
+            card.classList.add('active');
+            
+            // Reload timesheets with filter
+            loadAdminTimesheets();
+        });
+    });
 });
 
 // ==========================================

@@ -3,7 +3,7 @@
 {% block title %}Northstar Timesheet App - Dashboard{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20260107p1" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20260107p2" />
 {% endblock %}
 
 {% block content %}
@@ -339,21 +339,21 @@
       </div>
       
       <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card clickable" data-filter="SUBMITTED" id="stat-card-pending" title="Click to filter">
           <div class="stat-icon primary">📊</div>
           <div class="stat-content">
             <h4 id="stat-pending">-</h4>
             <p>Pending Review</p>
           </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable" data-filter="APPROVED" id="stat-card-approved" title="Click to filter">
           <div class="stat-icon accent">✅</div>
           <div class="stat-content">
             <h4 id="stat-approved">-</h4>
             <p>Approved This Week</p>
           </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable" data-filter="NEEDS_APPROVAL" id="stat-card-attention" title="Click to filter">
           <div class="stat-icon warning">⚠️</div>
           <div class="stat-content">
             <h4 id="stat-needs-attention">-</h4>
@@ -417,7 +417,7 @@
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260106p11"></script>
-<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260107p1"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260107p2"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260106p3"></script>
 {% endblock %}
