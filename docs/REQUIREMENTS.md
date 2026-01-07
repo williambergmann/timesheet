@@ -282,17 +282,106 @@ Allow users to submit timesheets with Field Hours but no attachment.
 
 ---
 
-## 🔒 Authentication
+### REQ-016: Auto-Redirect After Login (P0)
 
-### REQ-015: Azure AD User Sync (P2)
+After successful login, redirect users directly to their appropriate view:
 
-Sync user data (names, emails, roles) from Azure AD.
+- **Trainee/Support/Staff** → My Timesheets (`/app`)
+- **Admin** → Admin Dashboard (`/app#admin`)
+
+**No landing page** - users go straight to their workspace.
+
+---
+
+### REQ-017: Dev Mode Test Logins (P0)
+
+Display 4 clickable test login buttons on the login page:
+
+| Role    | Button Label | Credentials     |
+| ------- | ------------ | --------------- |
+| Trainee | 🎓 Trainee   | trainee/trainee |
+| Support | 🛠️ Support   | support/support |
+| Staff   | 👤 Staff     | staff/staff     |
+| Admin   | 👑 Admin     | admin/password  |
 
 **Implementation Notes:**
 
-- Use Microsoft Graph API to fetch user profiles
-- Map Azure AD groups to app roles
-- Periodic sync or on-demand during login
+- Show buttons only in dev mode (when Azure credentials not configured)
+- Each button logs in as that role for testing
+- Style as prominent buttons on login page
+
+---
+
+### REQ-018: Hour Type Filter (P1)
+
+Add filter on Admin Dashboard to show only timesheets containing specific hour types.
+
+**Options:**
+
+- All Hour Types (default)
+- Field Hours Only
+- Internal Hours Only
+- Training Only
+- Mixed (multiple types)
+
+**Implementation Notes:**
+
+- Add alongside existing status/user filters
+- Query entries table to find matching timesheets
+
+---
+
+### REQ-019: Export Format Options (P1)
+
+Add export functionality with multiple format options:
+
+| Format | Description                             |
+| ------ | --------------------------------------- |
+| CSV    | Comma-separated values for Excel import |
+| Excel  | Native .xlsx format                     |
+| PDF    | Formatted printable report              |
+
+**Export Scope:**
+
+- Current filtered view (all visible timesheets)
+- Single timesheet detail view
+- Pay period summary
+
+---
+
+### REQ-020: Travel Flag Visibility (P1)
+
+Show travel status prominently on admin timesheet list.
+
+**Features:**
+
+- Travel indicator icon/badge on timesheet cards
+- Quick filter: "Show only traveled"
+- Flag timesheets that traveled but lack documentation
+
+**Implementation Notes:**
+
+- `traveled` field already exists on Timesheet model
+- Add visual indicator to admin card component
+
+---
+
+### REQ-021: Per-Option Reimbursement Attachments (P1)
+
+Each reimbursement type should have its own attachment requirement:
+
+| Reimbursement Type | Attachment Required         |
+| ------------------ | --------------------------- |
+| Car                | Mileage log or receipt      |
+| Flight             | Flight receipt/confirmation |
+| Food               | Receipt(s)                  |
+| Other              | Supporting documentation    |
+
+**Implementation Notes:**
+
+- Extend Attachment model to link to reimbursement type
+- Validate each selected reimbursement type has attachment
+- Show warning if missing (similar to Field Hours warning)
 
 ---
 
@@ -315,7 +404,13 @@ Sync user data (names, emails, roles) from Azure AD.
 | REQ-013     | 📋 Planned | Role-based filtering                  |
 | REQ-014     | ✅ Partial | Warning exists, needs flow change     |
 | REQ-015     | 📋 Planned | Azure AD integration                  |
+| REQ-016     | 📋 Planned | Auto-redirect after login             |
+| REQ-017     | 📋 Planned | Dev mode test login buttons           |
+| REQ-018     | 📋 Planned | Hour type filter                      |
+| REQ-019     | 📋 Planned | Export format options                 |
+| REQ-020     | 📋 Planned | Travel flag visibility                |
+| REQ-021     | 📋 Planned | Per-option reimbursement attachments  |
 
 ---
 
-_Document created January 7, 2026_
+_Document updated January 7, 2026_

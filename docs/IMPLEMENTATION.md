@@ -942,6 +942,7 @@ python -m compileall app
   - [x] Verify: `flask db current` shows `001_initial_schema (head)`
 
 - [ ] **Complete Workflow Testing**
+
   - [ ] Create new timesheet as regular user
   - [ ] Add time entries for full week
   - [ ] Upload attachment for field hours
@@ -949,6 +950,41 @@ python -m compileall app
   - [ ] Approve timesheet as admin
   - [ ] Verify SMS notification sent
   - [ ] Test "needs attachment" flow
+
+- [ ] **Auto-Redirect After Login** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-016)
+
+  - [ ] Remove landing page / dashboard redirect
+  - [ ] Redirect non-admin users to `/app` (My Timesheets)
+  - [ ] Redirect admin users to `/app#admin` (Admin Dashboard)
+  - [ ] Update `auth.py` callback to check user role
+
+- [ ] **Dev Mode Test Login Buttons** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-017)
+
+  - [ ] Create 4 test accounts (trainee, support, staff, admin)
+  - [ ] Display 4 login buttons on login page in dev mode
+  - [ ] Style buttons with role icons (🎓 🛠️ 👤 👑)
+  - [ ] Each button auto-logs in as that role
+
+- [ ] **Export Format Options** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-019)
+
+  - [ ] Add Export button to Admin Dashboard
+  - [ ] Implement CSV export
+  - [ ] Implement Excel (.xlsx) export
+  - [ ] Implement PDF export
+
+- [ ] **Travel Flag & Hour Type Filters** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-018-req-020)
+
+  - [ ] Add hour type filter dropdown (Field/Internal/Training/All)
+  - [ ] Add travel indicator badge on admin timesheet cards
+  - [ ] Add "Traveled only" quick filter
+  - [ ] Flag traveled timesheets lacking documentation
+
+- [ ] **Per-Option Reimbursement Attachments** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-021)
+
+  - [ ] Extend Attachment model with `reimbursement_type` field
+  - [ ] Add attachment upload per reimbursement option (Car/Flight/Food/Other)
+  - [ ] Validate each selected type has attachment
+  - [ ] Show warning for missing reimbursement attachments
 
 ### Phase 3: Integration Setup
 
