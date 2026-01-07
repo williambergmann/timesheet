@@ -105,11 +105,20 @@ const TimesheetModule = {
             addBtn.replaceWith(addBtn.cloneNode(true));
             const newBtn = document.getElementById('add-hour-type-btn');
             
+            // Initially disable the button (no type selected)
+            newBtn.disabled = !selector.value;
+            
+            // Enable/disable button based on selector value
+            selector.addEventListener('change', () => {
+                newBtn.disabled = !selector.value || this.addedHourTypes.has(selector.value);
+            });
+            
             newBtn.addEventListener('click', () => {
                 const hourType = selector.value;
                 if (hourType && !this.addedHourTypes.has(hourType)) {
                     this.addHourTypeRow(hourType);
                     selector.value = ''; // Reset selector
+                    newBtn.disabled = true; // Disable button after adding
                 }
             });
         }
