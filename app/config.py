@@ -64,6 +64,14 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
+    # Session security (production only - requires HTTPS)
+    SESSION_COOKIE_SECURE = True  # Cookies only sent over HTTPS
+    SESSION_COOKIE_HTTPONLY = True  # Prevent XSS access to session cookie
+    SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection
+
+    # Session timeout (8 hours)
+    PERMANENT_SESSION_LIFETIME = 28800
+
 
 class TestingConfig(Config):
     """Testing configuration."""

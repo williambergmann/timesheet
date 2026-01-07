@@ -52,4 +52,16 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
+    # Security headers
+    @app.after_request
+    def set_security_headers(response):
+        """Add security headers to all responses."""
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Enable HSTS in production (uncomment when using HTTPS)
+        # response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
     return app

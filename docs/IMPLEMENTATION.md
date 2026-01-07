@@ -657,18 +657,20 @@ All feature documentation, planning guides, and reference materials are stored i
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
 | [../README.md](../README.md)           | **Project overview and quick start.** High-level features, installation, and getting started guide.                                                                            | All     |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | **Technical architecture and API reference (this file).** Database schema, endpoints, development phases, and checklist. This is the canonical source for project status.      | All     |
+| [../SECURITY.md](../SECURITY.md)       | **Security checklist and best practices.** Pre-deployment security audit, authentication/authorization checks, input validation, HTTPS configuration.                          | All     |
 | [TESTING.md](TESTING.md)               | **Test suite documentation.** How to run tests, coverage goals, and testing strategy.                                                                                          | Phase 1 |
 | [WALKTHROUGH.md](WALKTHROUGH.md)       | **End-user documentation.** Step-by-step guide to using the app: login flow, creating timesheets, admin functions. Screenshots and UI descriptions. Good for onboarding users. | All     |
 
 ### Feature Documentation
 
-| File                         | Purpose                                                                                                                                                                                  | Phase   |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [DARKMODE.md](DARKMODE.md)   | **Dark mode implementation plan.** YouTube/Material Design color system, elevation overlays, CSS variable strategy.                                                                      | Phase 5 |
-| [UI.md](UI.md)               | **UI refactor notes.** Documents the "Add Row" pattern for time entries, replacing the original grid layout.                                                                             | Phase 5 |
-| [POWERAPPS.md](POWERAPPS.md) | **Original PowerApps feature reference.** Complete documentation of the legacy app's UI, colors, workflows, and features for achieving parity. Used as a checklist for missing features. | Phase 5 |
-| [LOGIN.md](LOGIN.md)         | **Microsoft-style login page design.** Mockups and implementation notes for matching Microsoft's login aesthetic.                                                                        | Phase 5 |
-| [BOT.md](BOT.md)             | **Microsoft Teams chatbot planning.** Architecture, commands, Adaptive Cards, proactive notifications.                                                                                   | Phase 6 |
+| File                           | Purpose                                                                                                                                                                                  | Phase   |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| [DARKMODE.md](DARKMODE.md)     | **Dark mode implementation plan.** YouTube/Material Design color system, elevation overlays, CSS variable strategy.                                                                      | Phase 5 |
+| [RESPONSIVE.md](RESPONSIVE.md) | **Responsive design documentation.** Breakpoint architecture, mobile hamburger menu, three-state snap layout, component breakdowns.                                                      | Phase 5 |
+| [UI.md](UI.md)                 | **UI refactor notes.** Documents the "Add Row" pattern for time entries, replacing the original grid layout.                                                                             | Phase 5 |
+| [POWERAPPS.md](POWERAPPS.md)   | **Original PowerApps feature reference.** Complete documentation of the legacy app's UI, colors, workflows, and features for achieving parity. Used as a checklist for missing features. | Phase 5 |
+| [LOGIN.md](LOGIN.md)           | **Microsoft-style login page design.** Mockups and implementation notes for matching Microsoft's login aesthetic.                                                                        | Phase 5 |
+| [BOT.md](BOT.md)               | **Microsoft Teams chatbot planning.** Architecture, commands, Adaptive Cards, proactive notifications.                                                                                   | Phase 6 |
 
 ### Integration Guides
 
@@ -701,12 +703,15 @@ All feature documentation, planning guides, and reference materials are stored i
 | What did the original PowerApps look like? | POWERAPPS.md                           |
 | How should we deploy to production?        | roadmap.md                             |
 | What tests exist?                          | TESTING.md                             |
+| How do I secure the app?                   | SECURITY.md                            |
+| How does responsive design work?           | RESPONSIVE.md                          |
 
 ### File Organization
 
 ```
 timesheet/
 ├── README.md                # Project overview (root)
+├── SECURITY.md              # 🔒 Security checklist (root)
 │
 └── docs/                    # All documentation
     │
@@ -720,6 +725,7 @@ timesheet/
     │
     │── DARKMODE.md          # 🌙 Dark mode implementation (Phase 5)
     │── LOGIN.md             # 🔐 Microsoft login page design
+    │── RESPONSIVE.md        # 📱 Responsive design documentation
     │── UI.md                # 🎨 UI refactor documentation
     │── POWERAPPS.md         # 📱 Original app feature reference
     │── BOT.md               # 🤖 Teams bot planning (Phase 6)

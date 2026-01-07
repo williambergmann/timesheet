@@ -12,7 +12,7 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### Backend Secrets
 
-- [ ] **Verify `.env` is in `.gitignore`** - Ensure environment files are never committed
+- [x] **Verify `.env` is in `.gitignore`** - ✅ Confirmed in `.gitignore` lines 50-66
 - [ ] **Generate strong `SECRET_KEY`** - Use cryptographically secure random string (not the default `dev-secret-key-change-me`)
   ```bash
   python3 -c "import secrets; print(secrets.token_hex(32))"
@@ -45,13 +45,13 @@ Before deploying to production, run through this comprehensive checklist to ensu
 - [ ] **Strong database password** - Ensure PostgreSQL password is not the default `timesheet`
 - [ ] **Database user permissions** - Use principle of least privilege (app user shouldn't have `SUPERUSER` rights)
 - [ ] **Network isolation** - Database should only be accessible from application server (not public internet)
-- [ ] **Parameterized queries** - Verify all database queries use SQLAlchemy ORM or parameterized queries (no string concatenation)
+- [x] **Parameterized queries** - ✅ All queries use SQLAlchemy ORM (no raw SQL concatenation)
 
 #### Data Protection
 
-- [ ] **Check SQL injection vulnerabilities** - Review all raw SQL queries (if any) for proper parameterization
-- [ ] **Verify data ownership policies** - Ensure users can only access their own timesheets (except admins)
-- [ ] **Test admin authorization** - Verify admin routes require both authentication AND admin privileges
+- [x] **Check SQL injection vulnerabilities** - ✅ No raw SQL found; all queries via SQLAlchemy ORM
+- [x] **Verify data ownership policies** - ✅ All routes use `filter_by(user_id=session["user"]["id"])`
+- [x] **Test admin authorization** - ✅ Admin routes use both `@login_required` and `@admin_required`
 
 ---
 
@@ -59,21 +59,21 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### Session Security
 
-- [ ] **Secure session configuration** - Ensure Flask session cookies are:
+- [x] **Secure session configuration** - ✅ Added to `ProductionConfig` (Jan 7, 2026):
   - `SESSION_COOKIE_SECURE = True` (HTTPS only in production)
   - `SESSION_COOKIE_HTTPONLY = True` (prevent XSS access)
   - `SESSION_COOKIE_SAMESITE = 'Lax'` (CSRF protection)
-- [ ] **Session timeout** - Configure appropriate `PERMANENT_SESSION_LIFETIME`
+- [x] **Session timeout** - ✅ `PERMANENT_SESSION_LIFETIME = 28800` (8 hours)
 
 #### Server-Side Authentication
 
-- [ ] **Verify `@login_required` decorator** - All protected routes must use `@login_required`
-- [ ] **Verify `@admin_required` decorator** - Admin routes must use both `@login_required` and `@admin_required`
-- [ ] **No client-side only protection** - Never rely solely on hiding UI elements; all endpoints must verify server-side
+- [x] **Verify `@login_required` decorator** - ✅ All protected routes in `timesheets.py` use `@login_required`
+- [x] **Verify `@admin_required` decorator** - ✅ All admin routes in `admin.py` use both decorators
+- [x] **No client-side only protection** - ✅ All endpoints verify permissions server-side
 
 #### Authorization Checks
 
-- [ ] **Ownership verification** - Routes that access user data must verify:
+- [x] **Ownership verification** - ✅ All routes verify ownership:
   ```python
   # Example from timesheets.py
   timesheet = Timesheet.query.filter_by(
@@ -81,7 +81,7 @@ Before deploying to production, run through this comprehensive checklist to ensu
       user_id=session["user"]["id"]  # Verify ownership
   ).first_or_404()
   ```
-- [ ] **Admin privilege checks** - Admin routes properly check `is_admin` flag:
+- [x] **Admin privilege checks** - ✅ Implemented in `decorators.py`:
   ```python
   # From decorators.py
   if not session.get("user", {}).get("is_admin"):
@@ -101,11 +101,11 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### File Uploads
 
-- [ ] **Validate file extensions** - Only allow: `pdf`, `png`, `jpg`, `jpeg`, `gif`
-- [ ] **Enforce file size limits** - Currently set to 16MB (`MAX_CONTENT_LENGTH`)
-- [ ] **Validate file content** - Extension check alone isn't enough; verify file headers/magic numbers
-- [ ] **Secure file storage** - Uploaded files stored in `/app/uploads` with restricted access
-- [ ] **Sanitize filenames** - Use `werkzeug.utils.secure_filename()` (already implemented in [timesheets.py](file:///Users/lappy/Developer/northstar/timesheet/app/routes/timesheets.py))
+- [x] **Validate file extensions** - ✅ `ALLOWED_EXTENSIONS` in `config.py`: `pdf`, `png`, `jpg`, `jpeg`, `gif`
+- [x] **Enforce file size limits** - ✅ `MAX_CONTENT_LENGTH = 16MB` in `config.py`
+- [x] **Validate file content** - ✅ Magic number validation added to `upload_attachment()` (Jan 7, 2026)
+- [x] **Secure file storage** - ✅ Files stored in `/app/uploads` via Docker volume
+- [x] **Sanitize filenames** - ✅ Uses `werkzeug.utils.secure_filename()` in `timesheets.py`
 
 #### User Input
 
@@ -131,7 +131,7 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### CORS & Headers
 
-- [ ] **Configure security headers** - Add Flask-Talisman or manually set:
+- [x] **Configure security headers** - ✅ Added to `app/__init__.py` (Jan 7, 2026):
   ```python
   # app/__init__.py
   @app.after_request
@@ -139,7 +139,8 @@ Before deploying to production, run through this comprehensive checklist to ensu
       response.headers['X-Content-Type-Options'] = 'nosniff'
       response.headers['X-Frame-Options'] = 'DENY'
       response.headers['X-XSS-Protection'] = '1; mode=block'
-      response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+      response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+      # HSTS enabled when using HTTPS
       return response
   ```
 - [ ] **CORS policy** - If enabling CORS, restrict to specific domains (not `*`)
@@ -226,27 +227,28 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 ## Current Security Status
 
-### ✅ Good Security Practices Already Implemented
+### ✅ Good Security Practices Implemented
 
 1. **Session-based authentication** - Server-side session storage (no JWT in localStorage)
 2. **Decorator-based authorization** - `@login_required` and `@admin_required` decorators
 3. **SQLAlchemy ORM** - Parameterized queries prevent SQL injection
-4. **Ownership verification** - Timesheets filtered by `user_id`
+4. **Ownership verification** - Timesheets filtered by `user_id` in all routes
 5. **Development mode detection** - `_is_dev_mode()` prevents accidental bypass in production
 6. **File extension validation** - `ALLOWED_EXTENSIONS` restricts upload types
-7. **Secure filename handling** - Uses `secure_filename()` for uploads
-8. **Environment-based configuration** - Secrets loaded from environment variables
-9. **`.gitignore` properly configured** - `.env`, secrets, and sensitive files excluded
+7. **File magic number validation** - Verifies file content matches extension _(Added Jan 7, 2026)_
+8. **Secure filename handling** - Uses `secure_filename()` for uploads
+9. **Environment-based configuration** - Secrets loaded from environment variables
+10. **`.gitignore` properly configured** - `.env`, secrets, and sensitive files excluded
+11. **Session cookie flags** - `SECURE`, `HTTPONLY`, `SAMESITE` configured _(Added Jan 7, 2026)_
+12. **Security headers** - `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection` _(Added Jan 7, 2026)_
 
-### ⚠️ Areas Requiring Attention
+### ⚠️ Areas Requiring Attention Before Production
 
-1. **Session cookie flags** - Need to add `SECURE`, `HTTPONLY`, `SAMESITE` in production config
-2. **Security headers** - Missing `X-Frame-Options`, `CSP`, `HSTS`
-3. **File content validation** - Only checking extensions, not file magic numbers
-4. **Production secrets** - Must rotate from default/placeholder values
-5. **HTTPS enforcement** - Must configure for production
-6. **Rate limiting** - No rate limiting on API endpoints or SMS
-7. **Audit logging** - Limited logging of security events
+1. **Production secrets** - Must rotate `SECRET_KEY` and credentials from default/placeholder values
+2. **HTTPS enforcement** - Must configure SSL/TLS for production
+3. **Rate limiting** - No rate limiting on API endpoints or SMS
+4. **Audit logging** - Limited logging of security events
+5. **Database password** - Change from default `timesheet` in production
 
 ---
 

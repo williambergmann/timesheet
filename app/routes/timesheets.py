@@ -358,6 +358,31 @@ def upload_attachment(timesheet_id):
     filepath = os.path.join(upload_folder, stored_filename)
     file.save(filepath)
 
+    # Validate file content (magic numbers)
+    MAGIC_NUMBERS = {
+        "pdf": [b"%PDF"],
+        "png": [b"\x89PNG\r\n\x1a\n"],
+        "jpg": [b"\xff\xd8\xff"],
+        "jpeg": [b"\xff\xd8\xff"],
+        "gif": [b"GIF87a", b"GIF89a"],
+    }
+    try:
+        with open(filepath, "rb") as f:
+            header = f.read(8)
+        valid_magic = False
+        if ext in MAGIC_NUMBERS:
+            for magic in MAGIC_NUMBERS[ext]:
+                if header.startswith(magic):
+                    valid_magic = True
+                    break
+        if not valid_magic:
+            os.remove(filepath)
+            return {"error": "File content does not match extension"}, 400
+    except Exception:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        return {"error": "Failed to validate file"}, 500
+
     # Get file size
     file_size = os.path.getsize(filepath)
 
