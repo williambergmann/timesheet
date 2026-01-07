@@ -253,6 +253,28 @@
           <div class="form-section-header">
             <div class="form-section-icon">📎</div>
             <h3>Attachments</h3>
+            <button type="button" class="help-icon" id="attachment-help-btn" title="Attachment Requirements">
+              ?
+            </button>
+            <!-- Attachment Info Popup -->
+            <div id="attachment-help-popup" class="help-popup hidden">
+              <div class="help-popup-header">
+                <h4>Attachment Requirements</h4>
+                <button type="button" class="help-popup-close" id="attachment-help-close">&times;</button>
+              </div>
+              <div class="help-popup-content">
+                <dl class="help-definitions">
+                  <dt>Field Hours</dt>
+                  <dd>Field engineers must upload at least one image as proof of work.</dd>
+                  <dt>Accepted Formats</dt>
+                  <dd>PDF, PNG, JPG, JPEG, GIF files are supported.</dd>
+                  <dt>File Size Limit</dt>
+                  <dd>Maximum 16MB per file.</dd>
+                  <dt>Multiple Files</dt>
+                  <dd>You can attach multiple files by dragging or selecting them.</dd>
+                </dl>
+              </div>
+            </div>
           </div>
           <!-- Field Hours Warning -->
           <div id="field-hours-warning" class="field-hours-warning hidden">

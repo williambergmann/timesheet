@@ -779,6 +779,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Help popup toggle handlers - Attachment Info
+    const attachmentHelpBtn = document.getElementById('attachment-help-btn');
+    const attachmentHelpClose = document.getElementById('attachment-help-close');
+    const attachmentHelpPopup = document.getElementById('attachment-help-popup');
+    
+    if (attachmentHelpBtn) {
+        attachmentHelpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            TimesheetModule.toggleHelpPopup('attachment-help-popup');
+        });
+    }
+    
+    if (attachmentHelpClose) {
+        attachmentHelpClose.addEventListener('click', () => {
+            TimesheetModule.toggleHelpPopup('attachment-help-popup');
+        });
+    }
+    
     // Close popups when clicking outside
     document.addEventListener('click', (e) => {
         // Time Code popup
@@ -791,6 +809,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusHelpPopup && !statusHelpPopup.classList.contains('hidden')) {
             if (!statusHelpPopup.contains(e.target) && e.target !== statusHelpBtn) {
                 statusHelpPopup.classList.add('hidden');
+            }
+        }
+        // Attachment popup
+        if (attachmentHelpPopup && !attachmentHelpPopup.classList.contains('hidden')) {
+            if (!attachmentHelpPopup.contains(e.target) && e.target !== attachmentHelpBtn) {
+                attachmentHelpPopup.classList.add('hidden');
             }
         }
     });

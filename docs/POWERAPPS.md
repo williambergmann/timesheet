@@ -36,6 +36,8 @@
 
 ## 🎨 Visual Identity & Color Palette
 
+> **Note:** The colors below document the **original PowerApps light mode** design. The Flask app has been migrated to a **dark mode theme** (YouTube/Material Design inspired) with adapted colors for better contrast and accessibility on dark backgrounds. See `static/css/main.css` for the current dark mode palette.
+
 | Element            | Color        | Hex Code  | Usage                               |
 | ------------------ | ------------ | --------- | ----------------------------------- |
 | Primary Dark Green | Forest Green | `#004d1a` | Sidebar, headers, primary buttons   |
@@ -359,7 +361,7 @@ ELSE:
 | Row Delete Button        | ✅              | ✅              | Implemented                  |
 | Attachments Section      | ✅              | ✅              | Implemented                  |
 | "Nothing attached" Text  | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| Attachment Info Icon     | ✅              | ❌              | Missing (P2)                 |
+| Attachment Info Icon     | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
 | **User Notes**           | ✅ 255 chars    | ✅ 255 chars    | ✅ Implemented (Jan 6, 2026) |
 | **Admin Notes**          | ✅ Read-only    | ✅ Read-only    | ✅ Implemented (Jan 6, 2026) |
 | Unsaved Changes Warning  | ✅ Blue text    | ✅ Blue text    | ✅ Implemented (Jan 6, 2026) |
@@ -431,10 +433,15 @@ ELSE:
     - Ghost button in My Timesheets header
     - Allows manual refresh of timesheet list
 
-### Remaining Nice-to-Have
+### P2 - Nice-to-Have ✅ ALL COMPLETE
 
-11. **Attachment Info Icon**
-    - Information popup about attachment requirements
+11. ✅ **Attachment Info Icon** - _Implemented January 6, 2026_
+    - (?) icon next to "Attachments" header
+    - Popup explaining attachment requirements:
+      - Field Hours require at least one image
+      - Accepted formats: PDF, PNG, JPG, JPEG, GIF
+      - Max file size: 16MB per file
+      - Multiple files can be attached
 
 ---
 
