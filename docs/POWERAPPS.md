@@ -2,8 +2,36 @@
 
 > **Purpose:** Document every detail of the original PowerApps timesheet application for feature parity in the Python/Flask version.
 >
-> **Last Updated:** January 6, 2026
-> **Source URL:** `https://apps.powerapps.com/play/e/default-94b9b97a-c107-40a4-ab6e-1323c7ba2159/a/90670c3b-c8af-4ce6-802a-dbfd452c60a8`
+> **Last Updated:** January 7, 2026  
+> **Canvas Audit Date:** January 7, 2026  
+> **Source URL:** `https://apps.powerapps.com/play/e/default-94b9b97a-c107-40a4-ab6e-1323c7ba2159/a/90670c3b-c8af-4ce6-802a-dbfd452c60a8`  
+> **Canvas Editor:** `https://make.powerapps.com/e/Default-94b9b97a-c107-40a4-ab6e-1323c7ba2159/canvas/?action=edit&app-id=%2Fproviders%2FMicrosoft.PowerApps%2Fapps%2F90670c3b-c8af-4ce6-802a-dbfd452c60a8`
+
+---
+
+## 📂 App Structure (From Canvas Audit)
+
+### Screens
+
+The PowerApps application consists of **4 screens**:
+
+| Screen Name         | Purpose                                        | Flask Equivalent             |
+| ------------------- | ---------------------------------------------- | ---------------------------- |
+| `Welcome`           | Entry point with greeting and navigation cards | Dashboard view               |
+| `Timesheets Screen` | User's timesheet list and creation form        | My Timesheets + Editor views |
+| `AdminPage`         | Administrative review dashboard                | Admin Dashboard view         |
+| `Screen1`           | Raw data report view (DataTable)               | ⚠️ Not implemented           |
+
+### Data Sources (SharePoint)
+
+The original app connects to **two SharePoint lists**:
+
+| List Name         | Purpose                                              |
+| ----------------- | ---------------------------------------------------- |
+| `Timesheets`      | Header-level data (User, Week, Status, Total Hours)  |
+| `Timesheet Lines` | Granular daily entries (Mon-Sun hours per time code) |
+
+> **Note:** The Flask app uses a PostgreSQL database with equivalent tables: `timesheets` and `timesheet_entries`.
 
 ---
 
@@ -79,6 +107,13 @@
 - **Button:** "Admin" (grayed out for non-admins)
 - **Purpose:** Administrative functions
 - **State:** Disabled/grayed for non-admin users
+
+**Permission Logic (from Canvas):**
+
+```
+DisplayMode: If(User().Email in AdminEmails, DisplayMode.Edit, DisplayMode.Disabled)
+OnSelect: Navigate(AdminPage, ScreenTransition.Fade)
+```
 
 ---
 
@@ -344,30 +379,34 @@ ELSE:
 
 ## 📋 Feature Comparison: PowerApps vs Flask App
 
-| Feature                  | PowerApps       | Flask App       | Status                       |
-| ------------------------ | --------------- | --------------- | ---------------------------- |
-| Welcome Screen           | ✅              | ✅              | ✅ Implemented (Dashboard)   |
-| Week List Sidebar        | ✅              | ✅              | Implemented (as cards)       |
-| Status Definitions Popup | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| "+ New Line" Button      | ✅              | ✅              | Implemented (dropdown + add) |
-| Traveled Checkbox        | ✅              | ✅              | Implemented                  |
-| Expenses Checkbox        | ✅              | ✅              | Implemented                  |
-| Need Reimbursement       | ✅              | ✅              | Implemented                  |
-| Field Warning Message    | ✅ **RED TEXT** | ✅ **RED TEXT** | ✅ Implemented (Jan 6, 2026) |
-| Time Code Dropdown       | ✅              | ✅              | Implemented                  |
-| Time Code Help (?)       | ✅ Popup        | ✅ Popup        | ✅ Implemented (Jan 6, 2026) |
-| Daily Hour Inputs        | ✅              | ✅              | Implemented                  |
-| Row Total Calculation    | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| Row Delete Button        | ✅              | ✅              | Implemented                  |
-| Attachments Section      | ✅              | ✅              | Implemented                  |
-| "Nothing attached" Text  | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| Attachment Info Icon     | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| **User Notes**           | ✅ 255 chars    | ✅ 255 chars    | ✅ Implemented (Jan 6, 2026) |
-| **Admin Notes**          | ✅ Read-only    | ✅ Read-only    | ✅ Implemented (Jan 6, 2026) |
-| Unsaved Changes Warning  | ✅ Blue text    | ✅ Blue text    | ✅ Implemented (Jan 6, 2026) |
-| Northstar Logo           | ✅ Lower-right  | ✅              | Implemented                  |
-| Refresh Button           | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
-| Status Badges            | ✅              | ✅              | Implemented                  |
+| Feature                    | PowerApps       | Flask App       | Status                       |
+| -------------------------- | --------------- | --------------- | ---------------------------- |
+| Welcome Screen             | ✅              | ✅              | ✅ Implemented (Dashboard)   |
+| Week List Sidebar          | ✅              | ✅              | Implemented (as cards)       |
+| Status Definitions Popup   | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
+| "+ New Line" Button        | ✅              | ✅              | Implemented (dropdown + add) |
+| Traveled Checkbox          | ✅              | ✅              | Implemented                  |
+| Expenses Checkbox          | ✅              | ✅              | Implemented                  |
+| Need Reimbursement         | ✅              | ✅              | Implemented                  |
+| Field Warning Message      | ✅ **RED TEXT** | ✅ **RED TEXT** | ✅ Implemented (Jan 6, 2026) |
+| Time Code Dropdown         | ✅              | ✅              | Implemented                  |
+| Time Code Help (?)         | ✅ Popup        | ✅ Popup        | ✅ Implemented (Jan 6, 2026) |
+| Daily Hour Inputs          | ✅              | ✅              | Implemented                  |
+| Row Total Calculation      | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
+| Row Delete Button          | ✅              | ✅              | Implemented                  |
+| Attachments Section        | ✅              | ✅              | Implemented                  |
+| "Nothing attached" Text    | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
+| Attachment Info Icon       | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
+| **User Notes**             | ✅ 255 chars    | ✅ 255 chars    | ✅ Implemented (Jan 6, 2026) |
+| **Admin Notes**            | ✅ Read-only    | ✅ Read-only    | ✅ Implemented (Jan 6, 2026) |
+| Unsaved Changes Warning    | ✅ Blue text    | ✅ Blue text    | ✅ Implemented (Jan 6, 2026) |
+| Northstar Logo             | ✅ Lower-right  | ✅              | Implemented                  |
+| Refresh Button             | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
+| Status Badges              | ✅              | ✅              | Implemented                  |
+| **Admin Date Filter**      | ✅              | ❌              | ⚠️ Not implemented           |
+| **Screen1 DataTable**      | ✅ Raw data     | ❌              | ⚠️ Not implemented (P3)      |
+| **Mobile Hamburger Menu**  | ❌ N/A          | ✅              | ✅ Implemented (Jan 7, 2026) |
+| **Snap Responsive Layout** | ❌ N/A          | ✅              | ✅ Implemented (Jan 7, 2026) |
 
 ---
 
@@ -442,6 +481,31 @@ ELSE:
       - Accepted formats: PDF, PNG, JPG, JPEG, GIF
       - Max file size: 16MB per file
       - Multiple files can be attached
+
+### P3 - Future Enhancements (from Canvas Audit)
+
+12. ⚠️ **Admin Date Filter** - _Not implemented_
+
+    - Date picker on Admin Dashboard to filter by pay period
+    - PowerApps has this next to the status dropdown
+    - **Priority:** Low (status filter covers most use cases)
+
+13. ⚠️ **Screen1 - Raw Data Report View** - _Not implemented_
+    - DataTable control showing all timesheet records
+    - Columns: Employee, Status, Notes, Admin Notes, Payable Hours, Billable Hours, Traveled, Expenses, Remittance, Attachments
+    - Purpose: Auditing or HR administration
+    - **Priority:** Low (admin uses may require this later)
+
+### Flask-Exclusive Features (Not in PowerApps)
+
+14. ✅ **Mobile Hamburger Menu** - _Implemented January 7, 2026_
+
+    - Collapsible navigation for mobile viewports
+    - Contains: My Timesheets, New Timesheet, Admin Dashboard
+
+15. ✅ **Three-State Snap Responsive Layout** - _Implemented January 7, 2026_
+    - Admin detail card snaps between 450px, 680px, and 1100px
+    - Eliminates "postage stamp" effect on medium screens
 
 ---
 
