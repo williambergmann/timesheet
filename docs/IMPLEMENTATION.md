@@ -679,9 +679,11 @@ All feature documentation, planning guides, and reference materials are stored i
 
 ### Planning & Status
 
-| File                     | Purpose                                                                                                                                                                                       | When to Use              |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| [roadmap.md](roadmap.md) | **Production hardening recommendations.** Security, scalability, deployment patterns, and architectural decisions for going to production. Forward-looking technical debt and best practices. | Before production deploy |
+| File                               | Purpose                                                                                                                                                                                       | When to Use              |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| [DESIGN.md](DESIGN.md)             | **Stakeholder decisions.** Captured decisions on architecture, user roles, notifications, workflow rules, and business logic. Reference for all "why" questions.                              | Design decisions         |
+| [REQUIREMENTS.md](REQUIREMENTS.md) | **Feature requirements.** Prioritized list of new features identified from stakeholder decisions. Includes user roles, notification channels, grid enhancements.                              | Feature planning         |
+| [roadmap.md](roadmap.md)           | **Production hardening recommendations.** Security, scalability, deployment patterns, and architectural decisions for going to production. Forward-looking technical debt and best practices. | Before production deploy |
 
 ### File Purpose Comparison
 
@@ -691,6 +693,9 @@ All feature documentation, planning guides, and reference materials are stored i
 | What's the database schema?                | IMPLEMENTATION.md                      |
 | What API endpoints exist?                  | IMPLEMENTATION.md                      |
 | What's done vs. remaining?                 | IMPLEMENTATION.md (Development Phases) |
+| Why was a decision made?                   | DESIGN.md                              |
+| What user roles exist?                     | DESIGN.md, REQUIREMENTS.md             |
+| What new features are planned?             | REQUIREMENTS.md                        |
 | How do I set up Azure AD?                  | AZURE.md                               |
 | How do I set up Twilio SMS?                | TWILIO.md                              |
 | What did the original PowerApps look like? | POWERAPPS.md                           |
@@ -722,6 +727,8 @@ timesheet/
     │── AZURE.md             # ☁️ Azure AD setup guide
     │── TWILIO.md            # 📱 Twilio SMS setup guide
     │
+    │── DESIGN.md            # ✅ Stakeholder decisions
+    │── REQUIREMENTS.md      # 📝 Feature requirements
     │── roadmap.md           # 🚀 Production hardening recommendations
     │
     └── images/              # 📸 Screenshots and diagrams
