@@ -745,8 +745,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.value = defaultDate;
                 TimesheetModule.initForWeek(defaultDate);
                 TimesheetModule.markAsChanged();
+                
+                // Open calendar picker for user confirmation
+                if (typeof e.target.showPicker === 'function') {
+                    // Use setTimeout to ensure the value is set before opening picker
+                    setTimeout(() => {
+                        e.target.showPicker();
+                    }, 0);
+                }
             }
-            // The native calendar picker will open automatically on click
         });
     }
     
