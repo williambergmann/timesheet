@@ -252,20 +252,31 @@ function showAdminTimesheetDetail(timesheet) {
             ` : ''}
             
             <div class="detail-section">
-                <h4>Notes</h4>
-                <div class="notes-list">
-                    ${(timesheet.notes || []).map(note => `
-                        <div class="note-item">
-                            <div class="note-item-header">
-                                <span>${note.author_name || 'Unknown'}</span>
-                                <span>${new Date(note.created_at).toLocaleString()}</span>
-                            </div>
-                            <div class="note-item-content">${note.content}</div>
-                        </div>
-                    `).join('')}
+                <h4>User Notes</h4>
+                <div class="user-notes-display">
+                    ${timesheet.user_notes || '<span class="empty-note">No notes from employee.</span>'}
                 </div>
-                <div class="form-group">
-                    <textarea id="admin-note-input" class="form-textarea" rows="2" placeholder="Add a note..."></textarea>
+            </div>
+            
+            <div class="detail-section">
+                <h4>Admin Notes</h4>
+                <div class="admin-notes-list">
+                    ${(timesheet.notes || []).length > 0 ? 
+                        (timesheet.notes || []).map(note => `
+                            <div class="note-item">
+                                <div class="note-item-header">
+                                    <span>${note.author_name || 'Admin'}</span>
+                                    <span>${new Date(note.created_at).toLocaleString()}</span>
+                                </div>
+                                <div class="note-item-content">${note.content}</div>
+                            </div>
+                        `).join('') 
+                        : '<div class="empty-note">No admin notes yet.</div>'
+                    }
+                </div>
+                <div class="form-group" style="margin-top: var(--spacing-md);">
+                    <label class="form-label">Add Admin Note</label>
+                    <textarea id="admin-note-input" class="form-textarea" rows="3" placeholder="Enter feedback for the employee..."></textarea>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="addAdminNote('${timesheet.id}')">Add Note</button>
             </div>

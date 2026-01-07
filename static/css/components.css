@@ -974,6 +974,28 @@
     font-weight: 500;
 }
 
+/* User Notes Display in Admin Detail */
+.user-notes-display {
+    background: var(--color-bg-overlay);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-left: 3px solid var(--color-primary);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    min-height: 40px;
+    white-space: pre-wrap;
+}
+
+.admin-notes-list {
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-note {
+    color: var(--color-text-disabled);
+    font-style: italic;
+    font-size: var(--font-size-sm);
+}
+
 /* ============================================
    Admin Entries Grid (read-only hour table)
    ============================================ */
