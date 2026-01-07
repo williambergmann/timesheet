@@ -212,7 +212,7 @@ All detailed documentation is in the [`docs/`](docs/) folder:
 | ------------------------------------------- | ------------------------------------------------------ |
 | [IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Technical architecture, API reference, database schema |
 | [WALKTHROUGH.md](docs/WALKTHROUGH.md)       | Step-by-step user guide                                |
-| [SECURITY.md](SECURITY.md)                  | Pre-deployment security checklist and best practices   |
+| [docs/SECURITY.md](docs/SECURITY.md)        | Pre-deployment security checklist and best practices   |
 | [AZURE.md](docs/AZURE.md)                   | Azure AD / Microsoft 365 authentication setup          |
 | [TWILIO.md](docs/TWILIO.md)                 | Twilio SMS notification configuration                  |
 | [DARKMODE.md](docs/DARKMODE.md)             | Dark mode implementation plan and color system         |

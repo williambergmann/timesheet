@@ -657,7 +657,7 @@ All feature documentation, planning guides, and reference materials are stored i
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
 | [../README.md](../README.md)           | **Project overview and quick start.** High-level features, installation, and getting started guide.                                                                            | All     |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | **Technical architecture and API reference (this file).** Database schema, endpoints, development phases, and checklist. This is the canonical source for project status.      | All     |
-| [../SECURITY.md](../SECURITY.md)       | **Security checklist and best practices.** Pre-deployment security audit, authentication/authorization checks, input validation, HTTPS configuration.                          | All     |
+| [SECURITY.md](SECURITY.md)             | **Security checklist and best practices.** Pre-deployment security audit, authentication/authorization checks, input validation, HTTPS configuration.                          | All     |
 | [TESTING.md](TESTING.md)               | **Test suite documentation.** How to run tests, coverage goals, and testing strategy.                                                                                          | Phase 1 |
 | [WALKTHROUGH.md](WALKTHROUGH.md)       | **End-user documentation.** Step-by-step guide to using the app: login flow, creating timesheets, admin functions. Screenshots and UI descriptions. Good for onboarding users. | All     |
 
@@ -899,151 +899,72 @@ python -m compileall app
 
 ## Tasks
 
-### Phase 2: Testing & Refinement
+### Phase 2: Core Enhancements (Current)
 
-- [ ] **MSAL Authentication Integration**
+- [ ] **Authentication & Access Control**
 
-  - [ ] Test Azure AD login flow end-to-end
-  - [ ] Verify token refresh handling
-  - [ ] Test logout and session cleanup
-  - [ ] Confirm user creation/update on first login
-  - [ ] See [AZURE.md](AZURE.md) for setup guide
+  - [ ] **Auto-Redirect** (REQ-016): Redirect to `/app` (users) or `/app#admin` (admin) after login.
+  - [ ] **Dev Test Logins** (REQ-017): Add 4 role-based login buttons (Trainee, Support, Staff, Admin) to login page.
+  - [ ] **Role Enforcement** (REQ-001): Implement `trainee`, `support`, `staff`, `admin` roles in User model & decorators.
+  - [ ] **Trainee Restriction** (REQ-013): Trainees can only select 'Training' hour type.
 
-- [x] **Twilio SMS Notifications** ✅ Completed Jan 6, 2026
+- [ ] **Admin Dashboard Improvements**
 
-  - [x] Implement `send_sms()` utility function
-  - [x] Implement NotificationService
-  - [x] Test approval notification delivery
-  - [x] Test "needs attention" notification delivery
-  - [x] Add error handling and logging for failed SMS
-  - [x] See [TWILIO.md](TWILIO.md) for setup guide
+  - [ ] **Hour Type Filter** (REQ-018): Filter by Field, Internal, Training, or Mixed.
+  - [ ] **Travel Visibility** (REQ-020): Add travel icon/badge to timesheet cards & "Traveled" quick filter.
+  - [ ] **Pay Period Filter** (REQ-004): Filter by current biweekly pay period.
+  - [ ] **Current Week Filter** (REQ-005): Quick filter for "This Week".
 
-- [ ] **Test Suite Improvements** → See [TESTING.md](TESTING.md)
+- [ ] **Timesheet Entry & Validation**
 
-  - [ ] Add tests for `app/utils/sms.py` (P0 - 0% → 100%)
-  - [ ] Add tests for `app/services/notification.py` (P0 - 0% → 90%)
-  - [ ] Add tests for attachment upload/download
-  - [ ] Add tests for SSE events endpoint
-  - [ ] Reach 85%+ code coverage (currently 74%)
+  - [ ] **Grid Totals** (REQ-007, REQ-008): Add row/column totals to all grid views.
+  - [ ] **Auto-Populate** (REQ-009): Allow auto-fill (8h/day) for _any_ selected hour type.
+  - [ ] **Per-Option Attachments** (REQ-021): Require attachments for _each_ selected reimbursement type.
+  - [ ] **Submit Warning** (REQ-014): Allow submission without attachment (with warning & flag) instead of blocking.
 
-- [ ] **Microsoft-Style Login Page** → See [LOGIN.md](LOGIN.md)
+- [ ] **Data Export**
+  - [ ] **Export Options** (REQ-019): Implement CSV, Excel (.xlsx), and PDF export for filtered views.
 
-  - [ ] Create login.css with Microsoft brand styles
-  - [ ] Update login.html template to match Microsoft design
-  - [ ] Add gradient background, sharp-corner cards
-  - [ ] Extract Microsoft logo SVG
-  - [ ] Test responsive design on mobile
+### Phase 3: Integration & Notifications
 
-- [x] **Database Migrations** ✅ Completed Jan 6, 2026
+- [ ] **Notifications System**
 
-  - [x] Initialize Alembic: `flask db init`
-  - [x] Create baseline migration: `001_initial_schema.py`
-  - [x] Stamp database: `flask db stamp 001_initial_schema`
-  - [x] Verify: `flask db current` shows `001_initial_schema (head)`
+  - [x] **SMS Notifications** (REQ-011): Twilio implementation completed.
+  - [ ] **Email Notifications** (REQ-011): Send emails for approvals/reminders via MS Graph API.
+  - [ ] **Teams Bot** (REQ-012): Detailed notifications via Teams, interactive cards.
+  - [ ] **User Preferences** (REQ-003): Settings page for notification toggles (SMS/Email/Teams).
 
-- [ ] **Complete Workflow Testing**
+- [ ] **External Integrations**
+  - [ ] **Azure AD Sync** (REQ-015): Sync user profiles/roles from Azure AD.
+  - [ ] **SharePoint Sync** (REQ-010): Background job to upload attachments to SharePoint.
 
-  - [ ] Create new timesheet as regular user
-  - [ ] Add time entries for full week
-  - [ ] Upload attachment for field hours
-  - [ ] Submit timesheet
-  - [ ] Approve timesheet as admin
-  - [ ] Verify SMS notification sent
-  - [ ] Test "needs attachment" flow
+### Phase 4: Production Readiness
 
-- [ ] **Auto-Redirect After Login** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-016)
+- [ ] **Security Hardening**
 
-  - [ ] Remove landing page / dashboard redirect
-  - [ ] Redirect non-admin users to `/app` (My Timesheets)
-  - [ ] Redirect admin users to `/app#admin` (Admin Dashboard)
-  - [ ] Update `auth.py` callback to check user role
+  - [ ] **MSAL Integration**: Validated Azure AD login flow (see `AZURE.md`).
+  - [ ] **Database Migrations**: Alembic setup verified (completed Jan 6).
+  - [ ] **Session Security**: Cookie flags & timeouts configured.
+  - [ ] **Secrets Management**: Rotation plan for production credentials.
 
-- [ ] **Dev Mode Test Login Buttons** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-017)
+- [ ] **Deployment Prep**
+  - [ ] **Docker Optimization**: Multi-stage builds for production.
+  - [ ] **Backup Strategy**: Automated database backups.
+  - [ ] **HTTPS**: SSL certificate configuration.
 
-  - [ ] Create 4 test accounts (trainee, support, staff, admin)
-  - [ ] Display 4 login buttons on login page in dev mode
-  - [ ] Style buttons with role icons (🎓 🛠️ 👤 👑)
-  - [ ] Each button auto-logs in as that role
+### Phase 5: Future & Maintenance
 
-- [ ] **Export Format Options** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-019)
+- [ ] **Advanced Features**
 
-  - [ ] Add Export button to Admin Dashboard
-  - [ ] Implement CSV export
-  - [ ] Implement Excel (.xlsx) export
-  - [ ] Implement PDF export
-
-- [ ] **Travel Flag & Hour Type Filters** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-018-req-020)
-
-  - [ ] Add hour type filter dropdown (Field/Internal/Training/All)
-  - [ ] Add travel indicator badge on admin timesheet cards
-  - [ ] Add "Traveled only" quick filter
-  - [ ] Flag traveled timesheets lacking documentation
-
-- [ ] **Per-Option Reimbursement Attachments** → See [REQUIREMENTS.md](REQUIREMENTS.md#req-021)
-
-  - [ ] Extend Attachment model with `reimbursement_type` field
-  - [ ] Add attachment upload per reimbursement option (Car/Flight/Food/Other)
-  - [ ] Validate each selected type has attachment
-  - [ ] Show warning for missing reimbursement attachments
-
-### Phase 3: Integration Setup
-
-- [ ] **Azure AD Configuration**
-
-  - [ ] Create App Registration in Azure Portal
-  - [ ] Configure redirect URIs for all environments
-  - [ ] Create client secret
-  - [ ] Grant admin consent for `User.Read` permission
-  - [ ] Add credentials to `.env` file
-
-- [ ] **Twilio Configuration**
-
-  - [ ] Create Twilio account (or use existing)
-  - [ ] Purchase SMS-capable phone number
-  - [ ] Verify test phone numbers (if trial account)
-  - [ ] Add credentials to `.env` file
-
-- [ ] **User Onboarding**
-  - [ ] Prepare list of ~60 users with emails
-  - [ ] Identify admin users
-  - [ ] Collect phone numbers for SMS opt-in (optional)
-
-### Phase 4: Deployment
-
-- [ ] **Pre-Deployment Checklist**
-
-  - [ ] Set `SECRET_KEY` to a strong random value
-  - [ ] Configure `DATABASE_URL` for production PostgreSQL
-  - [ ] Set `AZURE_REDIRECT_URI` to production domain
-  - [ ] Enable HTTPS (required for production OAuth)
-  - [ ] Configure backup strategy for database
-
-- [ ] **Docker Deployment**
-
-  - [ ] Build production images: `docker-compose build`
-  - [ ] Start services: `docker-compose up -d`
-  - [ ] Run migrations: `docker-compose exec web flask db upgrade`
-  - [ ] Verify application loads at production URL
-  - [ ] Test authentication flow
-
-- [ ] **Post-Deployment Verification**
-  - [ ] Admin can log in and view submitted timesheets
-  - [ ] Regular user can create and submit timesheet
-  - [ ] File uploads work correctly
-  - [ ] SMS notifications are delivered
-  - [ ] SSE real-time updates function
-
-### Phase 5: Production Hardening (Optional)
-
-- [ ] **Monitoring & Logging**
-
-  - [ ] Configure centralized logging (e.g., ELK, CloudWatch)
+  - [ ] **Biweekly Confirmation** (REQ-006): Admin flow to "lock" a pay period.
+  - [ ] **Audit Logging**: Comprehensive activity log for admin actions.
+  - [ ] **Performance Tuning**: Redis caching & database indexing.
+  - [ ] **Monitoring & Logging**: Centralized logging (e.g., ELK, CloudWatch)
   - [ ] Set up uptime monitoring
   - [ ] Configure error alerting (e.g., Sentry)
 
 - [ ] **Performance**
 
-  - [ ] Enable Redis caching for sessions
   - [ ] Configure CDN for static assets
   - [ ] Load test with expected user count
 
