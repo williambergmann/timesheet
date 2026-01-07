@@ -413,16 +413,10 @@ const TimesheetModule = {
             this.updateCharCounter();
         }
         
-        // Populate admin notes (read-only for users)
-        const adminNotesSection = document.getElementById('admin-notes-section');
+        // Populate admin notes (read-only for users, always visible, blank if empty)
         const adminNotesDisplay = document.getElementById('admin-notes-display');
-        if (adminNotesSection && adminNotesDisplay) {
-            if (timesheet.admin_notes) {
-                adminNotesDisplay.textContent = timesheet.admin_notes;
-                adminNotesSection.classList.remove('hidden');
-            } else {
-                adminNotesSection.classList.add('hidden');
-            }
+        if (adminNotesDisplay) {
+            adminNotesDisplay.textContent = timesheet.admin_notes || '';
         }
         
         // Update field hours warning
@@ -564,7 +558,6 @@ const TimesheetModule = {
         const userNotes = document.getElementById('user-notes');
         const reimbursementSection = document.getElementById('reimbursement-section');
         const attachmentsList = document.getElementById('attachments-list');
-        const adminNotesSection = document.getElementById('admin-notes-section');
         const deleteBtn = document.getElementById('delete-btn');
         
         if (timesheetId) timesheetId.value = '';
@@ -584,7 +577,11 @@ const TimesheetModule = {
         
         if (reimbursementSection) reimbursementSection.classList.add('hidden');
         if (attachmentsList) attachmentsList.innerHTML = '<p id="empty-attachments-text" class="empty-attachments-text">There is nothing attached.</p>';
-        if (adminNotesSection) adminNotesSection.classList.add('hidden');
+        
+        // Clear admin notes display (section stays visible)
+        const adminNotesDisplay = document.getElementById('admin-notes-display');
+        if (adminNotesDisplay) adminNotesDisplay.textContent = '';
+        
         if (deleteBtn) deleteBtn.style.display = 'none';
         
         // Hide field hours warning
