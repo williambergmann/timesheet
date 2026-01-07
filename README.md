@@ -1,4 +1,4 @@
-# Northstar Time Timesheet - Employee Timesheet Management
+# Northstar Timesheet App - Employee Timesheet Management
 
 A modern timesheet management system replacing the legacy PowerApps solution. Built with Flask, vanilla JavaScript/CSS, and PostgreSQL for all Northstar employees and trainees.
 
