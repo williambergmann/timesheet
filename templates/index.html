@@ -3,7 +3,7 @@
 {% block title %}Northstar Timesheet App - Dashboard{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20260106p14" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=20260107p1" />
 {% endblock %}
 
 {% block content %}
@@ -379,6 +379,18 @@
               <option value="">All Users</option>
             </select>
           </div>
+          <div class="filter-group">
+            <label class="filter-label">Week:</label>
+            <input type="date" id="admin-filter-week" class="form-input" placeholder="Filter by week">
+          </div>
+          <div class="filter-group">
+            <button class="btn btn-ghost btn-sm" id="admin-clear-filters" title="Clear all filters">
+              🔄 Reset
+            </button>
+            <button class="btn btn-ghost btn-sm" id="admin-export-btn" title="Export to CSV">
+              📊 Export
+            </button>
+          </div>
         </div>
         
         <div id="admin-timesheets-list" class="timesheets-grid">
@@ -405,7 +417,7 @@
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260106p11"></script>
-<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260106p2"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260107p1"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260106p3"></script>
 {% endblock %}

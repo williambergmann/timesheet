@@ -136,6 +136,11 @@
     min-width: 180px;
 }
 
+.filters .form-input {
+    width: auto;
+    min-width: 150px;
+}
+
 /* ============================================
    Timesheets Grid
    ============================================ */

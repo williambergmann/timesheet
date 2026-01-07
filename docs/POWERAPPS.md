@@ -403,8 +403,9 @@ ELSE:
 | Northstar Logo             | ✅ Lower-right  | ✅              | Implemented                  |
 | Refresh Button             | ✅              | ✅              | ✅ Implemented (Jan 6, 2026) |
 | Status Badges              | ✅              | ✅              | Implemented                  |
-| **Admin Date Filter**      | ✅              | ❌              | ⚠️ Not implemented           |
-| **Screen1 DataTable**      | ✅ Raw data     | ❌              | ⚠️ Not implemented (P3)      |
+| **Admin Date Filter**      | ✅              | ✅              | ✅ Implemented (Jan 7, 2026) |
+| **Screen1 DataTable**      | ✅ Raw data     | ⚠️ CSV Export   | Partial (CSV alternative)    |
+| **CSV Export**             | ❌ N/A          | ✅              | ✅ Implemented (Jan 7, 2026) |
 | **Mobile Hamburger Menu**  | ❌ N/A          | ✅              | ✅ Implemented (Jan 7, 2026) |
 | **Snap Responsive Layout** | ❌ N/A          | ✅              | ✅ Implemented (Jan 7, 2026) |
 
@@ -484,17 +485,18 @@ ELSE:
 
 ### P3 - Future Enhancements (from Canvas Audit)
 
-12. ⚠️ **Admin Date Filter** - _Not implemented_
+12. ✅ **Admin Date Filter** - _Implemented January 7, 2026_
 
-    - Date picker on Admin Dashboard to filter by pay period
-    - PowerApps has this next to the status dropdown
-    - **Priority:** Low (status filter covers most use cases)
+    - Week date picker on Admin Dashboard to filter by pay period
+    - Filters timesheets by week_start date
+    - Reset button to clear all filters
+    - **Bonus:** Added CSV Export button for data reporting
 
-13. ⚠️ **Screen1 - Raw Data Report View** - _Not implemented_
-    - DataTable control showing all timesheet records
-    - Columns: Employee, Status, Notes, Admin Notes, Payable Hours, Billable Hours, Traveled, Expenses, Remittance, Attachments
-    - Purpose: Auditing or HR administration
-    - **Priority:** Low (admin uses may require this later)
+13. ⚠️ **Screen1 - Raw Data Report View** - _Partially implemented_
+    - The DataTable view is not replicated, BUT
+    - ✅ CSV Export functionality provides equivalent data export
+    - Columns exported: Employee, Email, Week Start, Status, Total/Payable/Billable/Unpaid Hours, Traveled, Expenses, Reimbursement, Attachments, Created At
+    - **Alternative:** Export to CSV achieves the same HR auditing purpose
 
 ### Flask-Exclusive Features (Not in PowerApps)
 
@@ -504,8 +506,14 @@ ELSE:
     - Contains: My Timesheets, New Timesheet, Admin Dashboard
 
 15. ✅ **Three-State Snap Responsive Layout** - _Implemented January 7, 2026_
+
     - Admin detail card snaps between 450px, 680px, and 1100px
     - Eliminates "postage stamp" effect on medium screens
+
+16. ✅ **CSV Export** - _Implemented January 7, 2026_
+    - Export filtered timesheets to CSV file
+    - Respects current status, user, and week filters
+    - Includes all relevant timesheet data for HR/payroll
 
 ---
 

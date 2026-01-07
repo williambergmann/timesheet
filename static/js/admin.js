@@ -20,12 +20,15 @@ async function loadAdminTimesheets() {
     try {
         const statusEl = document.getElementById('admin-filter-status');
         const userEl = document.getElementById('admin-filter-user');
+        const weekEl = document.getElementById('admin-filter-week');
         const status = statusEl ? statusEl.value : '';
         const userId = userEl ? userEl.value : '';
+        const weekStart = weekEl ? weekEl.value : '';
         
         const params = {};
         if (status) params.status = status;
         if (userId) params.user_id = userId;
+        if (weekStart) params.week_start = weekStart;
         
         const data = await API.getAdminTimesheets(params);
         
@@ -353,4 +356,112 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userFilter) {
         userFilter.addEventListener('change', loadAdminTimesheets);
     }
+    
+    const weekFilter = document.getElementById('admin-filter-week');
+    if (weekFilter) {
+        weekFilter.addEventListener('change', loadAdminTimesheets);
+    }
+    
+    // Clear filters button
+    const clearFiltersBtn = document.getElementById('admin-clear-filters');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+            const statusEl = document.getElementById('admin-filter-status');
+            const userEl = document.getElementById('admin-filter-user');
+            const weekEl = document.getElementById('admin-filter-week');
+            
+            if (statusEl) statusEl.value = '';
+            if (userEl) userEl.value = '';
+            if (weekEl) weekEl.value = '';
+            
+            loadAdminTimesheets();
+        });
+    }
+    
+    // Export to CSV button
+    const exportBtn = document.getElementById('admin-export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportTimesheetsToCSV);
+    }
 });
+
+// ==========================================
+// Export Functionality
+// ==========================================
+
+async function exportTimesheetsToCSV() {
+    try {
+        showToast('Generating export...', 'info');
+        
+        // Get current filters
+        const statusEl = document.getElementById('admin-filter-status');
+        const userEl = document.getElementById('admin-filter-user');
+        const weekEl = document.getElementById('admin-filter-week');
+        
+        const params = {};
+        if (statusEl && statusEl.value) params.status = statusEl.value;
+        if (userEl && userEl.value) params.user_id = userEl.value;
+        if (weekEl && weekEl.value) params.week_start = weekEl.value;
+        
+        // Fetch all timesheets matching filters
+        const data = await API.getAdminTimesheets(params);
+        
+        if (data.timesheets.length === 0) {
+            showToast('No timesheets to export', 'warning');
+            return;
+        }
+        
+        // Build CSV
+        const headers = [
+            'Employee',
+            'Email',
+            'Week Start',
+            'Status',
+            'Total Hours',
+            'Payable Hours',
+            'Billable Hours',
+            'Unpaid Hours',
+            'Traveled',
+            'Expenses',
+            'Reimbursement',
+            'Attachments',
+            'Created At'
+        ];
+        
+        const rows = data.timesheets.map(ts => [
+            ts.user?.display_name || 'Unknown',
+            ts.user?.email || '',
+            ts.week_start,
+            ts.status,
+            ts.totals.total,
+            ts.totals.payable,
+            ts.totals.billable,
+            ts.totals.unpaid,
+            ts.traveled ? 'Yes' : 'No',
+            ts.has_expenses ? 'Yes' : 'No',
+            ts.reimbursement_needed ? `${ts.reimbursement_type}: $${ts.reimbursement_amount}` : 'No',
+            ts.attachments?.length || 0,
+            new Date(ts.created_at).toLocaleDateString()
+        ]);
+        
+        // Convert to CSV string
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        ].join('\n');
+        
+        // Create download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `timesheets_export_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        
+        showToast(`Exported ${data.timesheets.length} timesheets`, 'success');
+        
+    } catch (error) {
+        showToast('Export failed: ' + error.message, 'error');
+    }
+}
