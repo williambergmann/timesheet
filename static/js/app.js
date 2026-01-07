@@ -341,6 +341,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof loadAdminTimesheets === 'function') {
             loadAdminTimesheets();
         }
+        if (typeof loadAdminStats === 'function') {
+            loadAdminStats();
+        }
     } else {
         showTimesheetsView();
     }
@@ -365,6 +368,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 showView('admin');
                 if (typeof loadAdminTimesheets === 'function') {
                     loadAdminTimesheets();
+                }
+                if (typeof loadAdminStats === 'function') {
+                    loadAdminStats();
                 }
             }
         });

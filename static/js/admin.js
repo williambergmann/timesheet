@@ -349,6 +349,7 @@ async function approveTimesheetAdmin(id) {
         await API.approveTimesheet(id);
         showToast('Timesheet approved!', 'success');
         loadAdminTimesheets();
+        loadAdminStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -361,6 +362,7 @@ async function rejectTimesheetAdmin(id) {
         await API.rejectTimesheet(id, reason || '');
         showToast('Timesheet marked as needing attachment', 'success');
         loadAdminTimesheets();
+        loadAdminStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -375,6 +377,7 @@ async function unapproveTimesheetAdmin(id) {
         await API.unapproveTimesheet(id);
         showToast('Timesheet un-approved', 'success');
         loadAdminTimesheets();
+        loadAdminStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
