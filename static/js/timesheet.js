@@ -500,7 +500,7 @@ const TimesheetModule = {
             has_expenses: hasExpenses ? hasExpenses.checked : false,
             reimbursement_needed: reimbursementNeeded ? reimbursementNeeded.checked : false,
             reimbursement_type: reimbursementType ? reimbursementType.value : '',
-            reimbursement_amount: reimbursementAmount ? (parseFloat(reimbursementAmount.value) || null) : null,
+            reimbursement_amount: reimbursementAmount ? (parseFloat(reimbursementAmount.value) || 0) : 0,
             stipend_date: stipendDate ? (stipendDate.value || null) : null,
             user_notes: userNotes ? userNotes.value : '',
         };
@@ -530,8 +530,9 @@ const TimesheetModule = {
         if (timesheet.reimbursement_type && reimbursementType) {
             reimbursementType.value = timesheet.reimbursement_type;
         }
-        if (timesheet.reimbursement_amount && reimbursementAmount) {
-            reimbursementAmount.value = timesheet.reimbursement_amount;
+        if (reimbursementAmount) {
+            // REQ-026: Display 0.00 for null/undefined amounts, not empty
+            reimbursementAmount.value = timesheet.reimbursement_amount != null ? timesheet.reimbursement_amount : '0.00';
         }
         if (timesheet.stipend_date && stipendDate) {
             stipendDate.value = timesheet.stipend_date;
@@ -746,7 +747,7 @@ const TimesheetModule = {
         if (hasExpenses) hasExpenses.checked = false;
         if (reimbursementNeeded) reimbursementNeeded.checked = false;
         if (reimbursementType) reimbursementType.value = 'Car';
-        if (reimbursementAmount) reimbursementAmount.value = '';
+        if (reimbursementAmount) reimbursementAmount.value = '0.00';  // REQ-026: Default to 0, not empty
         if (stipendDate) stipendDate.value = '';
         if (userNotes) {
             userNotes.value = '';

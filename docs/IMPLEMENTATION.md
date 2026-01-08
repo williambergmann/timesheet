@@ -660,6 +660,8 @@ All feature documentation, planning guides, and reference materials are stored i
 > - **Working on UI?** See `DARKMODE.md`, `UI.md`, or `POWERAPPS.md`
 > - **Planning production deploy?** See `roadmap.md`
 > - **Tracking what's done?** See the "Development Phases" section in this file
+> - **Tracking bugs?** See `BUGS.md`
+> - **MCP/AI tooling?** See `MCP.md`
 
 ### Core Documentation
 
@@ -695,7 +697,9 @@ All feature documentation, planning guides, and reference materials are stored i
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | [DESIGN.md](DESIGN.md)             | **Stakeholder decisions.** Captured decisions on architecture, user roles, notifications, workflow rules, and business logic. Reference for all "why" questions.                              | Design decisions         |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | **Feature requirements.** Prioritized list of new features identified from stakeholder decisions. Includes user roles, notification channels, grid enhancements.                              | Feature planning         |
+| [BUGS.md](BUGS.md)                 | **Known issues and bug tracker.** Active bugs with reproduction steps and fixes.                                                                                                             | Bug tracking             |
 | [roadmap.md](roadmap.md)           | **Production hardening recommendations.** Security, scalability, deployment patterns, and architectural decisions for going to production. Forward-looking technical debt and best practices. | Before production deploy |
+| [MCP.md](MCP.md)                   | **MCP setup and security guidance.** AI tooling integration and server configuration notes.                                                                                                  | AI tooling               |
 
 ### File Purpose Comparison
 
@@ -715,6 +719,8 @@ All feature documentation, planning guides, and reference materials are stored i
 | What tests exist?                          | TESTING.md                             |
 | How do I secure the app?                   | SECURITY.md                            |
 | How does responsive design work?           | RESPONSIVE.md                          |
+| Where are bugs tracked?                    | BUGS.md                                |
+| How do I configure MCP tooling?            | MCP.md                                 |
 
 ### File Organization
 
@@ -745,7 +751,9 @@ timesheet/
     │
     │── DESIGN.md            # ✅ Stakeholder decisions
     │── REQUIREMENTS.md      # 📝 Feature requirements
+    │── BUGS.md              # Known issues and bug tracker
     │── roadmap.md           # 🚀 Production hardening recommendations
+    │── MCP.md               # MCP setup and security guidance
     │
     └── images/              # 📸 Screenshots and diagrams
 ```
@@ -822,6 +830,15 @@ pytest tests/test_models.py -v
 | `app/routes/timesheets.py` | 72%      |
 | `app/routes/admin.py`      | 85%      |
 | `app/utils/decorators.py`  | 100%     |
+
+### Coverage Gaps (from TESTING.md)
+
+- `app/utils/sms.py` (0%): send_sms, is_twilio_configured, format_phone_number
+- `app/services/notification.py` (0%): notify_approved, notify_needs_attention, send_weekly_reminder
+- `app/routes/events.py` (0%): SSE stream, pub/sub
+- `app/routes/timesheets.py` (72%): attachment upload, notes CRUD
+- `app/routes/auth.py` (~50%): MSAL flow (mock), dev bypass
+- `app/routes/admin.py` (85%): edge cases, SMS trigger verification
 
 ### Manual Verification
 
@@ -911,26 +928,26 @@ python -m compileall app
 
 ### Phase 2: Core Enhancements (Current)
 
-- [ ] **Authentication & Access Control**
+- [x] **Authentication & Access Control**
 
-  - [ ] **Auto-Redirect** (REQ-016): Redirect to `/app` (users) or `/app#admin` (admin) after login.
-  - [ ] **Dev Test Logins** (REQ-017): Add 4 role-based login buttons (Trainee, Support, Staff, Admin) to login page.
-  - [ ] **Role Enforcement** (REQ-001): Implement `trainee`, `support`, `staff`, `admin` roles in User model & decorators.
-  - [ ] **Trainee Restriction** (REQ-013): Trainees can only select 'Training' hour type.
+  - [x] **Auto-Redirect** (REQ-016): Redirect to `/app` (users) or `/app#admin` (admin) after login.
+  - [x] **Dev Test Logins** (REQ-017): Add 4 role-based login buttons (Trainee, Support, Staff, Admin) to login page.
+  - [x] **Role Enforcement** (REQ-001): Implement `trainee`, `support`, `staff`, `admin` roles in User model & decorators.
+  - [x] **Trainee Restriction** (REQ-013): Trainees can only select 'Training' hour type.
 
 - [ ] **Admin Dashboard Improvements**
 
-  - [ ] **Hour Type Filter** (REQ-018): Filter by Field, Internal, Training, or Mixed.
-  - [ ] **Travel Visibility** (REQ-020): Add travel icon/badge to timesheet cards & "Traveled" quick filter.
+  - [x] **Hour Type Filter** (REQ-018): Filter by Field, Internal, Training, or Mixed.
+  - [x] **Travel Visibility** (REQ-020): Add travel icon/badge to timesheet cards & "Traveled" quick filter.
   - [ ] **Pay Period Filter** (REQ-004): Filter by current biweekly pay period.
-  - [ ] **Current Week Filter** (REQ-005): Quick filter for "This Week".
+  - [x] **Current Week Filter** (REQ-005): Quick filter for "This Week".
 
 - [ ] **Timesheet Entry & Validation**
 
-  - [ ] **Grid Totals** (REQ-007, REQ-008): Add row/column totals to all grid views.
-  - [ ] **Auto-Populate** (REQ-009): Allow auto-fill (8h/day) for _any_ selected hour type.
+  - [x] **Grid Totals** (REQ-007, REQ-008): Add row/column totals to all grid views.
+  - [ ] **Auto-Populate** (REQ-009): Allow auto-fill (8h/day) for _any_ selected hour type (partial).
   - [ ] **Per-Option Attachments** (REQ-021): Require attachments for _each_ selected reimbursement type.
-  - [ ] **Submit Warning** (REQ-014): Allow submission without attachment (with warning & flag) instead of blocking.
+  - [x] **Submit Warning** (REQ-014): Allow submission without attachment (with warning & flag) instead of blocking.
 
 - [ ] **Data Export**
   - [ ] **Export Options** (REQ-019): Implement CSV, Excel (.xlsx), and PDF export for filtered views.
@@ -953,14 +970,26 @@ python -m compileall app
 - [ ] **Security Hardening**
 
   - [ ] **MSAL Integration**: Validated Azure AD login flow (see `AZURE.md`).
-  - [ ] **Database Migrations**: Alembic setup verified (completed Jan 6).
-  - [ ] **Session Security**: Cookie flags & timeouts configured.
+  - [x] **Database Migrations**: Alembic setup verified (completed Jan 6).
+  - [x] **Session Security**: Cookie flags & timeouts configured.
   - [ ] **Secrets Management**: Rotation plan for production credentials.
+  - [ ] **OIDC hardening + dev bypass gating** (REQ-030): Enforce state/nonce and explicit dev flag.
+  - [ ] **CSRF protection** (REQ-031): Require tokens for mutating endpoints.
+  - [ ] **Security baseline audit** (REQ-032): Dependency scanning, rate limits, admin audit logs.
 
 - [ ] **Deployment Prep**
   - [ ] **Docker Optimization**: Multi-stage builds for production.
   - [ ] **Backup Strategy**: Automated database backups.
   - [ ] **HTTPS**: SSL certificate configuration.
+
+- [ ] **Platform Hardening (Roadmap)**
+
+  - [ ] **Production DB lifecycle** (REQ-029): No `db.create_all()` in app startup.
+  - [ ] **Attachment storage strategy** (REQ-033): SharePoint vs object storage decision.
+  - [ ] **Background jobs & notifications** (REQ-034): Queue-based sends and reminders.
+  - [ ] **API validation & error handling** (REQ-035): Standardized request validation.
+  - [ ] **Observability & metrics** (REQ-036): Structured logs + basic metrics.
+  - [ ] **Testing coverage gaps** (REQ-037): Close top test gaps from TESTING.md.
 
 ### Phase 5: Future & Maintenance
 
@@ -973,6 +1002,15 @@ python -m compileall app
   - [ ] Set up uptime monitoring
   - [ ] Configure error alerting (e.g., Sentry)
 
+- [ ] **UX & Accessibility**
+
+  - [ ] **UX backlog** (REQ-038): Login parity, responsive enhancements, dark mode review.
+  - [ ] **PowerApps data report view** (REQ-039): Add Screen1-style report page.
+
+- [ ] **Developer Tooling**
+
+  - [ ] **MCP tooling integration** (REQ-040): Optional MCP servers and setup.
+
 - [ ] **Performance**
 
   - [ ] Configure CDN for static assets
@@ -982,6 +1020,10 @@ python -m compileall app
   - [ ] Review OWASP Top 10 checklist
   - [ ] Scan for dependency vulnerabilities
   - [ ] Verify CORS and CSP headers
+
+## Known Issues
+
+- BUG-001: Submitted timesheets allow editing (see BUGS.md and REQ-023).
 
 ---
 
@@ -1036,10 +1078,16 @@ MCP servers are configured in your AI assistant's config file:
 
 ## Open Questions
 
-1. **File Storage**: Local vs. cloud - currently using local filesystem. Consider S3/Azure Blob for production?
-2. **Field Hours Document**: What specific document is uploaded? Client sign-off sheet?
-3. **Reporting**: Any export requirements (CSV, PDF reports)?
-4. **Historical Data**: Need to migrate existing PowerApps data?
-5. **Backup Strategy**: How frequently should database be backed up? Daily recommended.
-6. **Domain**: What will be the production URL for the application?
-7. **SSL Certificate**: Self-managed or automated (Let's Encrypt)?
+1. **File Storage**: Local vs SharePoint sync vs S3/R2 object storage for production scale.
+2. **Database Hosting**: Managed Postgres vs self-hosted.
+3. **Hosting Platform**: Managed platform vs ECS/K8s.
+4. **Domain/TLS**: Production URL and certificate approach (managed vs Let's Encrypt).
+5. **Environment Strategy**: dev/staging/prod separation and config model.
+6. **Data Retention Policy**: How long to keep timesheets and attachments.
+7. **Mobile Experience**: Target scope for mobile UX and offline support.
+8. **Audit/Compliance**: Audit logging level and GDPR/privacy requirements.
+9. **Field Hours Document**: What specific document is required for Field hours.
+10. **Reporting**: Export formats and pay period reporting needs.
+11. **Historical Data**: PowerApps data migration scope and strategy.
+12. **Backup/DR**: Backup frequency, retention, and restore tests.
+13. **Dark Mode Open Questions**: Logo treatment, brand compliance, print styles, prefers-color-scheme.

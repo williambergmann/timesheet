@@ -195,7 +195,18 @@ def update_timesheet(timesheet_id):
     if "reimbursement_type" in data:
         timesheet.reimbursement_type = data["reimbursement_type"]
     if "reimbursement_amount" in data:
-        timesheet.reimbursement_amount = data["reimbursement_amount"]
+        # REQ-026: Validate and sanitize reimbursement amount
+        amount = data["reimbursement_amount"]
+        if amount is None or amount == "" or amount == "null":
+            amount = 0.0
+        else:
+            try:
+                amount = float(amount)
+            except (ValueError, TypeError):
+                amount = 0.0
+        # Clamp to valid range
+        amount = max(0.0, min(amount, 10000.0))
+        timesheet.reimbursement_amount = amount
     if "stipend_date" in data and data["stipend_date"]:
         timesheet.stipend_date = datetime.fromisoformat(data["stipend_date"]).date()
     if "user_notes" in data:

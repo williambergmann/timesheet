@@ -180,6 +180,102 @@ The app is not detecting valid Azure credentials.
 2. Make sure values don't contain "your-azure" placeholder text
 3. Restart the application after changing `.env`
 
+### Microsoft Login Button Fails (No Redirect)
+
+Clicking "Sign in with Microsoft" on the landing page results in an error or no response.
+
+**Common Causes & Fixes**:
+
+1. **Azure credentials not configured**
+
+   - Without valid `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, and `AZURE_TENANT_ID`, the Microsoft login cannot work
+   - The app will show dev login buttons when credentials are missing - use those instead
+   - To enable Microsoft Login: follow Steps 1-5 above to configure Azure AD
+
+2. **MSAL scope configuration error**
+
+   - **Symptom**: `ValueError` or 500 error mentioning scopes
+   - **Cause**: Reserved OIDC scopes (`openid`, `profile`, `email`) are explicitly listed
+   - **Fix**: Remove reserved scopes from `AZURE_SCOPES` in `app/config.py` - MSAL adds them automatically
+
+3. **Redirect URI mismatch (AADSTS50011)**
+
+   - The Azure app registration redirect URI must match **exactly**:
+     - Docker: `http://localhost/auth/callback`
+     - Local Flask: `http://localhost:5000/auth/callback`
+   - Check for trailing slashes, http vs https, and port numbers
+
+4. **Expired or invalid client secret**
+
+   - Client secrets expire (check Azure Portal → Certificates & secrets)
+   - Create a new secret and update `AZURE_CLIENT_SECRET`
+
+5. **Network/firewall blocking Azure endpoints**
+   - Ensure the app can reach `login.microsoftonline.com` and `graph.microsoft.com`
+
+### Microsoft Login Works, But User Gets 500 Error After Callback
+
+Authentication succeeds but the callback fails.
+
+**Common Causes & Fixes**:
+
+1. **State/nonce validation failure**
+
+   - Clear browser cookies and try again
+   - Check that `SECRET_KEY` hasn't changed between requests
+
+2. **Database user creation fails**
+
+   - Check database connectivity and migrations are up to date
+   - Run `flask db upgrade` to ensure user table schema is current
+
+3. **Session cookie issues**
+   - In production (HTTPS), ensure `SESSION_COOKIE_SECURE=True`
+   - For localhost development over HTTP, set `SESSION_COOKIE_SECURE=False`
+
+### "Internal Server Error" with Duplicate Key Violation
+
+**Symptom**: Clicking login results in:
+
+```
+IntegrityError: duplicate key value violates unique constraint "users_azure_id_key"
+DETAIL: Key (azure_id)=(dev-user-001) already exists.
+```
+
+**Cause**: The dev authentication flow tries to INSERT a new user instead of finding the existing one.
+
+**Fixes**:
+
+1. **Immediate workaround - Reset the database**:
+
+   ```bash
+   cd docker
+   docker compose down -v   # Removes volumes (database data)
+   docker compose up --build -d
+   ```
+
+2. **Code fix required** (see BUG-002 in BUGS.md):
+
+   - The auth route should use `get_or_create` pattern
+   - Query for existing user by `azure_id` before inserting
+   - Example fix in `app/routes/auth.py`:
+     ```python
+     # Instead of always creating new user:
+     user = User.query.filter_by(azure_id=azure_id).first()
+     if not user:
+         user = User(azure_id=azure_id, ...)
+         db.session.add(user)
+     db.session.commit()
+     ```
+
+3. **Manual database fix** (without losing data):
+   ```bash
+   docker exec -it timesheet-db-1 psql -U postgres -d timesheet
+   # Then in psql:
+   DELETE FROM users WHERE azure_id = 'dev-user-001';
+   \q
+   ```
+
 ---
 
 ## Security Notes

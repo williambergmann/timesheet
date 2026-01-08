@@ -182,6 +182,89 @@ When a timesheet with reimbursement is saved without a proper amount value, the 
 
 ---
 
+### BUG-003: Dev Login Causes Duplicate Key Error
+
+**Status:** 🔴 Open  
+**Severity:** High (P0)  
+**Reported:** January 8, 2026  
+**Related:** REQ-015, REQ-030
+
+**Description:**
+Clicking the dev login buttons (or Microsoft Login without proper Azure credentials) results in an Internal Server Error due to a database unique constraint violation.
+
+**Error Message:**
+
+```
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation)
+duplicate key value violates unique constraint "users_azure_id_key"
+DETAIL: Key (azure_id)=(dev-user-001) already exists.
+```
+
+**Steps to Reproduce:**
+
+1. Start the application with Docker
+2. Log in as any dev user (Admin, Support, etc.)
+3. Log out
+4. Try to log in again with any dev user
+5. **Error:** Internal Server Error
+
+**Root Cause:**
+
+The dev authentication bypass in `app/routes/auth.py` always tries to INSERT a new user instead of checking if the user already exists. The code should use a "get or create" pattern.
+
+**Affected Files:**
+
+- `app/routes/auth.py` - Dev authentication bypass logic
+
+**Current Code (Problematic):**
+
+```python
+# Creates a new user every time, causing duplicate key error
+user = User(
+    azure_id='dev-user-001',
+    email='dev@localhost',
+    display_name='Development User',
+    ...
+)
+db.session.add(user)
+db.session.commit()
+```
+
+**Fix Required:**
+
+```python
+# Check if user exists first, only create if missing
+user = User.query.filter_by(azure_id='dev-user-001').first()
+if not user:
+    user = User(
+        azure_id='dev-user-001',
+        email='dev@localhost',
+        display_name='Development User',
+        ...
+    )
+    db.session.add(user)
+    db.session.commit()
+```
+
+**Workaround (until fixed):**
+
+Reset the database to clear duplicate users:
+
+```bash
+cd docker
+docker compose down -v
+docker compose up --build -d
+```
+
+**Acceptance Criteria:**
+
+- [ ] Dev users can log in multiple times without error
+- [ ] Existing dev users are retrieved, not duplicated
+- [ ] Same fix applied to MSAL callback for Azure users
+- [ ] No unique constraint violations on repeated logins
+
+---
+
 ## ✅ Resolved Issues
 
 _None yet._

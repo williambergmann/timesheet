@@ -189,8 +189,9 @@ class Timesheet(db.Model):
             "has_expenses": self.has_expenses,
             "reimbursement_needed": self.reimbursement_needed,
             "reimbursement_type": self.reimbursement_type,
+            # REQ-026: Always return a number, default to 0.0 (never null)
             "reimbursement_amount": (
-                float(self.reimbursement_amount) if self.reimbursement_amount else None
+                float(self.reimbursement_amount) if self.reimbursement_amount else 0.0
             ),
             "stipend_date": (
                 self.stipend_date.isoformat() if self.stipend_date else None
