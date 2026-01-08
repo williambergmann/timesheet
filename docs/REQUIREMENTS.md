@@ -443,7 +443,7 @@ Display holidays on the time entry grid and show a confirmation warning when use
 | REQ-019     | 📋 Planned  | Export format options                 |
 | REQ-020     | 📋 Planned  | Travel flag visibility                |
 | REQ-021     | 📋 Planned  | Per-option reimbursement attachments  |
-| REQ-022     | 📋 Planned  | Holiday awareness & warning           |
+| REQ-022     | ✅ Complete | Holiday indicators + entry warning    |
 
 ---
 

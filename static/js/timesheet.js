@@ -24,6 +24,68 @@ const TimesheetModule = {
     // Days of the week (Sunday first)
     DAYS: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     
+    // Company-observed holidays (REQ-022)
+    // Format: 'YYYY-MM-DD': 'Holiday Name'
+    HOLIDAYS: {
+        // 2025 Holidays
+        '2025-01-01': "New Year's Day",
+        '2025-05-26': 'Memorial Day',
+        '2025-07-04': 'Independence Day',
+        '2025-09-01': 'Labor Day',
+        '2025-11-27': 'Thanksgiving',
+        '2025-11-28': 'Day After Thanksgiving',
+        '2025-12-25': 'Christmas Day',
+        '2025-12-26': 'Day After Christmas',
+        // 2026 Holidays
+        '2026-01-01': "New Year's Day",
+        '2026-05-25': 'Memorial Day',
+        '2026-07-03': 'Independence Day (Observed)',
+        '2026-09-07': 'Labor Day',
+        '2026-11-26': 'Thanksgiving',
+        '2026-11-27': 'Day After Thanksgiving',
+        '2026-12-25': 'Christmas Day',
+        // 2027 Holidays
+        '2027-01-01': "New Year's Day",
+        '2027-05-31': 'Memorial Day',
+        '2027-07-05': 'Independence Day (Observed)',
+        '2027-09-06': 'Labor Day',
+        '2027-11-25': 'Thanksgiving',
+        '2027-11-26': 'Day After Thanksgiving',
+        '2027-12-24': 'Christmas Eve (Observed)',
+        '2027-12-25': 'Christmas Day',
+    },
+    
+    /**
+     * Check if a date is a company holiday (REQ-022)
+     * @param {string} dateStr - Date in YYYY-MM-DD format
+     * @returns {boolean}
+     */
+    isHoliday(dateStr) {
+        return dateStr in this.HOLIDAYS;
+    },
+    
+    /**
+     * Get holiday name for a date (REQ-022)
+     * @param {string} dateStr - Date in YYYY-MM-DD format
+     * @returns {string|null}
+     */
+    getHolidayName(dateStr) {
+        return this.HOLIDAYS[dateStr] || null;
+    },
+    
+    /**
+     * Format date as YYYY-MM-DD
+     * @param {Date} date
+     * @returns {string}
+     */
+    formatDateISO(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    },
+
+    
     /**
      * Initialize the module for a specific week
      */
@@ -94,7 +156,7 @@ const TimesheetModule = {
     },
     
     /**
-     * Update the table header with actual dates
+     * Update the table header with actual dates (REQ-022: show holiday indicators)
      */
     updateHeaderDates(weekStart) {
         const header = document.querySelector('.hour-type-header');
@@ -106,6 +168,9 @@ const TimesheetModule = {
         if (!weekStart) {
             dayCells.forEach((cell, i) => {
                 cell.innerHTML = this.DAYS[i];
+                cell.classList.remove('holiday-cell');
+                cell.removeAttribute('title');
+                cell.removeAttribute('data-date');
             });
             return;
         }
@@ -116,6 +181,9 @@ const TimesheetModule = {
         if (isNaN(startDate.getTime())) {
             dayCells.forEach((cell, i) => {
                 cell.innerHTML = this.DAYS[i];
+                cell.classList.remove('holiday-cell');
+                cell.removeAttribute('title');
+                cell.removeAttribute('data-date');
             });
             return;
         }
@@ -123,9 +191,24 @@ const TimesheetModule = {
         dayCells.forEach((cell, i) => {
             const date = new Date(startDate);
             date.setDate(date.getDate() + i);
+            const dateStr = this.formatDateISO(date);
             const dayLabel = this.DAYS[i];
             const dateLabel = `${date.getMonth() + 1}/${date.getDate()}`;
-            cell.innerHTML = `${dayLabel}<br><small>${dateLabel}</small>`;
+            
+            // Store date for holiday warning checks (REQ-022)
+            cell.setAttribute('data-date', dateStr);
+            
+            // Check if this day is a holiday (REQ-022)
+            const holidayName = this.getHolidayName(dateStr);
+            if (holidayName) {
+                cell.innerHTML = `${dayLabel}<br><small>${dateLabel}</small><br><span class="holiday-indicator" title="${holidayName}">🎄</span>`;
+                cell.classList.add('holiday-cell');
+                cell.setAttribute('title', holidayName);
+            } else {
+                cell.innerHTML = `${dayLabel}<br><small>${dateLabel}</small>`;
+                cell.classList.remove('holiday-cell');
+                cell.removeAttribute('title');
+            }
         });
     },
     
@@ -216,7 +299,8 @@ const TimesheetModule = {
                            max="24" 
                            step="0.5"
                            placeholder="0"
-                           oninput="TimesheetModule.updateRowTotal('${hourType}')">
+                           oninput="TimesheetModule.updateRowTotal('${hourType}')"
+                           onblur="TimesheetModule.checkHolidayInput(this)">
                 </div>
             `;
         }
@@ -534,7 +618,6 @@ const TimesheetModule = {
         // Update field hours warning when attachments change
         this.updateFieldHoursWarning();
     },
-    
     /**
      * Update row total when hours change
      */
@@ -551,6 +634,40 @@ const TimesheetModule = {
         const totalCell = row.querySelector('.hour-type-total-cell');
         if (totalCell) {
             totalCell.textContent = total;
+        }
+    },
+    
+    /**
+     * Check if user is entering hours on a holiday and warn them (REQ-022)
+     * @param {HTMLInputElement} input - The hour input element
+     */
+    checkHolidayInput(input) {
+        const dateStr = input.dataset.date;
+        const value = parseFloat(input.value) || 0;
+        
+        // Only warn if entering non-zero hours on a holiday
+        if (value <= 0) return;
+        
+        const holidayName = this.getHolidayName(dateStr);
+        if (!holidayName) return;
+        
+        // Check if we've already warned for this input (prevent multiple prompts)
+        if (input.dataset.holidayWarned === dateStr) return;
+        
+        // Show confirmation dialog
+        const confirmed = confirm(
+            `⚠️ Holiday Warning\n\n` +
+            `This day is a holiday: ${holidayName}\n\n` +
+            `Are you sure you want to enter ${value} hours?`
+        );
+        
+        if (confirmed) {
+            // Mark as warned so we don't prompt again for this session
+            input.dataset.holidayWarned = dateStr;
+        } else {
+            // Reset to 0 if cancelled
+            input.value = 0;
+            this.updateRowTotal(input.dataset.type);
         }
     },
     

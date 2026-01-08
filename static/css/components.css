@@ -1066,6 +1066,30 @@
 }
 
 /* ============================================
+   Holiday Indicators (REQ-022)
+   ============================================ */
+.hour-type-day-cell.holiday-cell {
+    background: rgba(239, 68, 68, 0.1) !important;
+    position: relative;
+}
+
+.holiday-indicator {
+    font-size: 0.75rem;
+    cursor: help;
+}
+
+/* Holiday cell in data rows - subtle red tint */
+.hour-type-row .hour-type-day-cell:has(input[data-date]) {
+    position: relative;
+}
+
+/* Style hour inputs on holidays */
+.hour-type-row .hour-type-day-cell input.holiday-input {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
    Responsive
    ============================================ */
 @media (max-width: 768px) {
@@ -1099,3 +1123,4 @@
         order: 1;
     }
 }
+
