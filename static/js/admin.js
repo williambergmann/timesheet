@@ -459,12 +459,52 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userEl) userEl.value = '';
             if (weekEl) weekEl.value = '';
             
+            // Remove active state from stat cards and this week button
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const thisWeekBtn = document.getElementById('admin-this-week-btn');
+            if (thisWeekBtn) thisWeekBtn.classList.remove('active');
+            
+            loadAdminTimesheets();
+        });
+    }
+    
+    // "This Week" quick filter button (REQ-005)
+    const thisWeekBtn = document.getElementById('admin-this-week-btn');
+    if (thisWeekBtn) {
+        thisWeekBtn.addEventListener('click', () => {
+            // Calculate current week's Sunday (week start)
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 = Sunday
+            const sunday = new Date(today);
+            sunday.setDate(today.getDate() - dayOfWeek);
+            
+            // Format as YYYY-MM-DD for the date input
+            const weekStart = sunday.toISOString().split('T')[0];
+            
+            // Set the week filter
+            const weekEl = document.getElementById('admin-filter-week');
+            if (weekEl) {
+                weekEl.value = weekStart;
+            }
+            
+            // Clear other filters for focused view
+            const statusEl = document.getElementById('admin-filter-status');
+            const userEl = document.getElementById('admin-filter-user');
+            if (statusEl) statusEl.value = '';
+            if (userEl) userEl.value = '';
+            
             // Remove active state from stat cards
             document.querySelectorAll('.stat-card').forEach(card => {
                 card.classList.remove('active');
             });
             
+            // Add active state to this button
+            thisWeekBtn.classList.add('active');
+            
             loadAdminTimesheets();
+            showToast(`Showing timesheets for week of ${TimesheetModule.formatWeekRange(weekStart)}`, 'info');
         });
     }
     

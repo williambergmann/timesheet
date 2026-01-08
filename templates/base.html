@@ -10,7 +10,7 @@
     <title>{% block title %}Northstar Timesheet App{% endblock %}</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}?v=14"
+      href="{{ url_for('static', filename='css/main.css') }}?v=15"
     />
     {% block extra_css %}{% endblock %}
   </head>
@@ -20,13 +20,22 @@
         <div class="logo-container">
           <!-- Hamburger Menu Button (Mobile Only) -->
           {% if user %}
-          <button type="button" class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu">
+          <button
+            type="button"
+            class="hamburger-btn"
+            id="hamburger-btn"
+            aria-label="Open navigation menu"
+          >
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
           </button>
           {% endif %}
-          <img src="{{ url_for('static', filename='img/logo-inverted.png') }}" alt="Northstar Logo" class="header-logo" />
+          <img
+            src="{{ url_for('static', filename='img/logo-inverted.png') }}"
+            alt="Northstar Logo"
+            class="header-logo"
+          />
           <h1 class="logo">Northstar Timesheet App</h1>
         </div>
         {% if user %}
@@ -45,7 +54,7 @@
             </button>
           </form>
         </nav>
-        
+
         <!-- Mobile Navigation Menu -->
         <nav class="mobile-nav hidden" id="mobile-nav">
           <a href="#timesheets" class="mobile-nav-link" data-view="timesheets">
@@ -73,4 +82,3 @@
     {% block extra_js %}{% endblock %}
   </body>
 </html>
-

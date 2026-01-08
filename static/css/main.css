@@ -425,6 +425,24 @@ a:hover {
   font-size: var(--font-size-lg);
 }
 
+/* Ghost button - transparent with subtle hover */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.btn-ghost.active {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-color: var(--color-primary-muted);
+}
+
 .btn-link {
   background: none;
   border: none;
