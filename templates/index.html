@@ -351,12 +351,67 @@ endblock %} {% block extra_css %}
                 maxlength="100"
                 placeholder="City or address (optional)"
               />
-            </div>
           </div>
           <div class="mileage-estimate" id="mileage-estimate" style="display: none;">
             <span class="estimate-label">Estimated Mileage Reimbursement:</span>
             <span class="estimate-value" id="mileage-estimate-value">$0.00</span>
             <small class="estimate-hint">(at $0.67/mile IRS rate)</small>
+          </div>
+        </div>
+
+        <!-- Expense Details (shown when has-expenses checkbox checked) - REQ-027 -->
+        <div id="expense-section" class="form-section hidden">
+          <div class="form-section-header">
+            <div class="form-section-icon">🧾</div>
+            <h3>Expense Details</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label for="expense-summary">Expense Summary</label>
+              <textarea
+                id="expense-summary"
+                name="expense_summary"
+                class="form-textarea"
+                rows="3"
+                maxlength="500"
+                placeholder="Describe your expenses (e.g., client dinner, office supplies, conference registration...)"
+              ></textarea>
+              <small class="form-hint">Brief description of expenses incurred</small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expense-total">Estimated Total ($)</label>
+              <input
+                type="number"
+                id="expense-total"
+                name="expense_total"
+                class="form-input"
+                step="0.01"
+                min="0"
+                max="10000"
+                value="0.00"
+                placeholder="0.00"
+              />
+            </div>
+            <div class="form-group">
+              <label for="expense-paid-by">Paid By</label>
+              <select
+                id="expense-paid-by"
+                name="expense_paid_by"
+                class="form-select"
+              >
+                <option value="">Select who paid...</option>
+                <option value="employee">💳 Employee (needs reimbursement)</option>
+                <option value="company_card">🏢 Company Card</option>
+                <option value="client">👤 Client Direct</option>
+                <option value="prepaid">📦 Pre-paid/Approved</option>
+              </select>
+            </div>
+          </div>
+          <div class="expense-notice" id="expense-reimbursement-notice" style="display: none;">
+            <span class="notice-icon">💡</span>
+            <span class="notice-text">If you paid out-of-pocket, check "Reimbursement needed" above and fill out the reimbursement details.</span>
           </div>
         </div>
 
@@ -663,7 +718,7 @@ endblock %} {% block extra_css %}
   window.currentUser = {{ user|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
-<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p4"></script>
+<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p5"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p5"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260107p1"></script>

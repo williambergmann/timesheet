@@ -637,6 +637,40 @@ const TimesheetModule = {
     },
     
     /**
+     * Toggle expense section visibility (REQ-027)
+     */
+    toggleExpenseSection() {
+        const checkbox = document.getElementById('has-expenses');
+        const section = document.getElementById('expense-section');
+        
+        if (checkbox && section) {
+            if (checkbox.checked) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+    },
+    
+    /**
+     * Update expense reimbursement notice (REQ-027)
+     * Shows helpful notice when employee paid out-of-pocket
+     */
+    updateExpenseNotice() {
+        const paidBySelect = document.getElementById('expense-paid-by');
+        const notice = document.getElementById('expense-reimbursement-notice');
+        
+        if (!paidBySelect || !notice) return;
+        
+        // Show notice if employee paid (needs reimbursement)
+        if (paidBySelect.value === 'employee') {
+            notice.style.display = 'flex';
+        } else {
+            notice.style.display = 'none';
+        }
+    },
+    
+    /**
      * Render attachments list
      */
     renderAttachments(attachments) {
@@ -956,6 +990,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (travelMethod) {
         travelMethod.addEventListener('change', () => {
             TimesheetModule.updateMileageEstimate();
+            TimesheetModule.markAsChanged();
+        });
+    }
+    
+    // Has expenses checkbox handler (REQ-027)
+    const hasExpensesCheckbox = document.getElementById('has-expenses');
+    if (hasExpensesCheckbox) {
+        hasExpensesCheckbox.addEventListener('change', () => {
+            TimesheetModule.toggleExpenseSection();
+            TimesheetModule.markAsChanged();
+        });
+    }
+    
+    // Expense paid-by select - update notice (REQ-027)
+    const expensePaidBy = document.getElementById('expense-paid-by');
+    if (expensePaidBy) {
+        expensePaidBy.addEventListener('change', () => {
+            TimesheetModule.updateExpenseNotice();
             TimesheetModule.markAsChanged();
         });
     }

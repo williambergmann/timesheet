@@ -972,7 +972,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-024     | ✅ Complete | Travel mileage tracking & details         |
 | REQ-025     | ✅ Complete | Expanded expense type dropdown            |
 | REQ-026     | ✅ Complete | Expense amount validation ($null fix)     |
-| REQ-027     | 📋 Planned  | "Has expenses" expense details section    |
+| REQ-027     | ✅ Complete | "Has expenses" expense details section    |
 | REQ-028     | 📋 Planned  | Multiple reimbursement line items         |
 | REQ-029     | 📋 Planned  | Production DB lifecycle (migrations only) |
 | REQ-030     | ✅ Partial  | Auth/session hardening                    |
