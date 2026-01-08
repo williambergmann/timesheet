@@ -81,6 +81,12 @@ Add a User Settings section where users can configure:
 - Store preferences in User model
 - Default all notifications to ON for new users
 - SMS opt-out already partially implemented
+- Add a username drop-down menu in the header with a **Settings** option
+- Settings page includes channel tiles for Email, SMS, and Teams
+- Email: allow entering one or more email addresses
+- SMS: allow selecting/entering one or more phone numbers
+- Teams: allow connecting a Microsoft account for Teams notifications
+- Allow multiple emails and phone numbers per user
 
 ---
 
