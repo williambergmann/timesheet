@@ -418,6 +418,37 @@ Display holidays on the time entry grid and show a confirmation warning when use
 
 ---
 
+### REQ-023: Read-Only Submitted Timesheets (P0)
+
+Submitted timesheets should be read-only. Users should not be able to edit a timesheet after submission until an admin rejects it.
+
+**Current Bug:**
+
+- Submitted timesheets still show "Select hour type to add..." dropdown
+- Hour inputs are editable (not disabled)
+- "Edit" button appears in Actions column
+- Form action buttons (Save, Submit) are visible
+
+**Required Behavior:**
+
+| Status         | Editable | Can Add Hours | Can Submit | Can Delete |
+| -------------- | -------- | ------------- | ---------- | ---------- |
+| Draft (NEW)    | ✅ Yes   | ✅ Yes        | ✅ Yes     | ✅ Yes     |
+| Submitted      | ❌ No    | ❌ No         | ❌ No      | ❌ No      |
+| Needs Approval | ❌ No\*  | ❌ No         | ❌ No      | ❌ No      |
+| Approved       | ❌ No    | ❌ No         | ❌ No      | ❌ No      |
+
+> \*Note: "Needs Approval" status should still allow attachment uploads.
+
+**Implementation Notes:**
+
+- Check `timesheet.status` when populating the form
+- Hide/disable edit controls for non-draft timesheets
+- Show status message explaining why editing is disabled
+- See [BUGS.md](BUGS.md) for detailed implementation plan
+
+---
+
 ## ✅ Implementation Status
 
 | Requirement | Status      | Notes                                    |
@@ -444,6 +475,7 @@ Display holidays on the time entry grid and show a confirmation warning when use
 | REQ-020     | 📋 Planned  | Travel flag visibility                   |
 | REQ-021     | 📋 Planned  | Per-option reimbursement attachments     |
 | REQ-022     | ✅ Complete | Holiday indicators + entry warning       |
+| REQ-023     | 🐛 Bug      | Read-only submitted timesheets (BUG-001) |
 
 ---
 
