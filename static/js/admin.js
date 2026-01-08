@@ -56,6 +56,8 @@ async function loadAdminTimesheets() {
                 </div>
                 <div class="timesheet-card-user">
                     👤 ${ts.user ? ts.user.display_name : 'Unknown User'}
+                    ${ts.traveled ? '<span class="travel-badge" title="Traveled this week">✈️</span>' : ''}
+                    ${ts.has_expenses ? '<span class="expense-badge" title="Has expenses">💰</span>' : ''}
                 </div>
                 <div class="admin-actions">
                     ${ts.status === 'SUBMITTED' ? `

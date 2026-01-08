@@ -472,7 +472,7 @@ Submitted timesheets should be read-only. Users should not be able to edit a tim
 | REQ-017     | ✅ Complete | 4 quick-login buttons on login page      |
 | REQ-018     | 📋 Planned  | Hour type filter                         |
 | REQ-019     | 📋 Planned  | Export format options                    |
-| REQ-020     | 📋 Planned  | Travel flag visibility                   |
+| REQ-020     | ✅ Complete | Travel ✈️ and expense 💰 badges on cards |
 | REQ-021     | 📋 Planned  | Per-option reimbursement attachments     |
 | REQ-022     | ✅ Complete | Holiday indicators + entry warning       |
 | REQ-023     | 🐛 Bug      | Read-only submitted timesheets (BUG-001) |
