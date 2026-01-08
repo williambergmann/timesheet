@@ -289,6 +289,74 @@ endblock %} {% block extra_css %}
               />
               <label for="reimbursement-needed">Reimbursement needed</label>
             </div>
+        </div>
+
+        <!-- Travel Details (shown when traveled checkbox checked) - REQ-024 -->
+        <div id="travel-section" class="form-section hidden">
+          <div class="form-section-header">
+            <div class="form-section-icon">✈️</div>
+            <h3>Travel Details</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="miles-traveled">Miles Traveled</label>
+              <input
+                type="number"
+                id="miles-traveled"
+                name="miles_traveled"
+                class="form-input"
+                step="1"
+                min="0"
+                max="9999"
+                value="0"
+                placeholder="0"
+              />
+              <small class="form-hint">Total round-trip miles for the week</small>
+            </div>
+            <div class="form-group">
+              <label for="travel-method">Travel Method</label>
+              <select
+                id="travel-method"
+                name="travel_method"
+                class="form-select"
+              >
+                <option value="">Select method...</option>
+                <option value="personal_car">🚗 Personal Car</option>
+                <option value="company_car">🚙 Company Car</option>
+                <option value="rental">🚐 Rental Vehicle</option>
+                <option value="flight">✈️ Flight</option>
+                <option value="other">📦 Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="travel-from">Starting Location</label>
+              <input
+                type="text"
+                id="travel-from"
+                name="travel_from"
+                class="form-input"
+                maxlength="100"
+                placeholder="City or address (optional)"
+              />
+            </div>
+            <div class="form-group">
+              <label for="travel-to">Destination</label>
+              <input
+                type="text"
+                id="travel-to"
+                name="travel_to"
+                class="form-input"
+                maxlength="100"
+                placeholder="City or address (optional)"
+              />
+            </div>
+          </div>
+          <div class="mileage-estimate" id="mileage-estimate" style="display: none;">
+            <span class="estimate-label">Estimated Mileage Reimbursement:</span>
+            <span class="estimate-value" id="mileage-estimate-value">$0.00</span>
+            <small class="estimate-hint">(at $0.67/mile IRS rate)</small>
           </div>
         </div>
 
@@ -595,7 +663,7 @@ endblock %} {% block extra_css %}
   window.currentUser = {{ user|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
-<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p3"></script>
+<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p4"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p5"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260107p1"></script>

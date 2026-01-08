@@ -595,6 +595,48 @@ const TimesheetModule = {
     },
     
     /**
+     * Toggle travel section visibility (REQ-024)
+     */
+    toggleTravelSection() {
+        const checkbox = document.getElementById('traveled');
+        const section = document.getElementById('travel-section');
+        
+        if (checkbox && section) {
+            if (checkbox.checked) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+    },
+    
+    /**
+     * Update mileage estimate display (REQ-024)
+     * IRS standard mileage rate for 2024: $0.67/mile
+     */
+    updateMileageEstimate() {
+        const milesInput = document.getElementById('miles-traveled');
+        const methodSelect = document.getElementById('travel-method');
+        const estimateDiv = document.getElementById('mileage-estimate');
+        const estimateValue = document.getElementById('mileage-estimate-value');
+        
+        if (!milesInput || !estimateDiv || !estimateValue) return;
+        
+        const miles = parseFloat(milesInput.value) || 0;
+        const method = methodSelect ? methodSelect.value : '';
+        
+        // Only show estimate for personal car (reimbursable mileage)
+        if (method === 'personal_car' && miles > 0) {
+            const rate = 0.67; // IRS rate
+            const estimate = (miles * rate).toFixed(2);
+            estimateValue.textContent = `$${estimate}`;
+            estimateDiv.style.display = 'flex';
+        } else {
+            estimateDiv.style.display = 'none';
+        }
+    },
+    
+    /**
      * Render attachments list
      */
     renderAttachments(attachments) {
@@ -887,6 +929,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkbox) {
         checkbox.addEventListener('change', () => {
             TimesheetModule.toggleReimbursementSection();
+            TimesheetModule.markAsChanged();
+        });
+    }
+    
+    // Travel checkbox handler (REQ-024)
+    const traveledCheckbox = document.getElementById('traveled');
+    if (traveledCheckbox) {
+        traveledCheckbox.addEventListener('change', () => {
+            TimesheetModule.toggleTravelSection();
+            TimesheetModule.markAsChanged();
+        });
+    }
+    
+    // Miles traveled input - update estimate (REQ-024)
+    const milesInput = document.getElementById('miles-traveled');
+    if (milesInput) {
+        milesInput.addEventListener('input', () => {
+            TimesheetModule.updateMileageEstimate();
+            TimesheetModule.markAsChanged();
+        });
+    }
+    
+    // Travel method select - update estimate (REQ-024)
+    const travelMethod = document.getElementById('travel-method');
+    if (travelMethod) {
+        travelMethod.addEventListener('change', () => {
+            TimesheetModule.updateMileageEstimate();
             TimesheetModule.markAsChanged();
         });
     }
