@@ -420,30 +420,30 @@ Display holidays on the time entry grid and show a confirmation warning when use
 
 ## ✅ Implementation Status
 
-| Requirement | Status      | Notes                                 |
-| ----------- | ----------- | ------------------------------------- |
-| REQ-001     | ✅ Complete | Four-tier role system implemented     |
-| REQ-002     | ✅ Complete | All 4 test accounts available         |
-| REQ-003     | 📋 Planned  | New feature                           |
-| REQ-004     | 📋 Planned  | Admin dashboard enhancement           |
-| REQ-005     | 📋 Planned  | Admin dashboard enhancement           |
-| REQ-006     | 📋 Planned  | New workflow                          |
-| REQ-007     | 📋 Planned  | Grid enhancement                      |
-| REQ-008     | ✅ Partial  | Exists in some views                  |
-| REQ-009     | ✅ Partial  | Works for Field, needs generalization |
-| REQ-010     | 📋 Planned  | SharePoint integration                |
-| REQ-011     | 📋 Planned  | Email service                         |
-| REQ-012     | 📋 Planned  | Teams bot                             |
-| REQ-013     | ✅ Complete | Dropdown filters by user role         |
-| REQ-014     | ✅ Partial  | Warning exists, needs flow change     |
-| REQ-015     | 📋 Planned  | Azure AD integration                  |
-| REQ-016     | ✅ Complete | Auto-redirect to /app after login     |
-| REQ-017     | ✅ Complete | 4 quick-login buttons on login page   |
-| REQ-018     | 📋 Planned  | Hour type filter                      |
-| REQ-019     | 📋 Planned  | Export format options                 |
-| REQ-020     | 📋 Planned  | Travel flag visibility                |
-| REQ-021     | 📋 Planned  | Per-option reimbursement attachments  |
-| REQ-022     | ✅ Complete | Holiday indicators + entry warning    |
+| Requirement | Status      | Notes                                    |
+| ----------- | ----------- | ---------------------------------------- |
+| REQ-001     | ✅ Complete | Four-tier role system implemented        |
+| REQ-002     | ✅ Complete | All 4 test accounts available            |
+| REQ-003     | 📋 Planned  | New feature                              |
+| REQ-004     | 📋 Planned  | Admin dashboard enhancement              |
+| REQ-005     | 📋 Planned  | Admin dashboard enhancement              |
+| REQ-006     | 📋 Planned  | New workflow                             |
+| REQ-007     | 📋 Planned  | Grid enhancement                         |
+| REQ-008     | ✅ Partial  | Exists in some views                     |
+| REQ-009     | ✅ Partial  | Works for Field, needs generalization    |
+| REQ-010     | 📋 Planned  | SharePoint integration                   |
+| REQ-011     | 📋 Planned  | Email service                            |
+| REQ-012     | 📋 Planned  | Teams bot                                |
+| REQ-013     | ✅ Complete | Dropdown filters by user role            |
+| REQ-014     | ✅ Complete | Submit without attachment (with warning) |
+| REQ-015     | 📋 Planned  | Azure AD integration                     |
+| REQ-016     | ✅ Complete | Auto-redirect to /app after login        |
+| REQ-017     | ✅ Complete | 4 quick-login buttons on login page      |
+| REQ-018     | 📋 Planned  | Hour type filter                         |
+| REQ-019     | 📋 Planned  | Export format options                    |
+| REQ-020     | 📋 Planned  | Travel flag visibility                   |
+| REQ-021     | 📋 Planned  | Per-option reimbursement attachments     |
+| REQ-022     | ✅ Complete | Holiday indicators + entry warning       |
 
 ---
 
