@@ -38,11 +38,6 @@
 - Added `.total-row` styling with border-top
 - Added `.grand-total` styling with enhanced green
 
-**`templates/index.html`**
-
-- Updated CSS version: `v=20260108p2`
-- Updated JS admin version: `v=20260108p1`
-
 ---
 
 ### REQ-005: Current Week Filter
@@ -75,9 +70,91 @@
 - Added `.btn-ghost` base style (transparent with subtle hover)
 - Added `.btn-ghost.active` with green background
 
-**`templates/index.html` (lines 536-548)**
+---
 
-- Added button element with id `admin-this-week-btn`
+### REQ-020: Travel Flag Visibility
+
+**Summary:** Added travel and expense badges to timesheet cards on admin dashboard.
+
+#### Files Modified
+
+| File                        | Type       | Changes                                               |
+| --------------------------- | ---------- | ----------------------------------------------------- |
+| `static/js/admin.js`        | JavaScript | Added travel/expense badge rendering in card template |
+| `static/css/components.css` | CSS        | Added `.travel-badge` and `.expense-badge` styles     |
+| `docs/REQUIREMENTS.md`      | Docs       | Marked REQ-020 as Complete                            |
+
+#### Detailed Changes
+
+**`static/js/admin.js` (line 58-59)**
+
+- Added conditional rendering: `${ts.traveled ? '<span class="travel-badge">✈️</span>' : ''}`
+- Added conditional rendering: `${ts.has_expenses ? '<span class="expense-badge">💰</span>' : ''}`
+
+**`static/css/components.css` (lines 331-351)**
+
+- Added `.travel-badge` with cyan color
+- Added `.expense-badge` with warning/yellow color
+- Both have `cursor: help` for tooltip indication
+
+---
+
+### REQ-018: Hour Type Filter
+
+**Summary:** Added hour type filter dropdown to admin dashboard for filtering timesheets by entry type.
+
+#### Files Modified
+
+| File                   | Type       | Changes                                        |
+| ---------------------- | ---------- | ---------------------------------------------- |
+| `templates/index.html` | HTML       | Added "Hours:" dropdown with hour type options |
+| `static/js/admin.js`   | JavaScript | Added filter value to params, event handler    |
+| `app/routes/admin.py`  | Python     | Added hour_type subquery filter                |
+| `docs/REQUIREMENTS.md` | Docs       | Marked REQ-018 as Complete                     |
+
+#### Detailed Changes
+
+**`app/routes/admin.py` (lines 57-78)**
+
+- Added `hour_type` query parameter handling
+- Uses `TimesheetEntry` subquery to filter timesheets
+- Special case "has_field" filters for any Field hours
+- Efficient `.in_()` subquery for performance
+
+**`static/js/admin.js`**
+
+- Added `hourTypeEl` to filter value collection
+- Added `hour_type` to API params
+- Added change event listener for hour type dropdown
+- Included in clear filters reset
+
+---
+
+### BUG-001: Submitted Timesheets Allow Editing
+
+**Summary:** Documented bug where submitted timesheets still show edit controls.
+
+#### Files Created
+
+| File                   | Type | Changes                             |
+| ---------------------- | ---- | ----------------------------------- |
+| `docs/BUGS.md`         | Docs | NEW - Created bug tracking document |
+| `docs/REQUIREMENTS.md` | Docs | Added REQ-023 for bug fix           |
+
+#### Bug Details
+
+- Submitted timesheets show "Add hour type" dropdown
+- Hour inputs are editable when they should be disabled
+- Edit button visible in Actions column
+- Form buttons (Save/Submit) visible
+
+**Fix Plan:**
+
+- Check `timesheet.status` when loading form
+- Only `NEW` and `NEEDS_APPROVAL` should be editable
+- Hide/disable controls for `SUBMITTED` and `APPROVED`
+
+---
 
 ## Previous Sessions
 
