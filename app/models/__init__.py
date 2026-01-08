@@ -4,7 +4,7 @@ Database Models
 SQLAlchemy models for the Timesheet application.
 """
 
-from .user import User
+from .user import User, UserRole
 from .timesheet import (
     Timesheet,
     TimesheetEntry,
@@ -18,6 +18,7 @@ from .notification import Notification, NotificationType
 
 __all__ = [
     "User",
+    "UserRole",
     "Timesheet",
     "TimesheetEntry",
     "TimesheetStatus",

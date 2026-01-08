@@ -17,21 +17,69 @@
         </div>
         {% endif %}
         
-        <form method="POST" action="{{ url_for('auth.dev_login') }}" class="login-form">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-input" required 
-                       placeholder="Enter username" autocomplete="username" />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-input" required 
-                       placeholder="Enter password" autocomplete="current-password" />
-            </div>
-            <button type="submit" class="btn btn-primary btn-lg btn-block">
-                Sign In
-            </button>
-        </form>
+        <!-- Quick Login Buttons (Dev Mode) - REQ-017 -->
+        <div class="dev-login-buttons">
+            <p class="dev-login-title">🔧 Development Mode - Quick Login</p>
+            
+            <form method="POST" action="{{ url_for('auth.dev_login') }}" class="dev-login-grid">
+                <button type="submit" name="username" value="trainee" class="btn btn-dev btn-trainee">
+                    <input type="hidden" name="password" value="trainee" />
+                    <span class="btn-icon">🎓</span>
+                    <span class="btn-label">Trainee</span>
+                    <span class="btn-desc">Training hours only</span>
+                </button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('auth.dev_login') }}" class="dev-login-grid">
+                <button type="submit" name="username" value="staff" class="btn btn-dev btn-staff">
+                    <input type="hidden" name="password" value="staff" />
+                    <span class="btn-icon">👤</span>
+                    <span class="btn-label">Staff</span>
+                    <span class="btn-desc">All hours, no approval</span>
+                </button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('auth.dev_login') }}" class="dev-login-grid">
+                <button type="submit" name="username" value="support" class="btn btn-dev btn-support">
+                    <input type="hidden" name="password" value="support" />
+                    <span class="btn-icon">🛠️</span>
+                    <span class="btn-label">Support</span>
+                    <span class="btn-desc">Approve trainees</span>
+                </button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('auth.dev_login') }}" class="dev-login-grid">
+                <button type="submit" name="username" value="admin" class="btn btn-dev btn-admin">
+                    <input type="hidden" name="password" value="password" />
+                    <span class="btn-icon">👑</span>
+                    <span class="btn-label">Admin</span>
+                    <span class="btn-desc">Full access</span>
+                </button>
+            </form>
+        </div>
+        
+        <div class="login-divider">
+            <span>or sign in manually</span>
+        </div>
+        
+        <details class="manual-login-section">
+            <summary>Manual Login</summary>
+            <form method="POST" action="{{ url_for('auth.dev_login') }}" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-input" required 
+                           placeholder="Enter username" autocomplete="username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required 
+                           placeholder="Enter password" autocomplete="current-password" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    Sign In
+                </button>
+            </form>
+        </details>
         
         <div class="login-divider">
             <span>or</span>
@@ -46,12 +94,96 @@
             </svg>
             Sign in with Microsoft 365
         </a>
-        
-        <div class="login-help">
-            <p><strong>Test Accounts:</strong></p>
-            <p><code>user</code> / <code>user</code> - Regular User</p>
-            <p><code>admin</code> / <code>password</code> - Admin User</p>
-        </div>
     </div>
 </div>
+
+<style>
+/* Dev Login Button Grid */
+.dev-login-buttons {
+    margin: 1.5rem 0;
+}
+
+.dev-login-title {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.dev-login-grid {
+    display: contents;
+}
+
+.dev-login-buttons form {
+    margin-bottom: 0.75rem;
+}
+
+.btn-dev {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-elevated);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.btn-dev:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+}
+
+.btn-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.btn-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Role-specific colors */
+.btn-trainee { border-left: 4px solid #9c27b0; }
+.btn-trainee:hover { background: rgba(156, 39, 176, 0.1); }
+
+.btn-staff { border-left: 4px solid #2196f3; }
+.btn-staff:hover { background: rgba(33, 150, 243, 0.1); }
+
+.btn-support { border-left: 4px solid #ff9800; }
+.btn-support:hover { background: rgba(255, 152, 0, 0.1); }
+
+.btn-admin { border-left: 4px solid #4caf50; }
+.btn-admin:hover { background: rgba(76, 175, 80, 0.1); }
+
+/* Manual login collapsible */
+.manual-login-section {
+    margin: 1rem 0;
+}
+
+.manual-login-section summary {
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.manual-login-section summary:hover {
+    color: var(--text-primary);
+}
+
+.manual-login-section .login-form {
+    margin-top: 1rem;
+}
+</style>
 {% endblock %}

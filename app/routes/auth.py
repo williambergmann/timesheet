@@ -162,21 +162,47 @@ def dev_login():
     """
     Development login with username/password.
     
-    Test accounts:
-    - user/user: Regular user
-    - admin/password: Admin user
+    Four-tier test accounts (REQ-002/REQ-017):
+    - trainee/trainee: Trainee role (Training hours only)
+    - staff/staff: Staff role (all hours, no approval)
+    - support/support: Support role (all hours, approve trainees)
+    - admin/password: Admin role (full access)
     """
-    from ..models import User
+    from ..models import User, UserRole
     from ..extensions import db
     from flask import render_template
     
     username = request.form.get("username", "").strip().lower()
     password = request.form.get("password", "")
     
-    # Test account credentials
+    # Four-tier test account credentials (REQ-001)
     TEST_ACCOUNTS = {
-        "user": {"password": "user", "is_admin": False, "display_name": "Test User"},
-        "admin": {"password": "password", "is_admin": True, "display_name": "Admin User"},
+        "trainee": {
+            "password": "trainee",
+            "role": UserRole.TRAINEE,
+            "display_name": "Test Trainee"
+        },
+        "staff": {
+            "password": "staff",
+            "role": UserRole.STAFF,
+            "display_name": "Test Staff"
+        },
+        "support": {
+            "password": "support",
+            "role": UserRole.SUPPORT,
+            "display_name": "Test Support"
+        },
+        "admin": {
+            "password": "password",
+            "role": UserRole.ADMIN,
+            "display_name": "Admin User"
+        },
+        # Legacy account for backwards compatibility
+        "user": {
+            "password": "user",
+            "role": UserRole.STAFF,
+            "display_name": "Test User"
+        },
     }
     
     # Validate credentials
@@ -197,20 +223,24 @@ def dev_login():
             azure_id=f"dev-{username}-001",
             email=email,
             display_name=account["display_name"],
-            is_admin=account["is_admin"],
+            role=account["role"],
+            is_admin=(account["role"] == UserRole.ADMIN),  # Legacy field
         )
         db.session.add(user)
         db.session.commit()
-        current_app.logger.info(f"Created dev user: {email}")
+        current_app.logger.info(f"Created dev user: {email} (role={account['role'].value})")
     else:
-        # Update admin status if changed
-        user.is_admin = account["is_admin"]
+        # Update role and display name
+        user.role = account["role"]
+        user.is_admin = (account["role"] == UserRole.ADMIN)
         user.display_name = account["display_name"]
         db.session.commit()
     
     # Store user in session
     session["user"] = user.to_dict()
-    current_app.logger.info(f"DEV LOGIN: {username} logged in (admin={account['is_admin']})")
+    current_app.logger.info(
+        f"DEV LOGIN: {username} logged in (role={account['role'].value})"
+    )
     
     return redirect(url_for("main.dashboard"))
 
