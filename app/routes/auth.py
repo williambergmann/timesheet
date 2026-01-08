@@ -70,7 +70,7 @@ def login():
 
         session["user"] = test_user.to_dict()
         current_app.logger.warning("DEV MODE: Bypassing Azure AD authentication")
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.app"))  # REQ-016: Auto-redirect to app
 
     # Production: redirect to Azure AD
     auth_url = _get_auth_url()
@@ -143,7 +143,7 @@ def callback():
     session["user"] = user.to_dict()
     session["access_token"] = result.get("access_token")
 
-    return redirect(url_for("main.dashboard"))
+    return redirect(url_for("main.app"))  # REQ-016: Auto-redirect to app
 
 
 @auth_bp.route("/logout", methods=["POST"])
@@ -242,7 +242,7 @@ def dev_login():
         f"DEV LOGIN: {username} logged in (role={account['role'].value})"
     )
     
-    return redirect(url_for("main.dashboard"))
+    return redirect(url_for("main.app"))  # REQ-016: Auto-redirect to app
 
 
 @auth_bp.route("/me")

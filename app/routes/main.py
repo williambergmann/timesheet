@@ -12,12 +12,12 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 def index():
     """
-    Root route - redirects to dashboard or login.
+    Root route - redirects to app or login.
     """
     if "user" not in session:
         return redirect(url_for("main.login_page"))
     
-    return redirect(url_for("main.dashboard"))
+    return redirect(url_for("main.app"))  # REQ-016: Go directly to app
 
 
 @main_bp.route("/login")
@@ -26,7 +26,7 @@ def login_page():
     Login page with username/password form.
     """
     if "user" in session:
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.app"))  # REQ-016: Go directly to app
     
     return render_template("login.html")
 

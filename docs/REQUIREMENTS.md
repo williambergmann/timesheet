@@ -437,7 +437,7 @@ Display holidays on the time entry grid and show a confirmation warning when use
 | REQ-013     | ✅ Complete | Dropdown filters by user role         |
 | REQ-014     | ✅ Partial  | Warning exists, needs flow change     |
 | REQ-015     | 📋 Planned  | Azure AD integration                  |
-| REQ-016     | 📋 Planned  | Auto-redirect after login             |
+| REQ-016     | ✅ Complete | Auto-redirect to /app after login     |
 | REQ-017     | ✅ Complete | 4 quick-login buttons on login page   |
 | REQ-018     | 📋 Planned  | Hour type filter                      |
 | REQ-019     | 📋 Planned  | Export format options                 |
