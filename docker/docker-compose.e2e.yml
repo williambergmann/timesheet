@@ -1,0 +1,34 @@
+# Docker Compose configuration for running E2E tests with Playwright
+#
+# Usage:
+#   # Ensure app is running first
+#   cd docker && docker compose up -d
+#
+#   # Run E2E tests in Docker
+#   docker compose -f docker/docker-compose.e2e.yml run --rm playwright
+#
+#   # Or use npm script from project root
+#   npm run test:e2e:docker
+
+name: timesheet-e2e
+
+services:
+  # Playwright test runner
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.57.0-noble
+    working_dir: /app
+    volumes:
+      - ..:/app
+      - /app/node_modules  # Anonymous volume to prevent node_modules conflicts
+    environment:
+      - BASE_URL=http://host.docker.internal
+      - CI=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      sh -c "
+        npm install &&
+        npx playwright test --reporter=list
+      "
+    profiles:
+      - test

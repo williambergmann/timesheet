@@ -6,11 +6,12 @@
 
 ## 📊 Current Status
 
-| Metric            | Value | Target |
-| ----------------- | ----- | ------ |
-| **Total Tests**   | 85    | 120+   |
-| **Code Coverage** | 74%   | 90%+   |
-| **Test Files**    | 4     | 8+     |
+| Metric             | Value   | Target |
+| ------------------ | ------- | ------ |
+| **Unit/API Tests** | 85      | 120+   |
+| **E2E Tests**      | 4 files | 6+     |
+| **Code Coverage**  | 74%     | 90%+   |
+| **Test Files**     | 8 (4+4) | 12+    |
 
 ---
 
@@ -31,7 +32,14 @@ tests/
 ├── test_sms.py           # TODO: SMS utility tests
 ├── test_notifications.py # TODO: Notification service tests
 ├── test_events.py        # TODO: SSE endpoint tests
-└── test_attachments.py   # TODO: File upload tests
+├── test_attachments.py   # TODO: File upload tests
+│
+└── e2e/                  # Playwright E2E tests
+    ├── fixtures.js       # Shared fixtures and utilities
+    ├── auth.spec.js      # Authentication flow tests
+    ├── timesheet.spec.js # Timesheet CRUD tests
+    ├── admin.spec.js     # Admin dashboard tests
+    └── csrf.spec.js      # CSRF protection tests
 ```
 
 ### Test Categories
@@ -42,6 +50,7 @@ tests/
 | **API Integration** | HTTP endpoints, request/response      | `test_*.py`             |
 | **Service Tests**   | Business logic services               | `test_notifications.py` |
 | **Utility Tests**   | Helper functions                      | `test_sms.py`           |
+| **E2E Tests**       | Browser-based user flow tests         | `e2e/*.spec.js`         |
 
 ---
 
@@ -99,6 +108,86 @@ docker exec timesheet-web-1 python -m pytest tests/ -v
 # Run with coverage in Docker
 docker exec timesheet-web-1 python -m pytest tests/ --cov=app
 ```
+
+### E2E Testing with Playwright
+
+End-to-end browser tests are implemented using Playwright for cross-browser testing of critical user flows.
+
+**Prerequisites:**
+
+```bash
+# Install Node.js dependencies
+npm install
+
+# Install Playwright browsers (requires Node 18+)
+npm run playwright:install
+
+# Or skip local install and use Docker
+```
+
+**Running E2E Tests:**
+
+```bash
+# Run all E2E tests (headless)
+npm run test:e2e
+
+# Run with browser visible
+npm run test:e2e:headed
+
+# Run with interactive UI mode
+npm run test:e2e:ui
+
+# Run with debugger
+npm run test:e2e:debug
+
+# View HTML report from last run
+npm run test:e2e:report
+```
+
+**Running E2E Tests in Docker (recommended for CI/CD):**
+
+```bash
+# Ensure the app is running
+cd docker && docker compose up -d && cd ..
+
+# Run tests using official Playwright Docker image
+npm run test:e2e:docker
+
+# Or using the E2E compose file
+docker compose -f docker/docker-compose.e2e.yml run --rm playwright
+```
+
+**E2E Test Structure:**
+
+```
+tests/e2e/
+├── fixtures.js       # Shared fixtures and utilities
+├── auth.spec.js      # Authentication flow tests
+├── timesheet.spec.js # Timesheet CRUD tests
+├── admin.spec.js     # Admin dashboard tests
+└── csrf.spec.js      # CSRF protection tests
+```
+
+**Test Coverage:**
+
+| Flow                                 | File              | Priority |
+| ------------------------------------ | ----------------- | -------- |
+| Dev login → Dashboard loads          | auth.spec.js      | P0       |
+| Create new timesheet → Save draft    | timesheet.spec.js | P0       |
+| Add time entries → Submit → Confirm  | timesheet.spec.js | P0       |
+| Admin login → View → Approve         | admin.spec.js     | P0       |
+| CSRF protection (POST without token) | csrf.spec.js      | P1       |
+| Logout → Session cleared             | auth.spec.js      | P1       |
+
+**Configuration:**
+
+Playwright configuration is in `playwright.config.js`:
+
+- Default browser: Chromium
+- Base URL: `http://localhost` (configurable via `BASE_URL` env var)
+- Screenshots on failure
+- Video recording on retry
+- HTML report generation
 
 ---
 
@@ -583,4 +672,4 @@ fi
 
 ---
 
-_Last updated: January 6, 2026_
+_Last updated: January 9, 2026_

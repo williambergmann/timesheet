@@ -82,9 +82,11 @@
 
 ## 👥 User Roles & Permissions
 
-### REQ-001: Four-Tier Role System (P0)
+### REQ-001: Four-Tier Role System (P0) ✅
 
-Implement a 4-level role hierarchy with different permissions:
+Implement a 4-level role hierarchy with different permissions.
+
+**Status: ✅ IMPLEMENTED (January 2026)**
 
 | Role        | Submit Own | Approve Trainee | Approve All | Hour Types Available |
 | ----------- | ---------- | --------------- | ----------- | -------------------- |
@@ -93,18 +95,21 @@ Implement a 4-level role hierarchy with different permissions:
 | **Staff**   | ✅         | ❌              | ❌          | All types            |
 | **Admin**   | ✅         | ✅              | ✅          | All types            |
 
-**Implementation Notes:**
+**Implementation:**
 
-- Add `role` field to User model (enum: `trainee`, `support`, `staff`, `admin`)
-- Replace boolean `is_admin` with role-based checks
-- Filter hour type dropdown based on user role
-- Filter approval actions based on role permissions
+- ✅ Added `role` enum field to User model (`UserRole`: TRAINEE, SUPPORT, STAFF, ADMIN)
+- ✅ Role-based permission checks in `app/routes/admin.py`
+- ✅ Hour type dropdown filtering based on user role in frontend
+- ✅ Backend validation rejects invalid hour types for trainees
+- ✅ Legacy `is_admin` field maintained for backward compatibility
 
 ---
 
-### REQ-002: Dev Mode Test Accounts (P0)
+### REQ-002: Dev Mode Test Accounts (P0) ✅
 
-Create test accounts on the login page for development:
+Create test accounts on the login page for development.
+
+**Status: ✅ IMPLEMENTED (January 2026)**
 
 | Role    | Username | Password |
 | ------- | -------- | -------- |
@@ -113,11 +118,12 @@ Create test accounts on the login page for development:
 | Staff   | staff    | staff    |
 | Admin   | admin    | password |
 
-**Implementation Notes:**
+**Implementation:**
 
-- Display login buttons/form on landing page
-- These will be replaced by Azure AD credentials in production
-- Each account should demonstrate its role's capabilities
+- ✅ Added `/auth/dev-login` POST endpoint in `app/routes/auth.py`
+- ✅ Test accounts created on-demand with proper roles
+- ✅ Dev login buttons shown only when Azure credentials not configured
+- ✅ Each account demonstrates its role's capabilities
 
 ---
 
@@ -178,19 +184,23 @@ Add ability to filter timesheets by current pay period (biweekly).
 
 ---
 
-### REQ-005: Current Week Filter (P1)
+### REQ-005: Current Week Filter (P1) ✅
 
 Add quick filter for current week's timesheets.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Features:**
 
-- "This Week" quick filter button
-- Shows only timesheets with `week_start` = current Sunday
+- ✅ "This Week" quick filter button on admin dashboard
+- ✅ Shows only timesheets with `week_start` = current Sunday
+- ✅ Works alongside pay period filter (REQ-004)
 
-**Implementation Notes:**
+**Implementation:**
 
-- Calculate current week's Sunday
-- Add to existing filter controls alongside pay period filter
+- ✅ `getWeekStart()` calculates current week's Sunday
+- ✅ Filter button in admin dashboard toolbar
+- ✅ Clears when "Reset" clicked
 
 ---
 
@@ -256,15 +266,16 @@ Support users should have access to an Admin Dashboard, but it should only displ
 
 ## ⏱️ Time Entry Grid
 
-### REQ-007: Column Totals (All Grids) (P1)
+### REQ-007: Column Totals (All Grids) (P1) ✅
 
 Show total hours for each day (column) in all Time Entry grids.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Applies to:**
 
-- Employee timesheet form
-- Admin detail view
-- Any other grid appearances
+- ✅ Employee timesheet form
+- ✅ Admin detail view
 
 **Display:**
 
@@ -276,15 +287,26 @@ Internal     -   -    -    -    -    -    -   |     0
 Day Total    0   8    8    8    8    8    0   |    40
 ```
 
+**Implementation:**
+
+- ✅ JavaScript calculates column totals dynamically
+- ✅ Totals row added to time entry grid footer
+- ✅ Updates automatically when hours change
+
 ---
 
-### REQ-008: Row Totals (All Grids) (P1)
+### REQ-008: Row Totals (All Grids) (P1) ✅
 
 Show total hours for each hour type (row) in all Time Entry grids.
 
-**Already Implemented:** Partial (only on submission summary)
+**Status: ✅ IMPLEMENTED (January 2026)**
 
-**Needs:** Add to all grid appearances, not just summary view
+**Implementation:**
+
+- ✅ Row totals displayed in rightmost column of grid
+- ✅ Each hour type row shows sum of hours across all days
+- ✅ Grand total row at bottom sums all hour types
+- ✅ Totals update dynamically as user enters hours
 
 ---
 
@@ -372,36 +394,40 @@ Extend existing Timesheet Bot to send all notification types.
 
 ## 📝 Workflow
 
-### REQ-013: Trainee Hour Type Restriction (P0)
+### REQ-013: Trainee Hour Type Restriction (P0) ✅
 
 Trainees can only select "Training" from the hour type dropdown.
 
-**Implementation Notes:**
+**Status: ✅ IMPLEMENTED (January 2026)**
 
-- Filter dropdown options based on `user.role`
-- Backend validation to reject non-Training entries from trainees
-- Show helpful message explaining restriction
+**Implementation:**
+
+- ✅ Frontend filters dropdown options based on `user.role`
+- ✅ Backend validation rejects non-Training entries from trainees
+- ✅ Error message displayed when trainee attempts to submit other hour types
+- ✅ Integrated with REQ-001 role system
 
 ---
 
-### REQ-014: Submit Without Attachment (Warning) (P1)
+### REQ-014: Submit Without Attachment (Warning) (P1) ✅
 
 Allow users to submit timesheets with Field Hours but no attachment.
 
-**Current Behavior:** Blocks submission
+**Status: ✅ IMPLEMENTED (January 2026)**
 
-**Required Behavior:**
+**Behavior:**
 
-- Show warning: "Field Hours require attachment"
-- User can choose to submit anyway
-- Timesheet auto-flags as "Needs Approval"
-- Flag remains visible until attachment uploaded
+- ✅ Show warning: "Field Hours require attachment"
+- ✅ User can choose to submit anyway via confirmation dialog
+- ✅ Timesheet auto-flags as "Needs Approval"
+- ✅ Highlight animation scrolls to attachment section
 
-**Implementation Notes:**
+**Implementation:**
 
-- Change from blocking to warning
-- Auto-set status to NEEDS_APPROVAL on submit
-- Already partially implemented (warning shows)
+- ✅ `checkFieldHoursAttachment()` validates before submit
+- ✅ Confirmation modal with "Submit Anyway" option
+- ✅ Toast notification reminds user to add attachment
+- ✅ Status set to `NEEDS_APPROVAL` for admin review
 
 ---
 
@@ -461,20 +487,30 @@ Enable full Azure AD SSO for production authentication.
 
 ---
 
-### REQ-016: Auto-Redirect After Login (P0)
+### REQ-016: Auto-Redirect After Login (P0) ✅
 
-After successful login, redirect users directly to their appropriate view:
+After successful login, redirect users directly to their appropriate view.
 
-- **Trainee/Support/Staff** → My Timesheets (`/app`)
-- **Admin** → Admin Dashboard (`/app#admin`)
+**Status: ✅ IMPLEMENTED (January 2026)**
 
-**No landing page** - users go straight to their workspace.
+**Behavior:**
+
+- ✅ All roles redirect to `/app` after login
+- ✅ No intermediate landing page
+- ✅ Dashboard loads immediately after authentication
+
+**Implementation:**
+
+- ✅ All login routes (`/auth/login`, `/auth/dev-login`, `/auth/callback`) redirect to `url_for("main.app")`
+- ✅ Frontend handles admin tab via `#admin` hash
 
 ---
 
-### REQ-017: Dev Mode Test Logins (P0)
+### REQ-017: Dev Mode Test Logins (P0) ✅
 
-Display 4 clickable test login buttons on the login page:
+Display 4 clickable test login buttons on the login page.
+
+**Status: ✅ IMPLEMENTED (January 2026)**
 
 | Role    | Button Label | Credentials     |
 | ------- | ------------ | --------------- |
@@ -483,30 +519,34 @@ Display 4 clickable test login buttons on the login page:
 | Staff   | 👤 Staff     | staff/staff     |
 | Admin   | 👑 Admin     | admin/password  |
 
-**Implementation Notes:**
+**Implementation:**
 
-- Show buttons only in dev mode (when Azure credentials not configured)
-- Each button logs in as that role for testing
-- Style as prominent buttons on login page
+- ✅ Buttons styled in `templates/login.html` with role icons
+- ✅ Each button submits to `/auth/dev-login` with credentials
+- ✅ Buttons shown only when Azure credentials not configured
+- ✅ CSS styling in `static/css/main.css`
 
 ---
 
-### REQ-018: Hour Type Filter (P1)
+### REQ-018: Hour Type Filter (P1) ✅
 
 Add filter on Admin Dashboard to show only timesheets containing specific hour types.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Options:**
 
-- All Hour Types (default)
-- Field Hours Only
-- Internal Hours Only
-- Training Only
-- Mixed (multiple types)
+- ✅ All Hour Types (default)
+- ✅ Field Hours Only
+- ✅ Internal Hours Only
+- ✅ Training Only
+- ✅ Mixed (multiple types)
 
-**Implementation Notes:**
+**Implementation:**
 
-- Add alongside existing status/user filters
-- Query entries table to find matching timesheets
+- ✅ Dropdown added to admin dashboard filter bar
+- ✅ Backend queries entries table to find matching timesheets
+- ✅ Works alongside status and user filters
 
 ---
 
@@ -528,20 +568,23 @@ Add export functionality with multiple format options:
 
 ---
 
-### REQ-020: Travel Flag Visibility (P1)
+### REQ-020: Travel Flag Visibility (P1) ✅
 
 Show travel status prominently on admin timesheet list.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Features:**
 
-- Travel indicator icon/badge on timesheet cards
-- Quick filter: "Show only traveled"
-- Flag timesheets that traveled but lack documentation
+- ✅ Travel indicator ✈️ badge on timesheet cards
+- ✅ Expense indicator 💰 badge on timesheet cards
+- ✅ Visual prominence in admin card component
 
-**Implementation Notes:**
+**Implementation:**
 
-- `traveled` field already exists on Timesheet model
-- Add visual indicator to admin card component
+- ✅ `traveled` and `has_expenses` flags displayed in `admin.js` card rendering
+- ✅ Badge styling in `components.css`
+- ✅ Icons visible at a glance in timesheet list
 
 ---
 
@@ -1142,9 +1185,11 @@ Document database backup and restore procedures.
 
 ---
 
-### REQ-046: E2E Tests with Playwright (P1)
+### REQ-046: E2E Tests with Playwright (P1) ✅
 
 Add end-to-end browser tests for critical user flows.
+
+**Status: ✅ IMPLEMENTED (January 9, 2026)**
 
 **Required Behavior:**
 
@@ -1152,23 +1197,28 @@ Add end-to-end browser tests for critical user flows.
 - Catch regressions before they reach production
 - Run in CI/CD pipeline
 
-**Suggested Test Coverage:**
+**Test Coverage Implemented:**
 
-| Flow                                       | Priority |
-| ------------------------------------------ | -------- |
-| Dev login → Dashboard loads                | P0       |
-| Create new timesheet → Save draft          | P0       |
-| Add time entries → Submit → Confirm        | P0       |
-| Admin login → View timesheets → Approve    | P0       |
-| Upload attachment → Verify display         | P1       |
-| CSRF protection (POST without token fails) | P1       |
+| Flow                                       | File              | Priority |
+| ------------------------------------------ | ----------------- | -------- |
+| Dev login → Dashboard loads                | auth.spec.js      | P0       |
+| Create new timesheet → Save draft          | timesheet.spec.js | P0       |
+| Add time entries → Submit → Confirm        | timesheet.spec.js | P0       |
+| Admin login → View timesheets → Approve    | admin.spec.js     | P0       |
+| Upload attachment → Verify display         | timesheet.spec.js | P1       |
+| CSRF protection (POST without token fails) | csrf.spec.js      | P1       |
 
-**Implementation Notes:**
+**Implementation:**
 
-- Use Playwright for cross-browser testing
-- Store tests in `tests/e2e/`
-- Add npm scripts: `npm run test:e2e`
-- See [TESTING.md](TESTING.md) for integration
+- ✅ Playwright configuration in `playwright.config.js`
+- ✅ Test fixtures with authenticated page contexts in `tests/e2e/fixtures.js`
+- ✅ Authentication tests in `tests/e2e/auth.spec.js`
+- ✅ Timesheet CRUD tests in `tests/e2e/timesheet.spec.js`
+- ✅ Admin dashboard tests in `tests/e2e/admin.spec.js`
+- ✅ CSRF protection tests in `tests/e2e/csrf.spec.js`
+- ✅ NPM scripts: `npm run test:e2e`, `test:e2e:headed`, `test:e2e:docker`
+- ✅ Docker Compose for E2E testing in `docker/docker-compose.e2e.yml`
+- ✅ Documentation updated in `TESTING.md`
 
 ---
 
@@ -1221,7 +1271,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-043     | ✅ Complete | Health check endpoint                           |
 | REQ-044     | 📋 Planned  | Frontend modularization (split JS)              |
 | REQ-045     | 📋 Planned  | Backup/restore documentation                    |
-| REQ-046     | 📋 Planned  | E2E tests with Playwright                       |
+| REQ-046     | ✅ Complete | E2E tests with Playwright (4 test files)        |
 
 ---
 
