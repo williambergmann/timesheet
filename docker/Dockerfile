@@ -15,6 +15,10 @@ RUN useradd --create-home appuser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entrypoint script
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Copy application code with correct ownership (faster than chown -R)
 COPY --chown=appuser:appuser . .
 
@@ -26,5 +30,5 @@ USER appuser
 # Expose port
 EXPOSE 5000
 
-# Run with Gunicorn + gevent for SSE support
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--worker-class", "gevent", "--workers", "4", "--timeout", "120", "app:create_app()"]
+# REQ-029: Run migrations before starting Gunicorn
+ENTRYPOINT ["/entrypoint.sh"]

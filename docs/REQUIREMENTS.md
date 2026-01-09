@@ -792,9 +792,11 @@ Reimbursement Details
 
 ## Security & Production Readiness
 
-### REQ-029: Production Database Lifecycle (P0)
+### REQ-029: Production Database Lifecycle (P0) ✅
 
 Migrations should be the only schema management mechanism in production.
+
+**Status: ✅ IMPLEMENTED (January 8, 2026)**
 
 **Required Behavior:**
 
@@ -802,9 +804,12 @@ Migrations should be the only schema management mechanism in production.
 - Apply schema changes only via Alembic/Flask-Migrate
 - Deployment step runs `flask db upgrade` before starting web workers
 
-**Implementation Notes:**
+**Implementation:**
 
-- See [roadmap.md](roadmap.md) Phase 1 for rollout guidance
+- ✅ Removed `db.create_all()` from `app/__init__.py` factory
+- ✅ Created `docker/entrypoint.sh` that runs `flask db upgrade` before Gunicorn
+- ✅ Updated `docker/Dockerfile` to use entrypoint script
+- ✅ Schema is now exclusively managed via Flask-Migrate
 
 ---
 
@@ -995,7 +1000,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-026     | ✅ Complete | Expense amount validation ($null fix)     |
 | REQ-027     | ✅ Complete | "Has expenses" expense details section    |
 | REQ-028     | ✅ Complete | Multiple reimbursement line items         |
-| REQ-029     | 📋 Planned  | Production DB lifecycle (migrations only) |
+| REQ-029     | ✅ Complete | Production DB lifecycle (migrations only) |
 | REQ-030     | ✅ Partial  | Auth/session hardening                    |
 | REQ-031     | ✅ Complete | CSRF protection for mutating endpoints    |
 | REQ-032     | 📋 Planned  | Security baseline & audit checklist       |
