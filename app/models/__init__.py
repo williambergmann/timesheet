@@ -16,6 +16,7 @@ from .attachment import Attachment
 from .note import Note
 from .notification import Notification, NotificationType
 from .reimbursement import ReimbursementItem
+from .pay_period import PayPeriod
 
 __all__ = [
     "User",
@@ -30,4 +31,5 @@ __all__ = [
     "Notification",
     "NotificationType",
     "ReimbursementItem",
+    "PayPeriod",
 ]
