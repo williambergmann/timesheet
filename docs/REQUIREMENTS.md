@@ -992,15 +992,30 @@ Move long-running work and reminders to a job queue.
 
 ---
 
-### REQ-035: API Validation & Error Handling (P1)
+### REQ-035: API Validation & Error Handling (P1) ✅
 
 Standardize request validation and error responses.
+
+**Status: ✅ IMPLEMENTED (January 9, 2026)**
 
 **Required Behavior:**
 
 - Validate request bodies (Marshmallow, Pydantic, or equivalent)
 - Use a consistent error shape: `{ "error": "...", "code": "...", "details": {...} }`
 - Add global exception handlers with request IDs in logs
+
+**Implementation:**
+
+- ✅ Created `app/utils/errors.py` with:
+  - Standardized error codes (ErrorCode class)
+  - Custom exception classes (APIError, ValidationError, NotFoundError, etc.)
+  - Request ID middleware (X-Request-ID header)
+  - Global exception handlers for all HTTP status codes
+- ✅ Created `app/utils/validation.py` with:
+  - Field class for schema-based validation
+  - Common validators (validate_uuid, validate_date, validate_positive_number, etc.)
+  - `@validate_json_body` decorator for route protection
+- ✅ Registered error handlers in Flask app factory
 
 ---
 
@@ -1260,7 +1275,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-032     | 📋 Planned  | Security baseline & audit checklist             |
 | REQ-033     | 📋 Planned  | Attachment storage strategy                     |
 | REQ-034     | 📋 Planned  | Background jobs & scheduled notifications       |
-| REQ-035     | 📋 Planned  | API validation & error handling                 |
+| REQ-035     | ✅ Complete | API validation & error handling modules         |
 | REQ-036     | 📋 Planned  | Observability & metrics                         |
 | REQ-037     | 📋 Planned  | Testing coverage & gaps                         |
 | REQ-038     | 📋 Planned  | UX & accessibility backlog                      |

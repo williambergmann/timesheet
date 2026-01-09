@@ -50,6 +50,10 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
     app.register_blueprint(events_bp, url_prefix="/api")
 
+    # REQ-035: Register global error handlers for standardized API responses
+    from .utils.errors import register_error_handlers
+    register_error_handlers(app)
+
     # REQ-029: Database schema is managed exclusively by Flask-Migrate.
     # Run 'flask db upgrade' before starting the application.
     # The old db.create_all() call has been removed to prevent
