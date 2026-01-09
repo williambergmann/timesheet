@@ -8,6 +8,69 @@
 
 ---
 
+## 📅 Session Log
+
+### January 8, 2026 - Progress Summary
+
+**Completed Today:**
+
+| Requirement       | Description                                                          | Status      |
+| ----------------- | -------------------------------------------------------------------- | ----------- |
+| REQ-023 / BUG-001 | Read-only submitted timesheets with status-specific UX               | ✅ Complete |
+| REQ-029           | Production DB lifecycle (removed db.create_all, use migrations only) | ✅ Complete |
+| REQ-031           | CSRF protection for all mutating endpoints (Flask-WTF)               | ✅ Complete |
+
+**Documentation Created:**
+
+- ✅ Created `CHECKIN.md` - Comprehensive project health assessment
+- ✅ Documented BUG-003 - Draft timesheets Save/Submit button verification
+- ✅ Expanded MCP.md integration in requirements
+
+**New Requirements Added:**
+
+- REQ-042: Rate limiting on auth endpoints
+- REQ-043: Health check endpoint
+- REQ-044: Frontend modularization (split JS)
+- REQ-045: Backup/restore documentation
+- REQ-046: E2E tests with Playwright
+
+---
+
+### 🚀 January 9, 2026 - Start Here
+
+**Recommended Priority Order:**
+
+1. **REQ-043: Health Check Endpoint** (Quick Win - ~30 min)
+
+   - Add `/health` endpoint for load balancer integration
+   - No auth required, check DB + Redis connectivity
+
+2. **Verify BUG-003: Draft Timesheet Buttons**
+
+   - Test that Save Draft / Submit buttons appear on draft timesheets
+   - Fix if broken (see BUGS.md for implementation steps)
+
+3. **REQ-033: Attachment Storage Strategy** (High Impact)
+
+   - Decide S3/R2 vs SharePoint for production storage
+   - Unblocks horizontal scaling
+
+4. **REQ-042: Rate Limiting** (~1-2 hours)
+
+   - Add Flask-Limiter to auth endpoints
+   - Protects against brute force attacks
+
+5. **REQ-046: E2E Tests** (Foundation for future)
+   - Set up Playwright test framework
+   - Add 2-3 happy path tests
+
+**P0 Items Still Open:**
+
+- REQ-030: Auth/session hardening (Partial - needs nonce verification)
+- REQ-015: Azure AD integration (needs production validation)
+
+---
+
 ## 🎯 Priority Legend
 
 - **P0** - Must have for launch
