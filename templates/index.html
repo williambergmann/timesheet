@@ -152,7 +152,7 @@ endblock %} {% block extra_css %}
             <div class="checkbox-item">
               <input type="checkbox" id="auto-populate" name="auto_populate" />
               <label for="auto-populate"
-                >Auto-fill 40h Field Hours (8h Mon-Fri)</label
+                >Auto-fill 8h Mon-Fri when adding rows</label
               >
             </div>
           </div>
@@ -698,7 +698,7 @@ endblock %} {% block extra_css %}
   window.currentUser = {{ user|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
-<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p6"></script>
+<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p7"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p5"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260107p1"></script>

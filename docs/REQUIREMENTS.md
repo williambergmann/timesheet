@@ -220,22 +220,25 @@ Show total hours for each hour type (row) in all Time Entry grids.
 
 ---
 
-### REQ-009: Auto-Populate Any Hour Type (P1)
+### REQ-009: Auto-Populate Any Hour Type (P1) ✅
 
 Extend auto-populate feature to work with any hour type selection.
 
-**Current:** Auto-populates 8h/day for Field Hours only
+**Status: ✅ IMPLEMENTED (January 8, 2026)**
 
-**Required:**
+**Previous:** Auto-populated 8h/day for Field Hours only
 
-- User selects hour type from dropdown
-- User checks "Auto-fill 8h Mon-Fri" checkbox
-- System fills 8 hours for Mon-Fri for selected type
+**Now:**
+
+- ✅ User selects any hour type from dropdown
+- ✅ User checks "Auto-fill 8h Mon-Fri when adding rows" checkbox
+- ✅ System fills 8 hours for Mon-Fri for selected type
 
 **Implementation Notes:**
 
-- Already implemented for Field Hours
-- Generalize to accept any selected hour type
+- ✅ Removed `hourType === 'Field'` condition from `addHourTypeRow()`
+- ✅ Updated checkbox label to be generic
+- ✅ Works for: Field, Internal, Training, PTO, Unpaid, Holiday
 
 ---
 
@@ -966,7 +969,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-006     | 📋 Planned  | New workflow                              |
 | REQ-007     | ✅ Complete | Column totals added to admin grid         |
 | REQ-008     | ✅ Complete | Row totals added to all grid views        |
-| REQ-009     | ✅ Partial  | Works for Field, needs generalization     |
+| REQ-009     | ✅ Complete | Auto-fill 8h works for any hour type      |
 | REQ-010     | 📋 Planned  | SharePoint integration                    |
 | REQ-011     | 📋 Planned  | Email service                             |
 | REQ-012     | 📋 Planned  | Teams bot                                 |

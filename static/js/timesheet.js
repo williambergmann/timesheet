@@ -273,9 +273,9 @@ const TimesheetModule = {
         const startDate = new Date(this.currentWeekStart + 'T00:00:00');
         const label = this.HOUR_TYPES[hourType] || hourType;
         
-        // Check if auto-populate is enabled for Field Hours
+        // REQ-009: Check if auto-populate is enabled (works for any hour type)
         const autoPopulate = document.getElementById('auto-populate')?.checked || false;
-        const shouldAutoFill = hourType === 'Field' && autoPopulate && !existingData;
+        const shouldAutoFill = autoPopulate && !existingData;
         
         // Create row element
         const row = document.createElement('div');
