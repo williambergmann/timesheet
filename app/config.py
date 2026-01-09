@@ -81,6 +81,14 @@ class Config:
     SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "true").lower() == "true"
     SMTP_USE_SSL = os.environ.get("SMTP_USE_SSL", "false").lower() == "true"
 
+    # Microsoft Teams Bot (REQ-012)
+    TEAMS_NOTIFICATIONS_ENABLED = (
+        os.environ.get("TEAMS_NOTIFICATIONS_ENABLED", "false").lower() == "true"
+    )
+    TEAMS_APP_ID = os.environ.get("TEAMS_APP_ID", "")
+    TEAMS_APP_PASSWORD = os.environ.get("TEAMS_APP_PASSWORD", "")
+    TEAMS_TENANT_ID = os.environ.get("TEAMS_TENANT_ID", "botframework.com")
+
     # Redis
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 

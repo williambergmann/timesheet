@@ -11,6 +11,12 @@ from ..models import Notification, NotificationType, User
 from ..extensions import db
 from ..utils.sms import send_sms, format_phone_number
 from ..utils.email import send_template_email
+from ..utils.teams import (
+    build_admin_submission_card,
+    build_timesheet_card,
+    send_card_to_user,
+    send_card_to_users,
+)
 
 
 class NotificationService:
@@ -43,6 +49,8 @@ class NotificationService:
 
         # Email notification (REQ-011)
         NotificationService._send_approval_email(timesheet)
+        # Teams notification (REQ-012)
+        NotificationService._send_approval_teams(timesheet)
 
         # Check if user has opted in and has a phone number
         if not user.sms_opt_in:
@@ -111,6 +119,8 @@ class NotificationService:
 
         # Email notification (REQ-011)
         NotificationService._send_needs_attention_email(timesheet, reason)
+        # Teams notification (REQ-012)
+        NotificationService._send_needs_attention_teams(timesheet, reason)
 
         # Check if user has opted in and has a phone number
         if not user.sms_opt_in:
@@ -179,6 +189,8 @@ class NotificationService:
         """
         # Email notification (REQ-011)
         NotificationService._send_reminder_email(user, week_start)
+        # Teams notification (REQ-012)
+        NotificationService._send_reminder_teams(user, week_start)
 
         # Check if user has opted in and has a phone number
         if not user.sms_opt_in:
@@ -231,6 +243,8 @@ class NotificationService:
         """
         # Email notification (REQ-011)
         NotificationService._send_unsubmitted_email(user, week_start)
+        # Teams notification (REQ-012)
+        NotificationService._send_unsubmitted_teams(user, week_start)
 
         # Check if user has opted in and has a phone number
         if not user.sms_opt_in:
@@ -326,6 +340,8 @@ class NotificationService:
                 attachment_count=timesheet.attachments.count(),
             )
 
+        NotificationService._send_admin_submission_teams(timesheet, admins)
+
         return True
 
     @staticmethod
@@ -416,3 +432,71 @@ class NotificationService:
             app_url=current_app.config.get("APP_URL", "http://localhost/app"),
             week_start=week_str,
         )
+
+    @staticmethod
+    def _send_approval_teams(timesheet):
+        user = timesheet.user
+        if not user or not user.teams_opt_in:
+            return None
+
+        week_str = timesheet.week_start.strftime("%b %d, %Y")
+        totals = timesheet.calculate_totals()
+        card = build_timesheet_card(
+            "Timesheet Approved",
+            week_str,
+            [f"Total hours: {float(totals['total'])}"],
+            current_app.config.get("APP_URL", "http://localhost/app"),
+        )
+        return send_card_to_user(user, card, f"Timesheet approved ({week_str})")
+
+    @staticmethod
+    def _send_needs_attention_teams(timesheet, reason=None):
+        user = timesheet.user
+        if not user or not user.teams_opt_in:
+            return None
+
+        week_str = timesheet.week_start.strftime("%b %d, %Y")
+        lines = []
+        if reason:
+            lines.append(f"Reason: {reason}")
+        card = build_timesheet_card(
+            "Timesheet Needs Attention",
+            week_str,
+            lines or ["Please review and resubmit your timesheet."],
+            current_app.config.get("APP_URL", "http://localhost/app"),
+        )
+        return send_card_to_user(user, card, f"Timesheet needs attention ({week_str})")
+
+    @staticmethod
+    def _send_reminder_teams(user, week_start):
+        if not user or not user.teams_opt_in:
+            return None
+
+        week_str = week_start.strftime("%b %d, %Y")
+        card = build_timesheet_card(
+            "Timesheet Reminder",
+            week_str,
+            ["Please submit your timesheet."],
+            current_app.config.get("APP_URL", "http://localhost/app"),
+        )
+        return send_card_to_user(user, card, f"Timesheet reminder ({week_str})")
+
+    @staticmethod
+    def _send_unsubmitted_teams(user, week_start):
+        if not user or not user.teams_opt_in:
+            return None
+
+        week_str = week_start.strftime("%b %d, %Y")
+        card = build_timesheet_card(
+            "Timesheet Past Due",
+            week_str,
+            ["Your timesheet is past due. Please submit as soon as possible."],
+            current_app.config.get("APP_URL", "http://localhost/app"),
+        )
+        return send_card_to_user(user, card, f"Timesheet past due ({week_str})")
+
+    @staticmethod
+    def _send_admin_submission_teams(timesheet, admins):
+        app_url = current_app.config.get("APP_URL", "http://localhost/app")
+        card = build_admin_submission_card(timesheet, app_url)
+        return send_card_to_users(admins, card, "New timesheet submitted")

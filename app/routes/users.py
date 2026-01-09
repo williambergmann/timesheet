@@ -5,7 +5,7 @@ User settings and profile preferences (REQ-003).
 """
 
 from flask import Blueprint, request, session
-from ..models import User
+from ..models import User, TeamsConversation
 from ..extensions import db
 from ..utils.decorators import login_required
 from ..utils.sms import format_phone_number
@@ -120,6 +120,13 @@ def update_user_settings():
     user.teams_account = teams_account
 
     user.phone = phones[0] if phones else None
+
+    if teams_account:
+        conversation = TeamsConversation.query.filter_by(
+            teams_user_principal=teams_account
+        ).first()
+        if conversation and conversation.user_id != user.id:
+            conversation.user_id = user.id
 
     db.session.commit()
 

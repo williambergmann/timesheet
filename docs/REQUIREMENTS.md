@@ -390,6 +390,8 @@ Send email notifications for timesheet events.
 
 Extend existing Timesheet Bot to send all notification types.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Events:**
 
 - All events from REQ-011
@@ -1453,7 +1455,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-009     | ✅ Complete | Auto-fill 8h works for any hour type            |
 | REQ-010     | ✅ Complete | SharePoint integration                          |
 | REQ-011     | ✅ Complete | Email service                                   |
-| REQ-012     | 📋 Planned  | Teams bot                                       |
+| REQ-012     | ✅ Complete | Teams bot                                       |
 | REQ-013     | ✅ Complete | Dropdown filters by user role                   |
 | REQ-014     | ✅ Complete | Submit without attachment (with warning)        |
 | REQ-015     | 📋 Planned  | Azure AD integration                            |

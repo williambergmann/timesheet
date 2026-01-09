@@ -124,6 +124,9 @@ class User(db.Model):
         "Notification", back_populates="user", lazy="dynamic"
     )
     notes = db.relationship("Note", back_populates="author", lazy="dynamic")
+    teams_conversation = db.relationship(
+        "TeamsConversation", back_populates="user", uselist=False
+    )
 
     def __repr__(self):
         return f"<User {self.email}>"

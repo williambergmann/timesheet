@@ -17,6 +17,7 @@ from .note import Note
 from .notification import Notification, NotificationType
 from .reimbursement import ReimbursementItem
 from .pay_period import PayPeriod
+from .teams_conversation import TeamsConversation
 
 __all__ = [
     "User",
@@ -32,4 +33,5 @@ __all__ = [
     "NotificationType",
     "ReimbursementItem",
     "PayPeriod",
+    "TeamsConversation",
 ]
