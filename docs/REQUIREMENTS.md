@@ -143,14 +143,16 @@ Add confirmation step at end of pay period.
 
 ---
 
-### REQ-041: Support Dashboard for Trainee Approvals (P1)
+### REQ-041: Support Dashboard for Trainee Approvals (P1) ✅
 
 Support users should have access to an Admin Dashboard, but it should only display trainee training timesheets that require their approval.
 
-**Current Bug:**
+**Status: ✅ IMPLEMENTED (January 8, 2026)**
 
-- Support users do not see any Admin Dashboard option
-- Support users cannot access timesheets they are authorized to approve (per REQ-001)
+**Previous Bug:**
+
+- Support users did not see any Admin Dashboard option
+- Support users could not access timesheets they are authorized to approve (per REQ-001)
 
 **Required Behavior:**
 
@@ -163,25 +165,24 @@ Support users should have access to an Admin Dashboard, but it should only displ
 
 **Features:**
 
-- Show "Admin Dashboard" navigation link for Support role
-- Filter dashboard to show ONLY:
-  - Timesheets submitted by users with role = `trainee`
-  - Timesheets containing Training hour type entries
-- Support can Approve/Reject trainee timesheets
-- Support cannot see Staff or other Support timesheets
+- ✅ Show "Trainee Approvals" navigation link for Support role
+- ✅ Filter dashboard to show ONLY timesheets submitted by users with role = `trainee`
+- ✅ Support can Approve/Reject trainee timesheets
+- ✅ Support cannot see Staff or other Support timesheets
 
 **UI Differences from Full Admin Dashboard:**
 
-- Title: "Trainee Approvals" instead of "Admin Dashboard"
-- No access to system settings or user management
-- Only approval-related actions available
+- ✅ Title: "Trainee Approvals" instead of "Admin Dashboard"
+- ✅ No access to system settings or user management (list_users remains admin-only)
+- ✅ Only approval-related actions available
 
 **Implementation Notes:**
 
-- Check `current_user.role == 'support'` to enable limited dashboard
-- Query filters: `JOIN users WHERE user.role = 'trainee'`
-- Reuse existing admin dashboard components with filtered data
-- Add role-based navigation in sidebar
+- ✅ Added `_can_access_timesheet()` helper for role-based authorization
+- ✅ Changed all approval endpoints from `@admin_required` to `@can_approve`
+- ✅ Added role-based filtering in `list_timesheets()` for Support users
+- ✅ Updated sidebar navigation in `templates/index.html`
+- ✅ Dashboard returns `view_mode` to frontend for UI customization
 
 ---
 
@@ -997,7 +998,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-038     | 📋 Planned  | UX & accessibility backlog                |
 | REQ-039     | 📋 Planned  | PowerApps data report view                |
 | REQ-040     | 📋 Planned  | MCP tooling integration                   |
-| REQ-041     | 🐛 Bug      | Support dashboard for trainee approvals   |
+| REQ-041     | ✅ Complete | Support dashboard for trainee approvals   |
 
 ---
 

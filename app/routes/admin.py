@@ -2,25 +2,29 @@
 Admin Routes
 
 Admin-only endpoints for timesheet management.
+Support users have limited access to approve trainee timesheets only (REQ-041).
 """
 
 from datetime import datetime
 from flask import Blueprint, request, session, send_file, current_app
-from ..models import Timesheet, User, Note, TimesheetStatus
+from ..models import Timesheet, User, Note, TimesheetStatus, UserRole
 from ..extensions import db
-from ..utils.decorators import login_required, admin_required
+from ..utils.decorators import login_required, admin_required, can_approve
 
 admin_bp = Blueprint("admin", __name__)
 
 
 @admin_bp.route("/timesheets", methods=["GET"])
 @login_required
-@admin_required
+@can_approve
 def list_timesheets():
     """
-    List all submitted timesheets (admin only).
+    List submitted timesheets for approval.
 
-    Drafts (NEW status) are NOT visible to admins.
+    - Admin: sees all non-draft timesheets
+    - Support: sees only trainee timesheets (REQ-041)
+
+    Drafts (NEW status) are NOT visible.
 
     Query params:
         status: Filter by status (SUBMITTED, APPROVED, NEEDS_APPROVAL)
@@ -30,10 +34,23 @@ def list_timesheets():
         per_page: Items per page (default 20)
 
     Returns:
-        dict: Paginated list of timesheets with user info
+        dict: Paginated list of timesheets with user info and view_mode
     """
+    current_role = session.get("user", {}).get("role", "staff")
+    is_support_only = (current_role == "support")
+    
     # Base query - exclude drafts
     query = Timesheet.query.filter(Timesheet.status != TimesheetStatus.NEW)
+    
+    # REQ-041: Support users can only see trainee timesheets
+    if is_support_only:
+        # Join with User and filter to only trainee submitters
+        query = query.join(User, Timesheet.user_id == User.id).filter(
+            User.role == UserRole.TRAINEE
+        )
+    else:
+        # Admin sees all - join with user for display name
+        query = query.join(User, Timesheet.user_id == User.id)
 
     # Filter by status
     status = request.args.get("status")
@@ -47,12 +64,12 @@ def list_timesheets():
     # Filter by user
     user_id = request.args.get("user_id")
     if user_id:
-        query = query.filter_by(user_id=user_id)
+        query = query.filter(Timesheet.user_id == user_id)
 
     # Filter by week
     week_start = request.args.get("week_start")
     if week_start:
-        query = query.filter_by(week_start=datetime.fromisoformat(week_start).date())
+        query = query.filter(Timesheet.week_start == datetime.fromisoformat(week_start).date())
 
     # Filter by hour type (REQ-018)
     from ..models import TimesheetEntry
@@ -77,9 +94,6 @@ def list_timesheets():
                 )
             )
 
-    # Join with user for display name (explicit join due to multiple FKs)
-    query = query.join(User, Timesheet.user_id == User.id)
-
     # Order by submitted_at (newest first)
     query = query.order_by(Timesheet.submitted_at.desc())
 
@@ -100,15 +114,45 @@ def list_timesheets():
         "page": page,
         "per_page": per_page,
         "pages": pagination.pages,
+        # REQ-041: Tell frontend which view mode we're in
+        "view_mode": "trainee_approvals" if is_support_only else "admin",
     }
+
+
+def _can_access_timesheet(timesheet):
+    """
+    Check if current user can access a specific timesheet.
+    
+    REQ-041: Support can only access trainee timesheets.
+    Admin can access all timesheets.
+    
+    Returns:
+        tuple: (can_access: bool, error_response: tuple or None)
+    """
+    current_role = session.get("user", {}).get("role", "staff")
+    
+    # Admin can access everything
+    if current_role == "admin":
+        return True, None
+    
+    # Support can only access trainee timesheets
+    if current_role == "support":
+        if timesheet.user and timesheet.user.role == UserRole.TRAINEE:
+            return True, None
+        return False, ({"error": "You can only access trainee timesheets"}, 403)
+    
+    # Other roles shouldn't reach here due to @can_approve, but just in case
+    return False, ({"error": "Access denied"}, 403)
 
 
 @admin_bp.route("/timesheets/<timesheet_id>", methods=["GET"])
 @login_required
-@admin_required
+@can_approve
 def get_timesheet(timesheet_id):
     """
-    Get a specific timesheet (admin view).
+    Get a specific timesheet for approval review.
+    
+    REQ-041: Support users can only view trainee timesheets.
 
     Returns:
         dict: Timesheet with entries, attachments, and user info
@@ -118,9 +162,14 @@ def get_timesheet(timesheet_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    # Admins cannot view drafts
+    # Cannot view drafts
     if timesheet.status == TimesheetStatus.NEW:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     data = timesheet.to_dict()
     data["user"] = timesheet.user.to_dict() if timesheet.user else None
@@ -131,20 +180,27 @@ def get_timesheet(timesheet_id):
 
 @admin_bp.route("/timesheets/<timesheet_id>/approve", methods=["POST"])
 @login_required
-@admin_required
+@can_approve
 def approve_timesheet(timesheet_id):
     """
     Approve a submitted timesheet.
+    
+    REQ-041: Support users can only approve trainee timesheets.
 
     Returns:
         dict: Updated timesheet
     """
-    admin_id = session["user"]["id"]
+    approver_id = session["user"]["id"]
 
     timesheet = Timesheet.query.filter_by(id=timesheet_id).first()
 
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     if timesheet.status not in [
         TimesheetStatus.SUBMITTED,
@@ -154,7 +210,7 @@ def approve_timesheet(timesheet_id):
 
     timesheet.status = TimesheetStatus.APPROVED
     timesheet.approved_at = datetime.utcnow()
-    timesheet.approved_by = admin_id
+    timesheet.approved_by = approver_id
     db.session.commit()
 
     # Send SMS notification
@@ -167,10 +223,12 @@ def approve_timesheet(timesheet_id):
 
 @admin_bp.route("/timesheets/<timesheet_id>/reject", methods=["POST"])
 @login_required
-@admin_required
+@can_approve
 def reject_timesheet(timesheet_id):
     """
     Mark a timesheet as needing approval (missing attachment).
+    
+    REQ-041: Support users can only reject trainee timesheets.
 
     Request body:
         reason: Optional rejection reason (also sets admin_notes)
@@ -182,6 +240,11 @@ def reject_timesheet(timesheet_id):
 
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     if timesheet.status != TimesheetStatus.SUBMITTED:
         return {"error": "Only submitted timesheets can be rejected"}, 400
@@ -192,13 +255,13 @@ def reject_timesheet(timesheet_id):
     data = request.get_json() or {}
     reason = data.get("reason", "").strip()
     if reason:
-        admin_id = session["user"]["id"]
+        approver_id = session["user"]["id"]
         # Set the admin_notes field
         timesheet.admin_notes = reason
         # Also create a Note record for history
         note = Note(
             timesheet_id=timesheet_id,
-            author_id=admin_id,
+            author_id=approver_id,
             content=f"Needs approval: {reason}",
         )
         db.session.add(note)
@@ -215,10 +278,12 @@ def reject_timesheet(timesheet_id):
 
 @admin_bp.route("/timesheets/<timesheet_id>/admin-notes", methods=["PUT"])
 @login_required
-@admin_required
+@can_approve
 def update_admin_notes(timesheet_id):
     """
     Update admin notes on a timesheet.
+    
+    REQ-041: Support users can only update notes on trainee timesheets.
 
     Request body:
         admin_notes: The admin notes text
@@ -231,9 +296,14 @@ def update_admin_notes(timesheet_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    # Admins cannot edit drafts
+    # Cannot edit drafts
     if timesheet.status == TimesheetStatus.NEW:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     data = request.get_json() or {}
     timesheet.admin_notes = data.get("admin_notes", "").strip() or None
@@ -244,10 +314,12 @@ def update_admin_notes(timesheet_id):
 
 @admin_bp.route("/timesheets/<timesheet_id>/unapprove", methods=["POST"])
 @login_required
-@admin_required
+@can_approve
 def unapprove_timesheet(timesheet_id):
     """
     Revert an approved timesheet back to submitted status.
+    
+    REQ-041: Support users can only unapprove trainee timesheets.
 
     Returns:
         dict: Updated timesheet
@@ -256,6 +328,11 @@ def unapprove_timesheet(timesheet_id):
 
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     if timesheet.status != TimesheetStatus.APPROVED:
         return {"error": "Only approved timesheets can be unapproved"}, 400
@@ -272,10 +349,12 @@ def unapprove_timesheet(timesheet_id):
     "/timesheets/<timesheet_id>/attachments/<attachment_id>", methods=["GET"]
 )
 @login_required
-@admin_required
+@can_approve
 def download_attachment(timesheet_id, attachment_id):
     """
-    Download an attachment (admin only).
+    Download an attachment for review.
+    
+    REQ-041: Support users can only download attachments from trainee timesheets.
 
     Returns:
         file: The attachment file
@@ -288,9 +367,14 @@ def download_attachment(timesheet_id, attachment_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    # Admins cannot view draft attachments
+    # Cannot view draft attachments
     if timesheet.status == TimesheetStatus.NEW:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     attachment = Attachment.query.filter_by(
         id=attachment_id, timesheet_id=timesheet_id
@@ -314,10 +398,12 @@ def download_attachment(timesheet_id, attachment_id):
 
 @admin_bp.route("/timesheets/<timesheet_id>/notes", methods=["POST"])
 @login_required
-@admin_required
+@can_approve
 def add_note(timesheet_id):
     """
-    Add an admin note to a timesheet.
+    Add a note to a timesheet.
+    
+    REQ-041: Support users can only add notes to trainee timesheets.
 
     Request body:
         content: Note text
@@ -325,16 +411,21 @@ def add_note(timesheet_id):
     Returns:
         dict: Created note
     """
-    admin_id = session["user"]["id"]
+    author_id = session["user"]["id"]
 
     timesheet = Timesheet.query.filter_by(id=timesheet_id).first()
 
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    # Admins cannot add notes to drafts
+    # Cannot add notes to drafts
     if timesheet.status == TimesheetStatus.NEW:
         return {"error": "Timesheet not found"}, 404
+    
+    # REQ-041: Check if Support user can access this timesheet
+    can_access, error = _can_access_timesheet(timesheet)
+    if not can_access:
+        return error
 
     data = request.get_json() or {}
     content = data.get("content", "").strip()
@@ -344,7 +435,7 @@ def add_note(timesheet_id):
 
     note = Note(
         timesheet_id=timesheet_id,
-        author_id=admin_id,
+        author_id=author_id,
         content=content,
     )
     db.session.add(note)

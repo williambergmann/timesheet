@@ -21,11 +21,11 @@ endblock %} {% block extra_css %}
         <span class="icon">✨</span>
         New Timesheet
       </a>
-      {% if user.is_admin %}
+      {% if user.is_admin or user.role == 'support' %}
       <hr class="sidebar-divider" />
       <a href="#admin" class="sidebar-link" data-view="admin">
         <span class="icon">👥</span>
-        Admin Dashboard
+        {% if user.role == 'support' %}Trainee Approvals{% else %}Admin Dashboard{% endif %}
       </a>
       {% endif %}
     </nav>
@@ -569,11 +569,11 @@ endblock %} {% block extra_css %}
       </form>
     </section>
 
-    <!-- Admin Dashboard View -->
-    {% if user.is_admin %}
-    <section id="view-admin" class="view">
+    <!-- Admin Dashboard View (REQ-041: Also visible for Support role) -->
+    {% if user.is_admin or user.role == 'support' %}
+    <section id="view-admin" class="view" data-view-mode="{% if user.role == 'support' %}trainee_approvals{% else %}admin{% endif %}">
       <div class="view-header">
-        <h2>Admin Dashboard</h2>
+        <h2>{% if user.role == 'support' %}Trainee Approvals{% else %}Admin Dashboard{% endif %}</h2>
       </div>
 
       <div class="stats-grid">
