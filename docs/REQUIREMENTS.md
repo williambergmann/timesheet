@@ -357,6 +357,8 @@ Extend auto-populate feature to work with any hour type selection.
 
 Sync uploaded attachments to SharePoint for permanent storage.
 
+**Status: 📋 Planned (Not implemented)**
+
 **Features:**
 
 - Background job to upload files to SharePoint document library
@@ -1381,7 +1383,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-041     | ✅ Complete | Support dashboard for trainee approvals         |
 | REQ-042     | ✅ Complete | Rate limiting on auth endpoints (Flask-Limiter) |
 | REQ-043     | ✅ Complete | Health check endpoint                           |
-| REQ-044     | 📋 Planned  | Frontend modularization (split JS)              |
+| REQ-044     | � Progress  | Frontend modular JS (4 modules created)         |
 | REQ-045     | ✅ Complete | Backup/restore docs (BACKUP.md)                 |
 | REQ-046     | ✅ Complete | E2E tests with Playwright (4 test files)        |
 
