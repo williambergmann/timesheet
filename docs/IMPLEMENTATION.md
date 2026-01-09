@@ -710,6 +710,7 @@ All feature documentation, planning guides, and reference materials are stored i
 | [DESIGN.md](DESIGN.md)             | **Stakeholder decisions.** Captured decisions on architecture, user roles, notifications, workflow rules, and business logic. Reference for all "why" questions.                              | Design decisions         |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | **Feature requirements.** Prioritized list of new features identified from stakeholder decisions. Includes user roles, notification channels, grid enhancements.                              | Feature planning         |
 | [BUGS.md](BUGS.md)                 | **Known issues and bug tracker.** Active bugs with reproduction steps and fixes.                                                                                                              | Bug tracking             |
+| [CHECKIN.md](CHECKIN.md)           | **Project health assessment.** Risks, technical debt, scalability concerns, onboarding friction, and prioritized improvements.                                                                | Project review           |
 | [roadmap.md](roadmap.md)           | **Production hardening recommendations.** Security, scalability, deployment patterns, and architectural decisions for going to production. Forward-looking technical debt and best practices. | Before production deploy |
 | [MCP.md](MCP.md)                   | **MCP setup and security guidance.** AI tooling integration and server configuration notes.                                                                                                   | AI tooling               |
 
@@ -733,6 +734,8 @@ All feature documentation, planning guides, and reference materials are stored i
 | How does responsive design work?           | RESPONSIVE.md                          |
 | Where are bugs tracked?                    | BUGS.md                                |
 | How do I configure MCP tooling?            | MCP.md                                 |
+| What are the project risks?                | CHECKIN.md                             |
+| What should we fix first?                  | CHECKIN.md                             |
 
 ### File Organization
 
@@ -763,9 +766,10 @@ timesheet/
     │
     │── DESIGN.md            # ✅ Stakeholder decisions
     │── REQUIREMENTS.md      # 📝 Feature requirements
-    │── BUGS.md              # Known issues and bug tracker
+    │── BUGS.md              # 🐛 Known issues and bug tracker
+    │── CHECKIN.md           # 🔍 Project health assessment
     │── roadmap.md           # 🚀 Production hardening recommendations
-    │── MCP.md               # MCP setup and security guidance
+    │── MCP.md               # 🤖 MCP setup and security guidance
     │
     └── images/              # 📸 Screenshots and diagrams
 ```

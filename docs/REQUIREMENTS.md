@@ -991,6 +991,127 @@ Optional AI tooling integration using Model Context Protocol (MCP) servers.
 
 ---
 
+## Production Hardening (from CHECKIN.md Analysis)
+
+### REQ-042: Rate Limiting on Auth Endpoints (P1)
+
+Protect authentication endpoints from brute-force attacks.
+
+**Required Behavior:**
+
+- Apply rate limiting to `/auth/login`, `/auth/dev-login`, `/auth/callback`
+- Use Flask-Limiter with Redis backend
+- Return 429 Too Many Requests after threshold
+- Log rate limit violations
+
+**Implementation Notes:**
+
+- Suggested limits: 10 requests/minute for login, 30 requests/minute for API
+- Consider IP-based + user-based limiting
+- See [SECURITY.md](SECURITY.md) for additional guidance
+
+---
+
+### REQ-043: Health Check Endpoint (P1)
+
+Add health check endpoint for load balancers and monitoring.
+
+**Required Behavior:**
+
+- `GET /health` returns 200 OK when app is healthy
+- Check database connectivity
+- Check Redis connectivity (if used)
+- Return 503 if any dependency is down
+
+**Implementation Notes:**
+
+- Should not require authentication
+- Include version info in response: `{ "status": "healthy", "version": "1.0.0" }`
+- Useful for Docker health checks and Kubernetes probes
+
+---
+
+### REQ-044: Frontend Modularization (P1)
+
+Split `timesheet.js` (1,400+ lines) into maintainable modules.
+
+**Required Behavior:**
+
+- Separate concerns: API calls, state management, DOM rendering
+- Extract reusable components: toast notifications, modals, validation
+- Enable parallel development without merge conflicts
+
+**Suggested Module Structure:**
+
+```
+static/js/
+├── api.js              # API client (exists)
+├── state.js            # Application state management (new)
+├── form.js             # Form handling and validation (new)
+├── timesheet/
+│   ├── entries.js      # Time entry row logic
+│   ├── attachments.js  # Attachment upload/display
+│   └── submit.js       # Submit/save workflow
+├── admin.js            # Admin dashboard (exists)
+└── app.js              # Main orchestrator (exists)
+```
+
+**Risk Mitigation:**
+
+- High-risk change; add E2E tests (REQ-046) before refactoring
+- See [CHECKIN.md](CHECKIN.md) for detailed analysis
+
+---
+
+### REQ-045: Backup/Restore Documentation (P1)
+
+Document database backup and restore procedures.
+
+**Required Behavior:**
+
+- Document `pg_dump` command for PostgreSQL backups
+- Document restore procedure
+- Include attachment backup strategy
+- Provide cron job example for automated backups
+
+**Implementation Notes:**
+
+- Add to README.md or create BACKUP.md
+- Include Docker exec commands for containerized database
+- Consider Azure Backup or AWS RDS snapshots for production
+
+---
+
+### REQ-046: E2E Tests with Playwright (P1)
+
+Add end-to-end browser tests for critical user flows.
+
+**Required Behavior:**
+
+- Test happy paths: login, create timesheet, submit, admin approval
+- Catch regressions before they reach production
+- Run in CI/CD pipeline
+
+**Suggested Test Coverage:**
+
+| Flow                                       | Priority |
+| ------------------------------------------ | -------- |
+| Dev login → Dashboard loads                | P0       |
+| Create new timesheet → Save draft          | P0       |
+| Add time entries → Submit → Confirm        | P0       |
+| Admin login → View timesheets → Approve    | P0       |
+| Upload attachment → Verify display         | P1       |
+| CSRF protection (POST without token fails) | P1       |
+
+**Implementation Notes:**
+
+- Use Playwright for cross-browser testing
+- Store tests in `tests/e2e/`
+- Add npm scripts: `npm run test:e2e`
+- See [TESTING.md](TESTING.md) for integration
+
+---
+
 ## ✅ Implementation Status
 
 | Requirement | Status      | Notes                                     |
@@ -1036,6 +1157,11 @@ Optional AI tooling integration using Model Context Protocol (MCP) servers.
 | REQ-039     | 📋 Planned  | PowerApps data report view                |
 | REQ-040     | 📋 Planned  | MCP tooling integration                   |
 | REQ-041     | ✅ Complete | Support dashboard for trainee approvals   |
+| REQ-042     | 📋 Planned  | Rate limiting on auth endpoints           |
+| REQ-043     | 📋 Planned  | Health check endpoint                     |
+| REQ-044     | 📋 Planned  | Frontend modularization (split JS)        |
+| REQ-045     | 📋 Planned  | Backup/restore documentation              |
+| REQ-046     | 📋 Planned  | E2E tests with Playwright                 |
 
 ---
 
