@@ -68,6 +68,17 @@ const TimesheetModule = {
         '2027-12-24': 'Christmas Eve (Observed)',
         '2027-12-25': 'Christmas Day',
     },
+
+    /**
+     * Check if a timesheet status allows editing (REQ-023 / BUG-001)
+     * Draft (NEW) and rejected (NEEDS_APPROVAL) timesheets are editable.
+     * Submitted and Approved timesheets are read-only.
+     * @param {string} status - Timesheet status
+     * @returns {boolean} - True if editable
+     */
+    isTimesheetEditable(status) {
+        return status === 'NEW' || status === 'NEEDS_APPROVAL';
+    },
     
     /**
      * Check if a date is a company holiday (REQ-022)
@@ -606,14 +617,33 @@ const TimesheetModule = {
         // Update field hours warning
         this.updateFieldHoursWarning();
         
-        // Show/hide delete button based on status
+        // REQ-023: Determine if timesheet is editable based on status
+        const isEditable = this.isTimesheetEditable(timesheet.status);
+        
+        // Show/hide delete button based on status (only drafts can be deleted)
         const deleteBtn = document.getElementById('delete-btn');
         if (deleteBtn) {
             deleteBtn.style.display = timesheet.status === 'NEW' ? 'block' : 'none';
         }
         
-        // Disable form if not a draft
-        this.setFormReadOnly(timesheet.status !== 'NEW');
+        // REQ-023: Show read-only notice for non-editable timesheets
+        const readonlyNotice = document.getElementById('readonly-notice');
+        if (readonlyNotice) {
+            if (!isEditable) {
+                // Customize message based on status
+                const statusMessages = {
+                    'SUBMITTED': 'This timesheet has been submitted and is pending review. It cannot be edited.',
+                    'APPROVED': 'This timesheet has been approved. It cannot be edited.'
+                };
+                readonlyNotice.textContent = statusMessages[timesheet.status] || 'This timesheet cannot be edited.';
+                readonlyNotice.classList.remove('hidden');
+            } else {
+                readonlyNotice.classList.add('hidden');
+            }
+        }
+        
+        // REQ-023: Disable form if not editable
+        this.setFormReadOnly(!isEditable);
     },
     
     /**
@@ -951,35 +981,62 @@ const TimesheetModule = {
     },
     
     /**
-     * Set form to read-only mode
+     * Set form to read-only mode (REQ-023 / BUG-001)
+     * @param {boolean} readOnly - True to make form read-only
      */
     setFormReadOnly(readOnly) {
         const form = document.getElementById('timesheet-form');
         if (!form) return;
         
+        // Disable all form inputs
         const inputs = form.querySelectorAll('input, select, textarea');
-        
         inputs.forEach(input => {
             input.disabled = readOnly;
         });
         
-        // Hide action buttons
+        // Hide/show form action buttons (Save Draft, Submit)
         const saveBtn = document.getElementById('save-draft-btn');
         const submitBtn = document.getElementById('submit-btn');
-        if (saveBtn) saveBtn.style.display = readOnly ? 'none' : 'block';
-        if (submitBtn) submitBtn.style.display = readOnly ? 'none' : 'block';
+        if (saveBtn) saveBtn.style.display = readOnly ? 'none' : 'inline-flex';
+        if (submitBtn) submitBtn.style.display = readOnly ? 'none' : 'inline-flex';
         
-        // Hide upload zone and add button
+        // Hide/show upload zone for attachments
         const uploadZone = document.getElementById('upload-zone');
-        const addBtn = document.getElementById('add-hour-type-btn');
-        const selector = document.getElementById('hour-type-selector');
-        
         if (uploadZone) uploadZone.style.display = readOnly ? 'none' : 'block';
-        if (addBtn) addBtn.style.display = readOnly ? 'none' : 'flex';
-        if (selector) selector.disabled = readOnly;
         
-        // Hide remove buttons on rows
+        // Hide/show the entire "Add hour type" row (selector + button)
+        const addHourTypeRow = document.querySelector('.add-hour-type-row');
+        if (addHourTypeRow) addHourTypeRow.style.display = readOnly ? 'none' : 'flex';
+        
+        // Hide/show auto-populate checkbox group
+        const autoPopulateGroup = document.getElementById('auto-populate-group');
+        if (autoPopulateGroup) autoPopulateGroup.style.display = readOnly ? 'none' : 'block';
+        
+        // Hide remove/done/edit buttons on hour type rows
         document.querySelectorAll('.hour-type-row .btn-remove').forEach(btn => {
+            btn.style.display = readOnly ? 'none' : 'inline-block';
+        });
+        document.querySelectorAll('.hour-type-row .btn-done').forEach(btn => {
+            btn.style.display = readOnly ? 'none' : 'inline-flex';
+        });
+        document.querySelectorAll('.hour-type-row .btn-action').forEach(btn => {
+            btn.style.display = readOnly ? 'none' : 'inline-flex';
+        });
+        
+        // Hide "Actions" column header when read-only
+        const actionsHeader = document.querySelector('.hour-type-header .hour-type-actions-cell');
+        if (actionsHeader) actionsHeader.style.visibility = readOnly ? 'hidden' : 'visible';
+        
+        // Hide reimbursement add/remove buttons (REQ-028)
+        const addReimbursementBtn = document.getElementById('add-reimbursement-btn');
+        if (addReimbursementBtn) addReimbursementBtn.style.display = readOnly ? 'none' : 'inline-flex';
+        
+        document.querySelectorAll('.btn-remove-item').forEach(btn => {
+            btn.style.display = readOnly ? 'none' : 'inline-flex';
+        });
+        
+        // Hide attachment remove buttons
+        document.querySelectorAll('.attachment-item .remove-btn').forEach(btn => {
             btn.style.display = readOnly ? 'none' : 'inline-block';
         });
     },

@@ -8,117 +8,61 @@
 
 ## 🐛 Active Issues
 
-### BUG-001: Submitted Timesheets Allow Editing
+### BUG-001: Submitted Timesheets Allow Editing ✅
 
-**Status:** 🔴 Open  
+**Status:** 🟢 Resolved  
 **Severity:** High (P0)  
-**Reported:** January 8, 2026
+**Reported:** January 8, 2026  
+**Resolved:** January 8, 2026
 
 **Description:**
-When a user views a timesheet they've submitted, the form still shows editable controls:
+When a user views a timesheet they've submitted, the form should be read-only.
 
-- "Select hour type to add..." dropdown (should be hidden)
-- Editable hour input fields (should be disabled)
-- "Edit" button in Actions column (should be hidden)
-- Save Draft / Submit buttons (should be hidden)
-
-**Business Logic:**
+**Business Logic (Implemented):**
 
 | Status           | Can Edit Hours | Can Add Attachments | Can Re-submit |
 | ---------------- | -------------- | ------------------- | ------------- |
 | `NEW` (Draft)    | ✅ Yes         | ✅ Yes              | ✅ Yes        |
 | `SUBMITTED`      | ❌ No          | ❌ No               | ❌ No         |
 | `APPROVED`       | ❌ No          | ❌ No               | ❌ No         |
-| `NEEDS_APPROVAL` | ✅ Yes\*       | ✅ Yes              | ✅ Yes        |
+| `NEEDS_APPROVAL` | ✅ Yes         | ✅ Yes              | ✅ Yes        |
 
-> **\*Clarification needed:** When admin rejects (sets to `NEEDS_APPROVAL`), should the user be able to:
->
-> - A) Only add attachments (hours are locked)
-> - B) Fully edit hours AND add attachments (like a draft)
->
-> **Current assumption:** Option B - full edit access on rejected timesheets
+**Resolution:** Option B - full edit access on rejected (`NEEDS_APPROVAL`) timesheets so users can fix and resubmit.
 
-**Current Behavior:**
+**Implementation (January 8, 2026):**
 
-- All timesheets show edit controls regardless of status
-- Users can attempt to modify hours on submitted timesheets (backend may reject)
+1. ✅ Added `isTimesheetEditable(status)` helper function in `timesheet.js`
+2. ✅ Updated `setFormReadOnly()` to hide all edit controls:
+   - Add hour type dropdown + button
+   - Auto-populate checkbox
+   - Hour inputs (disabled)
+   - Done/Edit/Remove buttons on rows
+   - Save Draft / Submit buttons
+   - Upload zone for attachments
+   - Reimbursement add/remove buttons
+3. ✅ Added read-only notice banner with status-specific message
+4. ✅ Updated backend routes to allow `NEEDS_APPROVAL` status editing:
+   - `update_timesheet()` - allows NEW and NEEDS_APPROVAL
+   - `update_entries()` - allows NEW and NEEDS_APPROVAL
+   - `submit_timesheet()` - allows NEW and NEEDS_APPROVAL
+5. ✅ Added CSS styling for `.readonly-notice` banner
 
-**Affected Files:**
+**Files Changed:**
 
-- `static/js/timesheet.js` - Form population and UI rendering
-- `templates/index.html` - Hour type table structure
+- `static/js/timesheet.js` - Read-only mode logic
+- `templates/index.html` - Read-only notice HTML
+- `static/css/components.css` - Notice styling
+- `app/routes/timesheets.py` - Backend validation
 
-**Implementation Plan:**
+**Acceptance Criteria (All Met):**
 
-1. **Determine editable status:**
-
-   ```javascript
-   // In loadTimesheet() or populateForm()
-   function isTimesheetEditable(status) {
-     // Draft and rejected (needs approval) timesheets are editable
-     return status === "NEW" || status === "NEEDS_APPROVAL";
-   }
-   ```
-
-2. **Hide "Add hour type" dropdown when not editable:**
-
-   ```javascript
-   const addHourTypeRow = document.querySelector(".add-hour-type-row");
-   if (addHourTypeRow) {
-     addHourTypeRow.style.display = isEditable ? "flex" : "none";
-   }
-   ```
-
-3. **Disable hour inputs when not editable:**
-
-   ```javascript
-   document.querySelectorAll(".hour-type-row input").forEach((input) => {
-     input.disabled = !isEditable;
-   });
-   ```
-
-4. **Hide edit/delete buttons when not editable:**
-
-   ```javascript
-   document.querySelectorAll(".hour-type-row .btn-action").forEach((btn) => {
-     btn.style.display = isEditable ? "inline-flex" : "none";
-   });
-   ```
-
-5. **Hide form action buttons when not editable:**
-
-   ```javascript
-   const saveDraftBtn = document.getElementById("save-draft-btn");
-   const submitBtn = document.getElementById("submit-btn");
-   const deleteBtn = document.getElementById("delete-btn");
-
-   if (saveDraftBtn)
-     saveDraftBtn.style.display = isEditable ? "inline-flex" : "none";
-   if (submitBtn) submitBtn.style.display = isEditable ? "inline-flex" : "none";
-   if (deleteBtn) deleteBtn.style.display = isEditable ? "inline-flex" : "none";
-   ```
-
-6. **Show read-only notice for non-editable timesheets:**
-
-   ```html
-   <div id="readonly-notice" class="readonly-notice hidden">
-     ℹ️ This timesheet has been submitted and cannot be edited.
-   </div>
-   ```
-
-7. **Verify backend validation:**
-   - Check `app/routes/timesheets.py` rejects edits to `SUBMITTED` and `APPROVED` timesheets
-   - Ensure `NEEDS_APPROVAL` timesheets CAN be edited
-
-**Acceptance Criteria:**
-
-- [ ] `NEW` (Draft) timesheets are fully editable
-- [ ] `SUBMITTED` timesheets are read-only (no hour editing, no form buttons)
-- [ ] `APPROVED` timesheets are read-only
-- [ ] `NEEDS_APPROVAL` (rejected) timesheets are editable
-- [ ] Read-only notice displayed for non-editable timesheets
-- [ ] Attachment section still visible for `NEEDS_APPROVAL` status
-- [ ] Backend properly validates edit permissions by status
+- [x] `NEW` (Draft) timesheets are fully editable
+- [x] `SUBMITTED` timesheets are read-only (no hour editing, no form buttons)
+- [x] `APPROVED` timesheets are read-only
+- [x] `NEEDS_APPROVAL` (rejected) timesheets are editable
+- [x] Read-only notice displayed for non-editable timesheets
+- [x] Attachment section hidden for submitted/approved timesheets
+- [x] Backend properly validates edit permissions by status
 
 ---
 
@@ -267,7 +211,9 @@ docker compose up --build -d
 
 ## ✅ Resolved Issues
 
-_None yet._
+### BUG-001: Submitted Timesheets Allow Editing
+
+Resolved January 8, 2026. See [BUG-001](#bug-001-submitted-timesheets-allow-editing-) above for details.
 
 ---
 

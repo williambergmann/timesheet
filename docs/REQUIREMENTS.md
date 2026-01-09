@@ -534,35 +534,30 @@ Display holidays on the time entry grid and show a confirmation warning when use
 
 ---
 
-### REQ-023: Read-Only Submitted Timesheets (P0)
+### REQ-023: Read-Only Submitted Timesheets (P0) ✅
 
 Submitted timesheets should be read-only. Users should not be able to edit a timesheet after submission until an admin rejects it.
 
-**Current Bug:**
+**Status: ✅ IMPLEMENTED (January 8, 2026)**
 
-- Submitted timesheets still show "Select hour type to add..." dropdown
-- Hour inputs are editable (not disabled)
-- "Edit" button appears in Actions column
-- Form action buttons (Save, Submit) are visible
-
-**Required Behavior:**
+**Behavior:**
 
 | Status         | Editable | Can Add Hours | Can Submit | Can Delete |
 | -------------- | -------- | ------------- | ---------- | ---------- |
 | Draft (NEW)    | ✅ Yes   | ✅ Yes        | ✅ Yes     | ✅ Yes     |
 | Submitted      | ❌ No    | ❌ No         | ❌ No      | ❌ No      |
-| Needs Approval | ❌ No\*  | ❌ No         | ❌ No      | ❌ No      |
+| Needs Approval | ✅ Yes   | ✅ Yes        | ✅ Yes     | ❌ No      |
 | Approved       | ❌ No    | ❌ No         | ❌ No      | ❌ No      |
 
-> \*Note: "Needs Approval" status should still allow attachment uploads.
-> Decision pending: BUGS.md assumes NEEDS_APPROVAL is fully editable; align this table once decided.
+> **Decision Made:** `NEEDS_APPROVAL` (rejected) timesheets are fully editable so users can fix issues and resubmit.
 
-**Implementation Notes:**
+**Implementation:**
 
-- Check `timesheet.status` when populating the form
-- Hide/disable edit controls for non-draft timesheets
-- Show status message explaining why editing is disabled
-- See [BUGS.md](BUGS.md) for detailed implementation plan
+- ✅ Added `isTimesheetEditable(status)` helper function
+- ✅ `setFormReadOnly()` hides all edit controls for non-editable statuses
+- ✅ Read-only notice banner displays status-specific message
+- ✅ Backend routes updated to allow `NEEDS_APPROVAL` editing
+- ✅ See [BUGS.md](BUGS.md) BUG-001 for full details
 
 ---
 
@@ -988,7 +983,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-020     | ✅ Complete | Travel ✈️ and expense 💰 badges on cards  |
 | REQ-021     | 📋 Planned  | Per-option reimbursement attachments      |
 | REQ-022     | ✅ Complete | Holiday indicators + entry warning        |
-| REQ-023     | 🐛 Bug      | Read-only submitted timesheets (BUG-001)  |
+| REQ-023     | ✅ Complete | Read-only submitted timesheets            |
 | REQ-024     | ✅ Complete | Travel mileage tracking & details         |
 | REQ-025     | ✅ Complete | Expanded expense type dropdown            |
 | REQ-026     | ✅ Complete | Expense amount validation ($null fix)     |

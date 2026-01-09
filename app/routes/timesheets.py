@@ -181,8 +181,9 @@ def update_timesheet(timesheet_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    if timesheet.status != TimesheetStatus.NEW:
-        return {"error": "Only draft timesheets can be edited"}, 400
+    # REQ-023/BUG-001: Allow editing of NEW and NEEDS_APPROVAL timesheets
+    if timesheet.status not in (TimesheetStatus.NEW, TimesheetStatus.NEEDS_APPROVAL):
+        return {"error": "Only draft or rejected timesheets can be edited"}, 400
 
     data = request.get_json() or {}
 
@@ -312,8 +313,9 @@ def submit_timesheet(timesheet_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    if timesheet.status != TimesheetStatus.NEW:
-        return {"error": "Only draft timesheets can be submitted"}, 400
+    # REQ-023/BUG-001: Allow submitting NEW or NEEDS_APPROVAL timesheets
+    if timesheet.status not in (TimesheetStatus.NEW, TimesheetStatus.NEEDS_APPROVAL):
+        return {"error": "Only draft or rejected timesheets can be submitted"}, 400
 
     # Check if attachment is required but missing
     if timesheet.requires_attachment():
@@ -346,8 +348,9 @@ def update_entries(timesheet_id):
     if not timesheet:
         return {"error": "Timesheet not found"}, 404
 
-    if timesheet.status != TimesheetStatus.NEW:
-        return {"error": "Only draft timesheets can be edited"}, 400
+    # REQ-023/BUG-001: Allow editing entries for NEW and NEEDS_APPROVAL timesheets
+    if timesheet.status not in (TimesheetStatus.NEW, TimesheetStatus.NEEDS_APPROVAL):
+        return {"error": "Only draft or rejected timesheets can be edited"}, 400
 
     data = request.get_json() or {}
     entries_data = data.get("entries", [])

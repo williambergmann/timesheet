@@ -2,7 +2,7 @@
 endblock %} {% block extra_css %}
 <link
   rel="stylesheet"
-  href="{{ url_for('static', filename='css/components.css') }}?v=20260108p5"
+  href="{{ url_for('static', filename='css/components.css') }}?v=20260108p6"
 />
 {% endblock %} {% block content %}
 <div class="app-container">
@@ -131,6 +131,11 @@ endblock %} {% block extra_css %}
 
       <form id="timesheet-form" class="timesheet-form">
         <input type="hidden" id="timesheet-id" />
+
+        <!-- REQ-023: Read-only notice for non-editable timesheets -->
+        <div id="readonly-notice" class="readonly-notice hidden">
+          This timesheet has been submitted and cannot be edited.
+        </div>
 
         <!-- Week Selection -->
         <div class="form-section">
@@ -707,7 +712,7 @@ endblock %} {% block extra_css %}
   window.currentUser = {{ user|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
-<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p7"></script>
+<script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p8"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p6"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260107p1"></script>

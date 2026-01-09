@@ -29,6 +29,71 @@ The **Model Context Protocol (MCP)** is an open standard that connects AI assist
 
 ---
 
+## ⚡ Dynamic MCP (Docker MCP Toolkit)
+
+Dynamic MCP lets agents discover and add MCP servers on-demand during a
+session, without pre-configuring every server. It is enabled automatically
+when clients connect through the Docker MCP Toolkit.
+
+**Status:** Experimental (early development)
+
+**How it works:**
+
+- MCP Gateway exposes management tools in every session:
+  - `mcp-find` (search catalog)
+  - `mcp-add` (add server to session)
+  - `mcp-config-set` (configure server settings)
+  - `mcp-remove` (remove server)
+  - `mcp-exec` (execute a tool by name)
+  - `code-mode` (compose tools with JavaScript; experimental)
+- Servers added dynamically are **session-scoped** and do not persist across
+  new sessions.
+
+**Prerequisites:**
+
+- Docker Desktop 4.50+ with MCP Toolkit enabled
+- MCP-capable client (Claude Desktop, VS Code, Claude Code)
+- Client configured to connect to the MCP Gateway
+
+**Usage examples:**
+
+```text
+What MCP servers can I use for working with SQL databases?
+Add the postgres mcp server
+```
+
+**Code mode (experimental):**
+
+- `code-mode` creates a JS tool that can coordinate multiple MCP servers.
+- Runs inside a sandbox and can only interact through MCP tools.
+- Not yet reliable for general use; focus on core dynamic tools for now.
+
+**Security notes:**
+
+- Catalog servers are built, signed, and maintained by Docker.
+- Servers run in isolated containers with restricted resources.
+- Credentials are injected and managed by the gateway.
+- Dynamic tools can add new capabilities at runtime; apply least-privilege
+  and monitor usage.
+
+**Disable/enable dynamic tools:**
+
+```bash
+docker mcp feature disable dynamic-tools
+docker mcp feature enable dynamic-tools
+```
+
+After toggling, restart connected MCP clients if they do not pick up the
+change.
+
+**References:**
+
+- https://docs.docker.com/ai/mcp-catalog-and-toolkit/dynamic-mcp/
+- https://docs.docker.com/ai/mcp-catalog-and-toolkit/catalog/
+- https://docs.docker.com/ai/mcp-catalog-and-toolkit/toolkit/
+
+---
+
 ## 🚀 Recommended MCP Servers
 
 ### Priority 1: High Value for This App
