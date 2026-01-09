@@ -309,3 +309,281 @@ If you need multiple environments, you can add additional redirect URIs:
 | `AZURE_CLIENT_SECRET` | Client secret value                           | `abc123~xxxxxxxxxxxxxxxxxxxxxx`        |
 | `AZURE_TENANT_ID`     | Directory (tenant) ID                         | `87654321-4321-4321-4321-cba987654321` |
 | `AZURE_REDIRECT_URI`  | OAuth callback URL                            | `http://localhost/auth/callback`       |
+
+---
+
+## 🚀 Hosting on Azure
+
+### Hosting Options Comparison
+
+| Option                        | Cost/Month                   | Best For                                 | Complexity      |
+| ----------------------------- | ---------------------------- | ---------------------------------------- | --------------- |
+| **Azure App Service**         | $13-55 (Free tier available) | Quick deployment, managed infrastructure | ⭐ Easy         |
+| **Azure Container Apps**      | Pay-per-use                  | Docker containers, autoscaling           | ⭐⭐ Medium     |
+| **Azure Container Instances** | ~$30-50                      | Simple container deployment              | ⭐⭐ Medium     |
+| **Azure VM**                  | ~$15-40                      | Full control, existing Docker setup      | ⭐⭐⭐ Advanced |
+
+---
+
+### Option 1: Azure App Service (Recommended)
+
+Azure App Service is the easiest way to host this application with managed infrastructure.
+
+#### Prerequisites
+
+```bash
+# Install Azure CLI
+brew install azure-cli  # macOS
+# or: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash  # Linux
+
+# Login to Azure
+az login
+```
+
+#### Step 1: Create Resource Group
+
+```bash
+az group create --name northstar-rg --location eastus
+```
+
+#### Step 2: Create Azure Database for PostgreSQL
+
+```bash
+# Create PostgreSQL Flexible Server
+az postgres flexible-server create \
+  --resource-group northstar-rg \
+  --name northstar-db \
+  --location eastus \
+  --admin-user timesheet \
+  --admin-password "YourSecurePassword123!" \
+  --sku-name Standard_B1ms \
+  --tier Burstable \
+  --storage-size 32 \
+  --version 15
+
+# Create the database
+az postgres flexible-server db create \
+  --resource-group northstar-rg \
+  --server-name northstar-db \
+  --database-name timesheet
+
+# Allow Azure services to connect
+az postgres flexible-server firewall-rule create \
+  --resource-group northstar-rg \
+  --name northstar-db \
+  --rule-name AllowAzure \
+  --start-ip-address 0.0.0.0 \
+  --end-ip-address 0.0.0.0
+```
+
+#### Step 3: Create App Service Plan and Web App
+
+```bash
+# Create App Service Plan
+az appservice plan create \
+  --resource-group northstar-rg \
+  --name northstar-plan \
+  --sku B1 \
+  --is-linux
+
+# Create Web App with Python
+az webapp create \
+  --resource-group northstar-rg \
+  --plan northstar-plan \
+  --name northstar-timesheet \
+  --runtime "PYTHON:3.11"
+```
+
+#### Step 4: Configure Environment Variables
+
+```bash
+az webapp config appsettings set \
+  --resource-group northstar-rg \
+  --name northstar-timesheet \
+  --settings \
+    AZURE_CLIENT_ID="your-client-id" \
+    AZURE_CLIENT_SECRET="your-client-secret" \
+    AZURE_TENANT_ID="your-tenant-id" \
+    AZURE_REDIRECT_URI="https://northstar-timesheet.azurewebsites.net/auth/callback" \
+    DATABASE_URL="postgresql://timesheet:YourSecurePassword123!@northstar-db.postgres.database.azure.com:5432/timesheet?sslmode=require" \
+    SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')" \
+    FLASK_ENV="production"
+```
+
+#### Step 5: Update Azure App Registration
+
+Add the production redirect URI to your App Registration:
+
+1. Go to [Azure Portal](https://portal.azure.com) → **App registrations** → **Northstar Timesheet**
+2. Navigate to **Authentication**
+3. Add redirect URI: `https://northstar-timesheet.azurewebsites.net/auth/callback`
+4. Save changes
+
+#### Step 6: Deploy the Application
+
+**Option A: Deploy from Local Git**
+
+```bash
+# Configure deployment source
+az webapp deployment source config-local-git \
+  --resource-group northstar-rg \
+  --name northstar-timesheet
+
+# Get the deployment URL
+az webapp deployment source config-local-git \
+  --resource-group northstar-rg \
+  --name northstar-timesheet \
+  --query url --output tsv
+
+# Add Azure remote and push
+git remote add azure <deployment-url>
+git push azure main
+```
+
+**Option B: Deploy from GitHub Actions**
+
+```bash
+# Get publish profile
+az webapp deployment list-publishing-profiles \
+  --resource-group northstar-rg \
+  --name northstar-timesheet \
+  --xml > publish-profile.xml
+```
+
+Then add the contents to GitHub Secrets as `AZURE_WEBAPP_PUBLISH_PROFILE`.
+
+#### Step 7: Run Database Migrations
+
+```bash
+# SSH into the web app
+az webapp ssh --resource-group northstar-rg --name northstar-timesheet
+
+# Inside the SSH session
+cd /home/site/wwwroot
+flask db upgrade
+```
+
+#### Step 8: Verify Deployment
+
+Open `https://northstar-timesheet.azurewebsites.net` in your browser.
+
+---
+
+### Option 2: Azure Container Apps
+
+For Docker-based deployment with automatic scaling.
+
+#### Step 1: Create Container Registry
+
+```bash
+az acr create \
+  --resource-group northstar-rg \
+  --name northstarcr \
+  --sku Basic
+
+az acr login --name northstarcr
+```
+
+#### Step 2: Build and Push Docker Image
+
+```bash
+# Build the image
+docker build -t northstarcr.azurecr.io/timesheet:latest -f docker/Dockerfile .
+
+# Push to Azure Container Registry
+docker push northstarcr.azurecr.io/timesheet:latest
+```
+
+#### Step 3: Create Container App
+
+```bash
+az containerapp create \
+  --name northstar-timesheet \
+  --resource-group northstar-rg \
+  --image northstarcr.azurecr.io/timesheet:latest \
+  --target-port 5000 \
+  --ingress external \
+  --registry-server northstarcr.azurecr.io \
+  --env-vars \
+    AZURE_CLIENT_ID="your-client-id" \
+    AZURE_CLIENT_SECRET="your-client-secret" \
+    DATABASE_URL="postgresql://..."
+```
+
+---
+
+### Option 3: Azure Container Instances (ACI)
+
+For simple container deployment without orchestration.
+
+```bash
+az container create \
+  --resource-group northstar-rg \
+  --name northstar-timesheet \
+  --image northstarcr.azurecr.io/timesheet:latest \
+  --dns-name-label northstar-timesheet \
+  --ports 5000 \
+  --environment-variables \
+    AZURE_CLIENT_ID="your-client-id" \
+    AZURE_CLIENT_SECRET="your-client-secret" \
+    DATABASE_URL="postgresql://..."
+```
+
+---
+
+### Option 4: Azure Virtual Machine
+
+For full control with existing Docker Compose setup.
+
+```bash
+# Create VM
+az vm create \
+  --resource-group northstar-rg \
+  --name northstar-vm \
+  --image Ubuntu2204 \
+  --size Standard_B2s \
+  --admin-username azureuser \
+  --generate-ssh-keys
+
+# Open ports
+az vm open-port --port 80 --resource-group northstar-rg --name northstar-vm
+az vm open-port --port 443 --resource-group northstar-rg --name northstar-vm
+
+# SSH into VM and set up Docker
+ssh azureuser@<vm-public-ip>
+# Then install Docker and run docker compose up
+```
+
+---
+
+### Production Checklist
+
+Before going live, ensure:
+
+- [ ] SSL/HTTPS enabled (App Service provides free certificates)
+- [ ] `AZURE_REDIRECT_URI` uses `https://` URL
+- [ ] `SESSION_COOKIE_SECURE=True` in production config
+- [ ] Strong `SECRET_KEY` generated (not placeholder)
+- [ ] Database backups configured
+- [ ] Application Insights enabled for monitoring
+- [ ] Rate limiting enabled (REQ-042)
+- [ ] Health check endpoint configured (REQ-043)
+
+---
+
+### Estimated Monthly Costs
+
+| Service     | Tier           | Cost           |
+| ----------- | -------------- | -------------- |
+| App Service | B1 (Basic)     | ~$13/month     |
+| PostgreSQL  | Burstable B1ms | ~$15/month     |
+| **Total**   |                | **~$28/month** |
+
+Free tier available for testing:
+
+- App Service F1 (free, limited hours)
+- PostgreSQL Burstable B1ms (750 hours free first year on new accounts)
+
+---
+
+_Document updated January 9, 2026_
