@@ -66,6 +66,84 @@ When a user views a timesheet they've submitted, the form should be read-only.
 
 ---
 
+### BUG-003: Draft Timesheets Missing Save/Submit Buttons
+
+**Status:** 🟡 To Verify  
+**Severity:** Medium (P1)  
+**Reported:** January 8, 2026  
+**Related:** REQ-023
+
+**Description:**
+When viewing an existing draft timesheet (`NEW` status), the Save Draft and Submit buttons should be visible, just like when creating a new timesheet. If these buttons are not appearing, the `setFormReadOnly()` function may not be correctly restoring visibility.
+
+**Expected Behavior:**
+
+- Draft timesheets (`status: 'NEW'`) should have:
+  - ✅ Save Draft button visible
+  - ✅ Submit button visible
+  - ✅ All hour inputs editable
+  - ✅ Add hour type dropdown visible
+  - ✅ Attachment upload zone visible
+
+**Root Cause (if confirmed):**
+
+The `setFormReadOnly(false)` call should reset all buttons to visible, but the button display styles may not be set correctly when transitioning from read-only to editable mode.
+
+**How to Verify:**
+
+1. Log in to the app
+2. Create a new timesheet and save as draft
+3. Navigate away, then click on the draft from "My Timesheets"
+4. Verify that Save Draft and Submit buttons are visible at the bottom
+
+**Implementation Fix (if needed):**
+
+**File: `static/js/timesheet.js`**
+
+In the `setFormReadOnly(readOnly)` function, ensure button visibility is explicitly restored:
+
+```javascript
+// Line ~970-980: Ensure buttons are restored when not read-only
+const saveBtn = document.getElementById("save-draft-btn");
+const submitBtn = document.getElementById("submit-btn");
+if (saveBtn) saveBtn.style.display = readOnly ? "none" : "inline-flex";
+if (submitBtn) submitBtn.style.display = readOnly ? "none" : "inline-flex";
+```
+
+Also ensure the parent `.form-actions` container is visible:
+
+```javascript
+// Add this to setFormReadOnly():
+const formActions = document.querySelector(".form-actions");
+if (formActions) {
+  formActions.style.display = readOnly ? "none" : "flex";
+}
+```
+
+**File: `templates/index.html`**
+
+Verify the form-actions section exists and has correct structure:
+
+```html
+<!-- Around line 555-590 -->
+<div class="form-actions">
+  <button type="button" id="save-draft-btn" class="btn btn-secondary">
+    💾 Save Draft
+  </button>
+  <button type="button" id="submit-btn" class="btn btn-primary">
+    🚀 Submit
+  </button>
+</div>
+```
+
+**Acceptance Criteria:**
+
+- [ ] Draft timesheets show Save Draft and Submit buttons
+- [ ] Buttons work correctly when clicked
+- [ ] Submitted/Approved timesheets still hide the buttons
+
+---
+
 ### BUG-002: Reimbursement Amounts Display "$null"
 
 **Status:** 🔴 Open  
