@@ -369,6 +369,18 @@ function showAdminTimesheetDetail(timesheet) {
                 </h3>
             </div>
 
+            <div class="detail-section detail-actions">
+                <label class="filter-label">Export Format:</label>
+                <select id="admin-detail-export-format" class="form-select">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="exportTimesheetDetail('${timesheet.id}')">
+                    📤 Export Timesheet
+                </button>
+            </div>
+
             ${isLocked ? `
             <div class="detail-section">
                 <div class="readonly-notice">
@@ -780,10 +792,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Export to CSV button
+    // Export button
     const exportBtn = document.getElementById('admin-export-btn');
     if (exportBtn) {
-        exportBtn.addEventListener('click', exportTimesheetsToCSV);
+        exportBtn.addEventListener('click', exportTimesheets);
     }
 
     const confirmPayPeriodBtn = document.getElementById('admin-confirm-pay-period-btn');
@@ -829,123 +841,44 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export Functionality
 // ==========================================
 
-async function fetchTimesheetsForExport(usePayPeriod = false) {
+function getExportFormat(selectId) {
+    const select = document.getElementById(selectId);
+    return (select && select.value) ? select.value : 'csv';
+}
+
+function triggerExport(url) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function exportTimesheets() {
     const statusEl = document.getElementById('admin-filter-status');
     const userEl = document.getElementById('admin-filter-user');
     const weekEl = document.getElementById('admin-filter-week');
     const hourTypeEl = document.getElementById('admin-filter-hourtype');
 
-    const status = statusEl ? statusEl.value : '';
-    const userId = userEl ? userEl.value : '';
-    const weekStart = weekEl ? weekEl.value : '';
-    const hourType = hourTypeEl ? hourTypeEl.value : '';
+    const params = new URLSearchParams();
+    params.set('format', getExportFormat('admin-export-format'));
 
-    let allTimesheets = [];
+    if (statusEl && statusEl.value) params.set('status', statusEl.value);
+    if (userEl && userEl.value) params.set('user_id', userEl.value);
+    if (weekEl && weekEl.value) params.set('week_start', weekEl.value);
+    if (hourTypeEl && hourTypeEl.value) params.set('hour_type', hourTypeEl.value);
 
-    if (usePayPeriod && window.payPeriodFilter) {
-        const params1 = { week_start: window.payPeriodFilter.week1 };
-        const params2 = { week_start: window.payPeriodFilter.week2 };
-        if (status) { params1.status = status; params2.status = status; }
-        if (userId) { params1.user_id = userId; params2.user_id = userId; }
-        if (hourType) { params1.hour_type = hourType; params2.hour_type = hourType; }
-
-        const [data1, data2] = await Promise.all([
-            API.getAdminTimesheets(params1),
-            API.getAdminTimesheets(params2)
-        ]);
-
-        const seen = new Set();
-        [...data1.timesheets, ...data2.timesheets].forEach(ts => {
-            if (!seen.has(ts.id)) {
-                seen.add(ts.id);
-                allTimesheets.push(ts);
-            }
-        });
-    } else {
-        const params = {};
-        if (status) params.status = status;
-        if (userId) params.user_id = userId;
-        if (weekStart) params.week_start = weekStart;
-        if (hourType) params.hour_type = hourType;
-
-        const data = await API.getAdminTimesheets(params);
-        allTimesheets = data.timesheets || [];
+    if (window.payPeriodFilter) {
+        params.set('pay_period_start', window.payPeriodFilter.startISO);
+        params.set('pay_period_end', window.payPeriodFilter.endISO);
     }
 
-    return allTimesheets;
+    showToast('Generating export...', 'info');
+    triggerExport(`/api/admin/exports/timesheets?${params.toString()}`);
 }
 
-function buildTimesheetCSV(timesheets) {
-    const headers = [
-        'Employee',
-        'Email',
-        'Week Start',
-        'Status',
-        'Total Hours',
-        'Payable Hours',
-        'Billable Hours',
-        'Unpaid Hours',
-        'Traveled',
-        'Expenses',
-        'Reimbursement',
-        'Attachments',
-        'Created At'
-    ];
-
-    const rows = timesheets.map(ts => [
-        ts.user?.display_name || 'Unknown',
-        ts.user?.email || '',
-        ts.week_start,
-        ts.status,
-        ts.totals.total,
-        ts.totals.payable,
-        ts.totals.billable,
-        ts.totals.unpaid,
-        ts.traveled ? 'Yes' : 'No',
-        ts.has_expenses ? 'Yes' : 'No',
-        ts.reimbursement_needed ? `${formatExpenseType(ts.reimbursement_type)}: $${ts.reimbursement_amount.toFixed(2)}` : 'No',
-        ts.attachments?.length || 0,
-        new Date(ts.created_at).toLocaleDateString()
-    ]);
-
-    return [
-        headers.join(','),
-        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-    ].join('\n');
-}
-
-function downloadCSV(csvContent, filename) {
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-}
-
-async function exportTimesheetsToCSV() {
-    try {
-        showToast('Generating export...', 'info');
-
-        const timesheets = await fetchTimesheetsForExport(Boolean(window.payPeriodFilter));
-
-        if (timesheets.length === 0) {
-            showToast('No timesheets to export', 'warning');
-            return;
-        }
-
-        const csvContent = buildTimesheetCSV(timesheets);
-        const filename = `timesheets_export_${new Date().toISOString().split('T')[0]}.csv`;
-        downloadCSV(csvContent, filename);
-
-        showToast(`Exported ${timesheets.length} timesheets`, 'success');
-    } catch (error) {
-        showToast('Export failed: ' + error.message, 'error');
-    }
-}
-
-async function exportPayPeriodToCSV() {
+function exportPayPeriodToCSV() {
     if (!window.payPeriodFilter) {
         showToast('Select a pay period first', 'warning');
         return;
@@ -956,21 +889,19 @@ async function exportPayPeriodToCSV() {
         return;
     }
 
-    try {
-        showToast('Generating payroll export...', 'info');
+    const params = new URLSearchParams({
+        format: getExportFormat('admin-export-format'),
+        start_date: window.payPeriodFilter.startISO,
+        end_date: window.payPeriodFilter.endISO,
+    });
 
-        const timesheets = await fetchTimesheetsForExport(true);
-        if (timesheets.length === 0) {
-            showToast('No timesheets to export', 'warning');
-            return;
-        }
+    showToast('Generating payroll export...', 'info');
+    triggerExport(`/api/admin/exports/pay-period?${params.toString()}`);
+}
 
-        const csvContent = buildTimesheetCSV(timesheets);
-        const filename = `pay_period_${window.payPeriodFilter.startISO}_${window.payPeriodFilter.endISO}.csv`;
-        downloadCSV(csvContent, filename);
-
-        showToast(`Exported ${timesheets.length} timesheets`, 'success');
-    } catch (error) {
-        showToast('Payroll export failed: ' + error.message, 'error');
-    }
+function exportTimesheetDetail(timesheetId) {
+    const format = getExportFormat('admin-detail-export-format');
+    const params = new URLSearchParams({ format });
+    showToast('Generating timesheet export...', 'info');
+    triggerExport(`/api/admin/exports/timesheets/${timesheetId}?${params.toString()}`);
 }

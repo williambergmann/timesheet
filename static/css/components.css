@@ -1042,6 +1042,13 @@
   font-weight: 500;
 }
 
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 /* User Notes Display in Admin Detail */
 .user-notes-display {
   background: var(--color-bg-overlay);

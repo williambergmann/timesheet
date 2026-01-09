@@ -157,7 +157,7 @@ Add a User Settings section where users can configure:
 - Teams: allow connecting a Microsoft account for Teams notifications
 - Allow multiple emails and phone numbers per user
 
-**Status: ✅ IMPLEMENTED (January 10, 2026)**
+**Status: ✅ IMPLEMENTED (January 9, 2026)**
 
 **Implementation:**
 
@@ -229,7 +229,7 @@ Add confirmation step at end of pay period.
 - May need new status or flag for "pay period confirmed"
 - Prevents further edits after confirmation
 
-**Status: ✅ IMPLEMENTED (January 10, 2026)**
+**Status: ✅ IMPLEMENTED (January 9, 2026)**
 
 **Implementation:**
 
@@ -586,6 +586,15 @@ Add export functionality with multiple format options:
 - Current filtered view (all visible timesheets)
 - Single timesheet detail view
 - Pay period summary
+
+**Status: ✅ IMPLEMENTED (January 10, 2026)**
+
+**Implementation:**
+
+- ✅ Export endpoints for CSV, Excel (.xlsx), and PDF
+- ✅ Admin dashboard format selector + export buttons
+- ✅ Single timesheet detail export with summary + entries
+- ✅ Pay period summary export (admin-only)
 
 ---
 
@@ -1356,7 +1365,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-016     | ✅ Complete | Auto-redirect to /app after login               |
 | REQ-017     | ✅ Complete | 4 quick-login buttons on login page             |
 | REQ-018     | ✅ Complete | Hour type filter dropdown on admin dash         |
-| REQ-019     | 📋 Planned  | Export format options                           |
+| REQ-019     | ✅ Complete | CSV/XLSX/PDF exports + pay period summary       |
 | REQ-020     | ✅ Complete | Travel ✈️ and expense 💰 badges on cards        |
 | REQ-021     | 📋 Planned  | Per-option reimbursement attachments            |
 | REQ-022     | ✅ Complete | Holiday indicators + entry warning              |
@@ -1387,4 +1396,4 @@ Add end-to-end browser tests for critical user flows.
 
 ---
 
-_Document updated January 10, 2026_
+_Document updated January 9, 2026_

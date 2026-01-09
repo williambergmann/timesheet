@@ -561,6 +561,11 @@ a:hover {
     box-shadow var(--transition-fast);
 }
 
+.form-select-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
 .form-input::placeholder,
 .form-textarea::placeholder {
   color: var(--color-text-disabled);
