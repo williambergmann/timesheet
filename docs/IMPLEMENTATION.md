@@ -739,7 +739,6 @@ All feature documentation, planning guides, and reference materials are stored i
 ```
 timesheet/
 ├── README.md                # Project overview (root)
-├── SECURITY.md              # 🔒 Security checklist (root)
 │
 └── docs/                    # All documentation
     │
@@ -748,6 +747,7 @@ timesheet/
     │                        #    - API endpoints
     │                        #    - Development phases & status
     │
+    │── SECURITY.md          # 🔒 Security checklist and best practices
     │── TESTING.md           # 🧪 Test suite guide
     │── WALKTHROUGH.md       # 👤 End-user guide
     │

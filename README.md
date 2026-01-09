@@ -220,13 +220,7 @@ pytest tests/test_models.py -v
 
 ## Documentation
 
-Detailed documentation is available in multiple locations:
-
-### Root-Level Docs
-
-| Document                   | Description                                          |
-| -------------------------- | ---------------------------------------------------- |
-| [SECURITY.md](SECURITY.md) | Pre-deployment security checklist and best practices |
+Detailed documentation is available in the `docs/` folder:
 
 ### docs/ Folder
 
@@ -234,6 +228,7 @@ Detailed documentation is available in multiple locations:
 | ------------------------------------------- | ------------------------------------------------------ |
 | [IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Technical architecture, API reference, database schema |
 | [REQUIREMENTS.md](docs/REQUIREMENTS.md)     | Feature requirements with priorities (P0/P1/P2)        |
+| [SECURITY.md](docs/SECURITY.md)             | Pre-deployment security checklist and best practices   |
 | [DESIGN.md](docs/DESIGN.md)                 | Architecture decisions and stakeholder answers         |
 | [TESTING.md](docs/TESTING.md)               | Testing strategy, coverage, and test structure         |
 | [WALKTHROUGH.md](docs/WALKTHROUGH.md)       | Step-by-step user guide                                |
@@ -246,7 +241,6 @@ Detailed documentation is available in multiple locations:
 | [DARKMODE.md](docs/DARKMODE.md)             | Dark mode implementation and color system              |
 | [RESPONSIVE.md](docs/RESPONSIVE.md)         | Responsive design and mobile breakpoints               |
 | [LOGIN.md](docs/LOGIN.md)                   | Authentication flow and login page design              |
-| [SECURITY.md](docs/SECURITY.md)             | Detailed security implementation notes                 |
 | [roadmap.md](docs/roadmap.md)               | Production deployment recommendations                  |
 
 ## License
