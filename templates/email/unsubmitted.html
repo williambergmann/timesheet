@@ -1,0 +1,10 @@
+{% extends "email/base.html" %}
+
+{% block title %}Timesheet Past Due{% endblock %}
+{% block header_subtitle %}Timesheet Past Due{% endblock %}
+
+{% block body %}
+<h2>Your timesheet is past due.</h2>
+<p>Week of {{ week_start }}</p>
+<p>Please submit as soon as possible.</p>
+{% endblock %}

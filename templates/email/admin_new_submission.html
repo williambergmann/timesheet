@@ -1,0 +1,29 @@
+{% extends "email/base.html" %}
+
+{% block title %}New Timesheet Submitted{% endblock %}
+{% block header_subtitle %}New Timesheet Submitted{% endblock %}
+
+{% block body %}
+<h2>A new timesheet is ready for review.</h2>
+<p>Week of {{ week_start }}</p>
+<div class="detail">
+  <div class="label">Submitter</div>
+  <div class="value">{{ user_name }}{% if user_email %} ({{ user_email }}){% endif %}</div>
+</div>
+<div class="detail">
+  <div class="label">Total hours</div>
+  <div class="value">{{ total_hours }}</div>
+</div>
+<div class="detail">
+  <div class="label">Field hours</div>
+  <div class="value">{{ field_hours }}</div>
+</div>
+{% if traveled %}
+<p>Travel was marked for this timesheet.</p>
+{% endif %}
+{% if has_attachments %}
+<p>Attachments: {{ attachment_count }}</p>
+{% else %}
+<p>No attachments were included.</p>
+{% endif %}
+{% endblock %}

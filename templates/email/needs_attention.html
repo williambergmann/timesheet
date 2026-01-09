@@ -1,0 +1,17 @@
+{% extends "email/base.html" %}
+
+{% block title %}Timesheet Needs Attention{% endblock %}
+{% block header_subtitle %}Timesheet Needs Attention{% endblock %}
+
+{% block body %}
+<h2>Your timesheet needs attention.</h2>
+<p>Week of {{ week_start }}</p>
+{% if reason %}
+<div class="detail">
+  <div class="label">Reason</div>
+  <div class="value">{{ reason }}</div>
+</div>
+{% else %}
+<p>Please review your timesheet and address any outstanding items.</p>
+{% endif %}
+{% endblock %}

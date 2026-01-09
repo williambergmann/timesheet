@@ -63,6 +63,16 @@ class Config:
     TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
     TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
 
+    # SMTP Email (REQ-011)
+    SMTP_HOST = os.environ.get("SMTP_HOST", "")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587") or 587)
+    SMTP_USER = os.environ.get("SMTP_USER", "")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+    SMTP_FROM_EMAIL = os.environ.get("SMTP_FROM_EMAIL", "")
+    SMTP_FROM_NAME = os.environ.get("SMTP_FROM_NAME", "Northstar Timesheet")
+    SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "true").lower() == "true"
+    SMTP_USE_SSL = os.environ.get("SMTP_USE_SSL", "false").lower() == "true"
+
     # Redis
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
@@ -121,4 +131,3 @@ class TestingConfig(Config):
     # Stricter limits for testing (easy to trigger)
     RATELIMIT_AUTH_LIMIT = "3 per minute"
     RATELIMIT_API_LIMIT = "5 per minute"
-

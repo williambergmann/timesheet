@@ -1,0 +1,16 @@
+{% extends "email/base.html" %}
+
+{% block title %}Timesheet Approved{% endblock %}
+{% block header_subtitle %}Timesheet Approved{% endblock %}
+
+{% block body %}
+<h2>Your timesheet was approved.</h2>
+<p>Week of {{ week_start }}</p>
+<div class="detail">
+  <div class="label">Total hours</div>
+  <div class="value">{{ total_hours }}</div>
+</div>
+{% if approved_by %}
+<p>Approved by {{ approved_by }}.</p>
+{% endif %}
+{% endblock %}

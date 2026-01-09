@@ -17,6 +17,7 @@ from ..models import (
     ReimbursementType,
 )
 from ..extensions import db
+from ..services.notification import NotificationService
 from ..utils.decorators import login_required
 from ..utils.pay_periods import get_confirmed_pay_period
 
@@ -355,6 +356,8 @@ def submit_timesheet(timesheet_id):
 
     timesheet.submitted_at = datetime.utcnow()
     db.session.commit()
+
+    NotificationService.notify_admin_new_submission(timesheet)
 
     return timesheet.to_dict()
 

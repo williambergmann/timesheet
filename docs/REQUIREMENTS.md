@@ -382,6 +382,8 @@ Sync uploaded attachments to SharePoint for permanent storage.
 
 Send email notifications for timesheet events.
 
+**Status: ✅ IMPLEMENTED (January 2026)**
+
 **Events:**
 
 - Timesheet approved
@@ -391,9 +393,10 @@ Send email notifications for timesheet events.
 
 **Implementation Notes:**
 
-- Use Microsoft Graph API (M365 email)
-- Respect user notification preferences
-- Template-based emails
+- SMTP-based delivery with config in `.env`/`app.config`
+- Respects user notification preferences + email opt-in
+- Template-based HTML emails for all events
+- Logs in dev mode when SMTP is not configured
 
 ---
 
@@ -1365,7 +1368,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-008     | ✅ Complete | Row totals added to all grid views              |
 | REQ-009     | ✅ Complete | Auto-fill 8h works for any hour type            |
 | REQ-010     | 📋 Planned  | SharePoint integration                          |
-| REQ-011     | 📋 Planned  | Email service                                   |
+| REQ-011     | ✅ Complete | Email service                                   |
 | REQ-012     | 📋 Planned  | Teams bot                                       |
 | REQ-013     | ✅ Complete | Dropdown filters by user role                   |
 | REQ-014     | ✅ Complete | Submit without attachment (with warning)        |
