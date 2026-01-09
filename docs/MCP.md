@@ -2,9 +2,24 @@
 
 > **Purpose:** Document Model Context Protocol (MCP) servers that can enhance development and operations of the Northstar Timesheet application.
 >
-> **Status:** 📋 Planning
+> **Status:** 📋 Reference Only (Not Actively Used)
 >
-> **Last Updated:** January 8, 2026
+> **Last Updated:** January 9, 2026
+
+---
+
+## ⚠️ Project Status Note
+
+**This document is retained for reference only.** MCP is not currently used in this project.
+
+| Aspect                       | Assessment                                               |
+| ---------------------------- | -------------------------------------------------------- |
+| **For this timesheet app**   | Not needed - no MCP servers are configured               |
+| **For AI coding assistants** | Marginal value - direct APIs are preferred               |
+| **Complexity**               | Adds confusion with unimplemented features               |
+| **Future value**             | Low - DB access, Teams integration would use direct APIs |
+
+**Recommendation:** If MCP integration becomes relevant in the future, revisit this document. For now, focus on direct API implementations (Microsoft Graph, PostgreSQL, Twilio).
 
 ---
 

@@ -1019,38 +1019,17 @@ Implement the missing PowerApps `Screen1` data report view.
 
 ## Developer Tooling
 
-### REQ-040: MCP Tooling Integration (P3)
+### REQ-040: MCP Tooling Integration (P3) - Deferred
 
-Optional AI tooling integration using Model Context Protocol (MCP) servers.
+> **Status:** 🔄 Deferred - Not actively used. See [MCP.md](MCP.md) for reference.
 
-**Priority 1 - High Value Servers:**
+Optional AI tooling integration using Model Context Protocol (MCP) servers. This was explored but determined to add complexity without sufficient benefit for this project.
 
-| MCP Server      | Use Case                                  | Related Features          |
-| --------------- | ----------------------------------------- | ------------------------- |
-| Microsoft Graph | Azure AD sync, SharePoint, Teams, Email   | REQ-010, REQ-011, REQ-015 |
-| PostgreSQL      | Direct DB queries for debugging/reporting | Development               |
-| Twilio          | SMS notifications management              | REQ-011 (SMS)             |
+**Assessment:**
 
-**Priority 2 - Operations Servers:**
-
-| MCP Server | Use Case                          |
-| ---------- | --------------------------------- |
-| Docker     | Container management, log viewing |
-| Sentry     | Error tracking, stack traces      |
-
-**Implementation Notes:**
-
-- Configure MCP servers as needed (see [MCP.md](MCP.md) for full setup)
-- Use read-only database credentials when possible
-- Store API keys securely (environment variables, not committed)
-- Dynamic MCP available via Docker MCP Toolkit (experimental)
-
-**Security Requirements:**
-
-- Principle of least privilege for all MCP credentials
-- Audit logging for database access via MCP
-- Never commit credentials to git
-- See [MCP.md](MCP.md) Security Best Practices section
+- MCP is not currently used in this project
+- Direct API integrations (Microsoft Graph, PostgreSQL, Twilio) are preferred
+- Document retained for future reference if MCP becomes relevant
 
 ---
 
@@ -1218,14 +1197,14 @@ Add end-to-end browser tests for critical user flows.
 | REQ-037     | 📋 Planned  | Testing coverage & gaps                   |
 | REQ-038     | 📋 Planned  | UX & accessibility backlog                |
 | REQ-039     | 📋 Planned  | PowerApps data report view                |
-| REQ-040     | 📋 Planned  | MCP tooling integration                   |
+| REQ-040     | � Deferred  | MCP tooling integration (not used)        |
 | REQ-041     | ✅ Complete | Support dashboard for trainee approvals   |
 | REQ-042     | 📋 Planned  | Rate limiting on auth endpoints           |
-| REQ-043     | 📋 Planned  | Health check endpoint                     |
+| REQ-043     | ✅ Complete | Health check endpoint                     |
 | REQ-044     | 📋 Planned  | Frontend modularization (split JS)        |
 | REQ-045     | 📋 Planned  | Backup/restore documentation              |
 | REQ-046     | 📋 Planned  | E2E tests with Playwright                 |
 
 ---
 
-_Document updated January 8, 2026_
+_Document updated January 9, 2026_
