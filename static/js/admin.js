@@ -24,6 +24,52 @@ function formatExpenseType(type) {
     return `${icon} ${type}`;
 }
 
+// REQ-004: Pay Period Configuration
+// Anchor date for biweekly pay periods (must be a Sunday)
+// Adjust this to match your company's pay period calendar
+const PAY_PERIOD_ANCHOR = new Date('2026-01-05'); // First Sunday of a pay period
+
+/**
+ * Calculate the current pay period (biweekly).
+ * Returns the start and end dates of the current pay period.
+ */
+function getCurrentPayPeriod() {
+    const today = new Date();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const msPerWeek = 7 * msPerDay;
+    const msPer2Weeks = 14 * msPerDay;
+    
+    // Calculate days since anchor
+    const daysSinceAnchor = Math.floor((today - PAY_PERIOD_ANCHOR) / msPerDay);
+    
+    // Find which 2-week period we're in
+    const periodsElapsed = Math.floor(daysSinceAnchor / 14);
+    
+    // Calculate start of current pay period
+    const periodStart = new Date(PAY_PERIOD_ANCHOR.getTime() + (periodsElapsed * msPer2Weeks));
+    
+    // End is 13 days later (inclusive), or 14 days for exclusive end
+    const periodEnd = new Date(periodStart.getTime() + (13 * msPerDay));
+    
+    return {
+        start: periodStart,
+        end: periodEnd,
+        // Week starts (Sundays) in this period
+        week1: periodStart.toISOString().split('T')[0],
+        week2: new Date(periodStart.getTime() + msPerWeek).toISOString().split('T')[0]
+    };
+}
+
+/**
+ * Format pay period for display.
+ */
+function formatPayPeriod(period) {
+    const options = { month: 'short', day: 'numeric' };
+    const startStr = period.start.toLocaleDateString('en-US', options);
+    const endStr = period.end.toLocaleDateString('en-US', options);
+    return `${startStr} - ${endStr}`;
+}
+
 // ==========================================
 // Data Loading
 // ==========================================
@@ -44,15 +90,43 @@ async function loadAdminTimesheets() {
         const weekStart = weekEl ? weekEl.value : '';
         const hourType = hourTypeEl ? hourTypeEl.value : '';
         
-        const params = {};
-        if (status) params.status = status;
-        if (userId) params.user_id = userId;
-        if (weekStart) params.week_start = weekStart;
-        if (hourType) params.hour_type = hourType;
+        let allTimesheets = [];
         
-        const data = await API.getAdminTimesheets(params);
+        // REQ-004: Check if pay period filter is active
+        if (window.payPeriodFilter) {
+            // Fetch both weeks of the pay period
+            const params1 = { week_start: window.payPeriodFilter.week1 };
+            const params2 = { week_start: window.payPeriodFilter.week2 };
+            if (status) { params1.status = status; params2.status = status; }
+            if (userId) { params1.user_id = userId; params2.user_id = userId; }
+            if (hourType) { params1.hour_type = hourType; params2.hour_type = hourType; }
+            
+            const [data1, data2] = await Promise.all([
+                API.getAdminTimesheets(params1),
+                API.getAdminTimesheets(params2)
+            ]);
+            
+            // Combine and deduplicate by ID
+            const seen = new Set();
+            [...data1.timesheets, ...data2.timesheets].forEach(ts => {
+                if (!seen.has(ts.id)) {
+                    seen.add(ts.id);
+                    allTimesheets.push(ts);
+                }
+            });
+        } else {
+            // Normal single-week or no-week filter
+            const params = {};
+            if (status) params.status = status;
+            if (userId) params.user_id = userId;
+            if (weekStart) params.week_start = weekStart;
+            if (hourType) params.hour_type = hourType;
+            
+            const data = await API.getAdminTimesheets(params);
+            allTimesheets = data.timesheets;
+        }
         
-        if (data.timesheets.length === 0) {
+        if (allTimesheets.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📋</div>
@@ -63,7 +137,7 @@ async function loadAdminTimesheets() {
             return;
         }
         
-        container.innerHTML = data.timesheets.map(ts => `
+        container.innerHTML = allTimesheets.map(ts => `
             <div class="timesheet-card" onclick="openAdminTimesheet('${ts.id}')">
                 <div class="timesheet-card-header">
                     <span class="timesheet-card-week">${TimesheetModule.formatWeekRange(ts.week_start)}</span>
@@ -489,7 +563,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (weekEl) weekEl.value = '';
             if (hourTypeEl) hourTypeEl.value = '';
             
-            // Remove active state from stat cards and this week button
+            // REQ-004: Clear pay period filter
+            window.payPeriodFilter = null;
+            const payPeriodBtn = document.getElementById('admin-pay-period-btn');
+            if (payPeriodBtn) payPeriodBtn.classList.remove('active');
+            const payPeriodDisplay = document.getElementById('pay-period-display');
+            if (payPeriodDisplay) payPeriodDisplay.style.display = 'none';
+            
+            // Remove active state from stat cards and filter buttons
             document.querySelectorAll('.stat-card').forEach(card => {
                 card.classList.remove('active');
             });
@@ -504,6 +585,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const thisWeekBtn = document.getElementById('admin-this-week-btn');
     if (thisWeekBtn) {
         thisWeekBtn.addEventListener('click', () => {
+            // Clear pay period filter (REQ-004)
+            window.payPeriodFilter = null;
+            const payPeriodBtn = document.getElementById('admin-pay-period-btn');
+            if (payPeriodBtn) payPeriodBtn.classList.remove('active');
+            const payPeriodDisplay = document.getElementById('pay-period-display');
+            if (payPeriodDisplay) payPeriodDisplay.style.display = 'none';
+            
             // Calculate current week's Sunday (week start)
             const today = new Date();
             const dayOfWeek = today.getDay(); // 0 = Sunday
@@ -535,6 +623,48 @@ document.addEventListener('DOMContentLoaded', () => {
             
             loadAdminTimesheets();
             showToast(`Showing timesheets for week of ${TimesheetModule.formatWeekRange(weekStart)}`, 'info');
+        });
+    }
+    
+    // "Pay Period" quick filter button (REQ-004)
+    const payPeriodBtn = document.getElementById('admin-pay-period-btn');
+    if (payPeriodBtn) {
+        payPeriodBtn.addEventListener('click', () => {
+            // Calculate current pay period
+            const period = getCurrentPayPeriod();
+            
+            // Store pay period filter state
+            window.payPeriodFilter = period;
+            
+            // Clear week filter (pay period uses its own logic)
+            const weekEl = document.getElementById('admin-filter-week');
+            if (weekEl) weekEl.value = '';
+            
+            // Clear other filters for focused view
+            const statusEl = document.getElementById('admin-filter-status');
+            const userEl = document.getElementById('admin-filter-user');
+            if (statusEl) statusEl.value = '';
+            if (userEl) userEl.value = '';
+            
+            // Remove active state from other controls
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const thisWeekBtn = document.getElementById('admin-this-week-btn');
+            if (thisWeekBtn) thisWeekBtn.classList.remove('active');
+            
+            // Add active state to pay period button
+            payPeriodBtn.classList.add('active');
+            
+            // Show pay period date range
+            const payPeriodDisplay = document.getElementById('pay-period-display');
+            if (payPeriodDisplay) {
+                payPeriodDisplay.textContent = formatPayPeriod(period);
+                payPeriodDisplay.style.display = 'inline';
+            }
+            
+            loadAdminTimesheets();
+            showToast(`Showing pay period: ${formatPayPeriod(period)}`, 'info');
         });
     }
     

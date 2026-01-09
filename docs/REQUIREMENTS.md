@@ -92,21 +92,26 @@ Add a User Settings section where users can configure:
 
 ## 📊 Admin Dashboard
 
-### REQ-004: Pay Period Filter (P1)
+### REQ-004: Pay Period Filter (P1) ✅
 
 Add ability to filter timesheets by current pay period (biweekly).
 
+**Status: ✅ IMPLEMENTED (January 8, 2026)**
+
 **Features:**
 
-- "Current Pay Period" quick filter button
-- Pay period date range display
-- Group timesheets by pay period
+- ✅ "Current Pay Period" quick filter button (💵 Pay Period)
+- ✅ Pay period date range display (shows "Jan 5 - Jan 18" style badge)
+- ✅ Fetches timesheets for both weeks in the pay period
+- ✅ Configurable anchor date for pay period calendar
 
 **Implementation Notes:**
 
-- Define pay period start dates (need business input on which weeks)
-- Calculate current pay period dynamically
-- Add to existing filter controls
+- ✅ Uses `PAY_PERIOD_ANCHOR` (Jan 5, 2026) to calculate biweekly periods
+- ✅ `getCurrentPayPeriod()` calculates start/end dates for current period
+- ✅ Makes 2 API calls (one per week) and combines results
+- ✅ Added to admin.js with style in components.css
+- ✅ Clears when "Reset" or "This Week" clicked
 
 ---
 
@@ -964,7 +969,7 @@ Optional AI tooling integration using MCP servers.
 | REQ-001     | ✅ Complete | Four-tier role system implemented         |
 | REQ-002     | ✅ Complete | All 4 test accounts available             |
 | REQ-003     | 📋 Planned  | New feature                               |
-| REQ-004     | 📋 Planned  | Admin dashboard enhancement               |
+| REQ-004     | ✅ Complete | Pay period filter button + display        |
 | REQ-005     | ✅ Complete | "This Week" quick filter button           |
 | REQ-006     | 📋 Planned  | New workflow                              |
 | REQ-007     | ✅ Complete | Column totals added to admin grid         |

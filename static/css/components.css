@@ -246,6 +246,16 @@
   min-width: 150px;
 }
 
+/* REQ-004: Pay Period Display */
+.pay-period-display {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
 /* ============================================
    Timesheets Grid
    ============================================ */

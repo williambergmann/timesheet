@@ -2,7 +2,7 @@
 endblock %} {% block extra_css %}
 <link
   rel="stylesheet"
-  href="{{ url_for('static', filename='css/components.css') }}?v=20260108p4"
+  href="{{ url_for('static', filename='css/components.css') }}?v=20260108p5"
 />
 {% endblock %} {% block content %}
 <div class="app-container">
@@ -660,6 +660,14 @@ endblock %} {% block extra_css %}
             >
               📅 This Week
             </button>
+            <button
+              class="btn btn-ghost btn-sm"
+              id="admin-pay-period-btn"
+              title="Filter to current pay period (biweekly)"
+            >
+              💵 Pay Period
+            </button>
+            <span id="pay-period-display" class="pay-period-display" style="display: none;"></span>
           </div>
           <div class="filter-group">
             <button
@@ -700,7 +708,7 @@ endblock %} {% block extra_css %}
 </script>
 <script src="{{ url_for('static', filename='js/api.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/timesheet.js') }}?v=20260108p7"></script>
-<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p5"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260108p6"></script>
 <script src="{{ url_for('static', filename='js/sse.js') }}?v=20260106p1"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20260107p1"></script>
 {% endblock %}
