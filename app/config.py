@@ -66,6 +66,16 @@ class Config:
     # Redis
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
+    # Rate limiting (REQ-042)
+    # Use Redis as rate limit storage backend
+    RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    RATELIMIT_STRATEGY = "fixed-window"  # Simple fixed window counting
+    RATELIMIT_HEADERS_ENABLED = True  # Send X-RateLimit-* headers in responses
+    # Auth endpoint limits (per IP): 10 requests per minute
+    RATELIMIT_AUTH_LIMIT = os.environ.get("RATELIMIT_AUTH_LIMIT", "10 per minute")
+    # API limits (per IP): 30 requests per minute
+    RATELIMIT_API_LIMIT = os.environ.get("RATELIMIT_API_LIMIT", "30 per minute")
+
     # Application URL (for SMS notification links)
     APP_URL = os.environ.get("APP_URL", "http://localhost/app")
 
@@ -102,3 +112,13 @@ class TestingConfig(Config):
 
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    
+    # Disable CSRF in testing to simplify test requests
+    WTF_CSRF_ENABLED = False
+    
+    # Rate limiting for tests (use memory storage, not Redis)
+    RATELIMIT_STORAGE_URI = "memory://"
+    # Stricter limits for testing (easy to trigger)
+    RATELIMIT_AUTH_LIMIT = "3 per minute"
+    RATELIMIT_API_LIMIT = "5 per minute"
+

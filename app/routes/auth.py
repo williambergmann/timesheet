@@ -2,10 +2,12 @@
 Authentication Routes
 
 Microsoft 365 / MSAL authentication endpoints.
+Rate limited to prevent brute-force attacks (REQ-042).
 """
 
 from flask import Blueprint, redirect, url_for, session, request, current_app
 import msal
+from ..extensions import limiter
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -45,6 +47,7 @@ def _get_auth_url():
 
 
 @auth_bp.route("/login")
+@limiter.limit(lambda: current_app.config.get("RATELIMIT_AUTH_LIMIT", "10 per minute"))
 def login():
     """
     Initiate Microsoft 365 login flow.
@@ -89,6 +92,7 @@ def login():
 
 
 @auth_bp.route("/callback")
+@limiter.limit("20 per minute")  # Slightly higher limit for OAuth flow
 def callback():
     """
     Handle OAuth callback from Microsoft.
@@ -169,6 +173,7 @@ def logout():
 
 
 @auth_bp.route("/dev-login", methods=["POST"])
+@limiter.limit(lambda: current_app.config.get("RATELIMIT_AUTH_LIMIT", "10 per minute"))
 def dev_login():
     """
     Development login with username/password.
@@ -257,6 +262,7 @@ def dev_login():
 
 
 @auth_bp.route("/me")
+@limiter.limit(lambda: current_app.config.get("RATELIMIT_API_LIMIT", "30 per minute"))
 def me():
     """
     Get current user info.

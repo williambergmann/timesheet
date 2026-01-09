@@ -1035,9 +1035,11 @@ Optional AI tooling integration using Model Context Protocol (MCP) servers. This
 
 ## Production Hardening (from CHECKIN.md Analysis)
 
-### REQ-042: Rate Limiting on Auth Endpoints (P1)
+### REQ-042: Rate Limiting on Auth Endpoints (P1) ✅
 
 Protect authentication endpoints from brute-force attacks.
+
+**Status: ✅ IMPLEMENTED (January 9, 2026)**
 
 **Required Behavior:**
 
@@ -1046,11 +1048,27 @@ Protect authentication endpoints from brute-force attacks.
 - Return 429 Too Many Requests after threshold
 - Log rate limit violations
 
-**Implementation Notes:**
+**Implementation:**
 
-- Suggested limits: 10 requests/minute for login, 30 requests/minute for API
-- Consider IP-based + user-based limiting
-- See [SECURITY.md](SECURITY.md) for additional guidance
+- ✅ Added Flask-Limiter>=3.5.0 to requirements.txt
+- ✅ Configured limiter extension in `app/extensions.py`
+- ✅ Rate limits applied to auth endpoints in `app/routes/auth.py`
+- ✅ Custom 429 error handler with JSON responses for API endpoints
+- ✅ Rate limit headers (X-RateLimit-\*) enabled in responses
+- ✅ Configurable via environment variables:
+  - `RATELIMIT_AUTH_LIMIT`: Auth endpoints (default: 10/minute)
+  - `RATELIMIT_API_LIMIT`: API endpoints (default: 30/minute)
+- ✅ Redis backend for production (memory for tests)
+- ✅ Rate limit violations logged with IP and path
+
+**Rate Limits Applied:**
+
+| Endpoint          | Limit  | Purpose                        |
+| ----------------- | ------ | ------------------------------ |
+| `/auth/login`     | 10/min | Prevent login brute-force      |
+| `/auth/dev-login` | 10/min | Prevent dev auth abuse         |
+| `/auth/callback`  | 20/min | OAuth callback (higher margin) |
+| `/auth/me`        | 30/min | API-level rate limiting        |
 
 ---
 
@@ -1156,54 +1174,54 @@ Add end-to-end browser tests for critical user flows.
 
 ## ✅ Implementation Status
 
-| Requirement | Status      | Notes                                     |
-| ----------- | ----------- | ----------------------------------------- |
-| REQ-001     | ✅ Complete | Four-tier role system implemented         |
-| REQ-002     | ✅ Complete | All 4 test accounts available             |
-| REQ-003     | 📋 Planned  | New feature                               |
-| REQ-004     | ✅ Complete | Pay period filter button + display        |
-| REQ-005     | ✅ Complete | "This Week" quick filter button           |
-| REQ-006     | 📋 Planned  | New workflow                              |
-| REQ-007     | ✅ Complete | Column totals added to admin grid         |
-| REQ-008     | ✅ Complete | Row totals added to all grid views        |
-| REQ-009     | ✅ Complete | Auto-fill 8h works for any hour type      |
-| REQ-010     | 📋 Planned  | SharePoint integration                    |
-| REQ-011     | 📋 Planned  | Email service                             |
-| REQ-012     | 📋 Planned  | Teams bot                                 |
-| REQ-013     | ✅ Complete | Dropdown filters by user role             |
-| REQ-014     | ✅ Complete | Submit without attachment (with warning)  |
-| REQ-015     | 📋 Planned  | Azure AD integration                      |
-| REQ-016     | ✅ Complete | Auto-redirect to /app after login         |
-| REQ-017     | ✅ Complete | 4 quick-login buttons on login page       |
-| REQ-018     | ✅ Complete | Hour type filter dropdown on admin dash   |
-| REQ-019     | 📋 Planned  | Export format options                     |
-| REQ-020     | ✅ Complete | Travel ✈️ and expense 💰 badges on cards  |
-| REQ-021     | 📋 Planned  | Per-option reimbursement attachments      |
-| REQ-022     | ✅ Complete | Holiday indicators + entry warning        |
-| REQ-023     | ✅ Complete | Read-only submitted timesheets            |
-| REQ-024     | ✅ Complete | Travel mileage tracking & details         |
-| REQ-025     | ✅ Complete | Expanded expense type dropdown            |
-| REQ-026     | ✅ Complete | Expense amount validation ($null fix)     |
-| REQ-027     | ✅ Complete | "Has expenses" expense details section    |
-| REQ-028     | ✅ Complete | Multiple reimbursement line items         |
-| REQ-029     | ✅ Complete | Production DB lifecycle (migrations only) |
-| REQ-030     | ✅ Partial  | Auth/session hardening                    |
-| REQ-031     | ✅ Complete | CSRF protection for mutating endpoints    |
-| REQ-032     | 📋 Planned  | Security baseline & audit checklist       |
-| REQ-033     | 📋 Planned  | Attachment storage strategy               |
-| REQ-034     | 📋 Planned  | Background jobs & scheduled notifications |
-| REQ-035     | 📋 Planned  | API validation & error handling           |
-| REQ-036     | 📋 Planned  | Observability & metrics                   |
-| REQ-037     | 📋 Planned  | Testing coverage & gaps                   |
-| REQ-038     | 📋 Planned  | UX & accessibility backlog                |
-| REQ-039     | 📋 Planned  | PowerApps data report view                |
-| REQ-040     | � Deferred  | MCP tooling integration (not used)        |
-| REQ-041     | ✅ Complete | Support dashboard for trainee approvals   |
-| REQ-042     | 📋 Planned  | Rate limiting on auth endpoints           |
-| REQ-043     | ✅ Complete | Health check endpoint                     |
-| REQ-044     | 📋 Planned  | Frontend modularization (split JS)        |
-| REQ-045     | 📋 Planned  | Backup/restore documentation              |
-| REQ-046     | 📋 Planned  | E2E tests with Playwright                 |
+| Requirement | Status      | Notes                                           |
+| ----------- | ----------- | ----------------------------------------------- |
+| REQ-001     | ✅ Complete | Four-tier role system implemented               |
+| REQ-002     | ✅ Complete | All 4 test accounts available                   |
+| REQ-003     | 📋 Planned  | New feature                                     |
+| REQ-004     | ✅ Complete | Pay period filter button + display              |
+| REQ-005     | ✅ Complete | "This Week" quick filter button                 |
+| REQ-006     | 📋 Planned  | New workflow                                    |
+| REQ-007     | ✅ Complete | Column totals added to admin grid               |
+| REQ-008     | ✅ Complete | Row totals added to all grid views              |
+| REQ-009     | ✅ Complete | Auto-fill 8h works for any hour type            |
+| REQ-010     | 📋 Planned  | SharePoint integration                          |
+| REQ-011     | 📋 Planned  | Email service                                   |
+| REQ-012     | 📋 Planned  | Teams bot                                       |
+| REQ-013     | ✅ Complete | Dropdown filters by user role                   |
+| REQ-014     | ✅ Complete | Submit without attachment (with warning)        |
+| REQ-015     | 📋 Planned  | Azure AD integration                            |
+| REQ-016     | ✅ Complete | Auto-redirect to /app after login               |
+| REQ-017     | ✅ Complete | 4 quick-login buttons on login page             |
+| REQ-018     | ✅ Complete | Hour type filter dropdown on admin dash         |
+| REQ-019     | 📋 Planned  | Export format options                           |
+| REQ-020     | ✅ Complete | Travel ✈️ and expense 💰 badges on cards        |
+| REQ-021     | 📋 Planned  | Per-option reimbursement attachments            |
+| REQ-022     | ✅ Complete | Holiday indicators + entry warning              |
+| REQ-023     | ✅ Complete | Read-only submitted timesheets                  |
+| REQ-024     | ✅ Complete | Travel mileage tracking & details               |
+| REQ-025     | ✅ Complete | Expanded expense type dropdown                  |
+| REQ-026     | ✅ Complete | Expense amount validation ($null fix)           |
+| REQ-027     | ✅ Complete | "Has expenses" expense details section          |
+| REQ-028     | ✅ Complete | Multiple reimbursement line items               |
+| REQ-029     | ✅ Complete | Production DB lifecycle (migrations only)       |
+| REQ-030     | ✅ Partial  | Auth/session hardening                          |
+| REQ-031     | ✅ Complete | CSRF protection for mutating endpoints          |
+| REQ-032     | 📋 Planned  | Security baseline & audit checklist             |
+| REQ-033     | 📋 Planned  | Attachment storage strategy                     |
+| REQ-034     | 📋 Planned  | Background jobs & scheduled notifications       |
+| REQ-035     | 📋 Planned  | API validation & error handling                 |
+| REQ-036     | 📋 Planned  | Observability & metrics                         |
+| REQ-037     | 📋 Planned  | Testing coverage & gaps                         |
+| REQ-038     | 📋 Planned  | UX & accessibility backlog                      |
+| REQ-039     | 📋 Planned  | PowerApps data report view                      |
+| REQ-040     | � Deferred  | MCP tooling integration (not used)              |
+| REQ-041     | ✅ Complete | Support dashboard for trainee approvals         |
+| REQ-042     | ✅ Complete | Rate limiting on auth endpoints (Flask-Limiter) |
+| REQ-043     | ✅ Complete | Health check endpoint                           |
+| REQ-044     | 📋 Planned  | Frontend modularization (split JS)              |
+| REQ-045     | 📋 Planned  | Backup/restore documentation                    |
+| REQ-046     | 📋 Planned  | E2E tests with Playwright                       |
 
 ---
 

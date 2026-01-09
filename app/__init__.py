@@ -6,9 +6,9 @@ Replaces PowerApps solution with modern web stack.
 """
 
 import os
-from flask import Flask
+from flask import Flask, jsonify, request
 from .config import Config
-from .extensions import db, migrate, csrf
+from .extensions import db, migrate, csrf, limiter
 
 
 def create_app(config_class=Config):
@@ -35,6 +35,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)  # REQ-031: CSRF protection for mutating endpoints
+    limiter.init_app(app)  # REQ-042: Rate limiting on auth endpoints
 
     # Register blueprints
     from .routes.auth import auth_bp
@@ -66,4 +67,21 @@ def create_app(config_class=Config):
         # response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
+    # REQ-042: Rate limit exceeded handler
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        """Handle rate limit exceeded errors."""
+        app.logger.warning(
+            f"Rate limit exceeded: {request.remote_addr} on {request.path}"
+        )
+        # Return JSON for API endpoints, HTML for web endpoints
+        if request.path.startswith("/api/") or request.path.startswith("/auth/"):
+            return jsonify({
+                "error": "Too many requests",
+                "message": "Rate limit exceeded. Please try again later.",
+                "retry_after": e.description if hasattr(e, "description") else None
+            }), 429
+        return "Too many requests. Please try again later.", 429
+
     return app
+
