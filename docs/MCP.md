@@ -94,6 +94,45 @@ change.
 
 ---
 
+## 🧩 UI Rerun Models + MCP (Local Agent UX Pattern)
+
+Some UI frameworks rerun the app script on each interaction, which breaks MCP's
+need for a persistent, stateful connection. The recommended pattern is to keep
+the MCP connection out of the UI loop and use the Docker MCP Gateway as a
+long-lived hub.
+
+**Key points:**
+
+- Avoid `stdio` transport for rerun-based UIs; prefer SSE (HTTP) to decouple the UI
+  lifecycle from the MCP session.
+- Run the Gateway as a daemon and connect to it as a client from the UI.
+- Keep the MCP session in a background worker (thread + asyncio loop) and
+  communicate with the UI via queues.
+- Use a periodic polling/fragment-style update loop to read output without
+  re-initializing the MCP client on every interaction.
+
+**Gateway (SSE) startup example:**
+
+```bash
+docker mcp gateway run --port 8080 --transport sse
+```
+
+**Recommended architecture:**
+
+- UI thread: render UI, enqueue tool requests.
+- Worker thread: maintain persistent `ClientSession`, execute MCP tool calls,
+  push results to output queue.
+- UI fragment: poll output queue and update a log/chat panel.
+
+**Why it matters:**
+
+- Dynamic tools (`mcp-add`) can be added mid-session and reflected in the UI.
+- Tool failures are isolated from the Streamlit UI process.
+- Secrets and credentials remain managed by the Gateway rather than embedded in
+  the Streamlit app.
+
+---
+
 ## 🚀 Recommended MCP Servers
 
 ### Priority 1: High Value for This App
