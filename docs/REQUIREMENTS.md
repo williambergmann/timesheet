@@ -1446,7 +1446,7 @@ Add end-to-end browser tests for critical user flows.
 | ----------- | ----------- | ----------------------------------------------- |
 | REQ-001     | ✅ Complete | Four-tier role system implemented               |
 | REQ-002     | ✅ Complete | All 4 test accounts available                   |
-| REQ-003     | 📋 Planned  | User notification preferences + settings page   |
+| REQ-003     | ✅ Complete | User notification preferences + settings page   |
 | REQ-004     | ✅ Complete | Pay period filter button + display              |
 | REQ-005     | ✅ Complete | "This Week" quick filter button                 |
 | REQ-006     | ✅ Complete | Pay period confirmation + payroll export        |
