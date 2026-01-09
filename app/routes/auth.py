@@ -156,8 +156,6 @@ def callback():
         user.display_name = display_name
         if user.notification_emails is None:
             user.notification_emails = [email]
-        elif email not in user.notification_emails:
-            user.notification_emails = [email] + user.notification_emails
         db.session.commit()
 
     # Store user in session
@@ -259,8 +257,6 @@ def dev_login():
         user.display_name = account["display_name"]
         if user.notification_emails is None:
             user.notification_emails = [email]
-        elif email not in user.notification_emails:
-            user.notification_emails = [email] + user.notification_emails
         db.session.commit()
     
     # Store user in session

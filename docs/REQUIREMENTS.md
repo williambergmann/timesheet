@@ -1329,4 +1329,4 @@ Add end-to-end browser tests for critical user flows.
 
 ---
 
-_Document updated January 9, 2026_
+_Document updated January 10, 2026_

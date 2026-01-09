@@ -147,6 +147,27 @@ const SettingsModule = (() => {
                 state.teamsAccount = teamsInput.value.trim().toLowerCase();
             }
 
+            if (state.emailOptIn && state.emails.length === 0) {
+                if (typeof showToast === 'function') {
+                    showToast('Add at least one email address for notifications', 'warning');
+                }
+                return;
+            }
+
+            if (state.smsOptIn && state.phones.length === 0) {
+                if (typeof showToast === 'function') {
+                    showToast('Add at least one phone number for SMS notifications', 'warning');
+                }
+                return;
+            }
+
+            if (state.teamsOptIn && !state.teamsAccount) {
+                if (typeof showToast === 'function') {
+                    showToast('Connect a Teams account before enabling notifications', 'warning');
+                }
+                return;
+            }
+
             const payload = {
                 notification_emails: state.emails,
                 notification_phones: state.phones,

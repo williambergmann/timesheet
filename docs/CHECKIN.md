@@ -2,7 +2,7 @@
 
 > **Purpose:** Candid assessment of project risks, technical debt, and improvement priorities.
 >
-> **Last Updated:** January 8, 2026
+> **Last Updated:** January 9, 2026
 
 ---
 
@@ -110,7 +110,7 @@
 
 - **API contract**: No OpenAPI/Swagger spec for frontend developers
 - **State machine**: Timesheet status transitions undocumented
-- **Error codes**: No standard error response format
+- ~~**Error codes**: No standard error response format~~ ✅ Implemented in REQ-035
 
 ---
 
@@ -178,13 +178,13 @@
 
 ### Quick Wins (High Impact, Low Effort):
 
-| Improvement                                  | Effort   | Impact    | Notes                                      |
-| -------------------------------------------- | -------- | --------- | ------------------------------------------ |
-| **Add Playwright E2E tests for happy paths** | 2-3 days | 🟢 High   | Catch regressions in critical flows        |
-| **Split `timesheet.js` into modules**        | 1-2 days | 🟢 High   | Easier debugging, parallel development     |
-| **Add API response standardization**         | 1 day    | 🟢 High   | Consistent error handling frontend/backend |
-| **Containerize test database**               | 0.5 day  | 🟡 Medium | Faster CI, isolated test runs              |
-| **Add health check endpoint**                | 0.5 day  | 🟡 Medium | Load balancer integration, monitoring      |
+| Improvement                                      | Effort       | Impact        | Notes                                         |
+| ------------------------------------------------ | ------------ | ------------- | --------------------------------------------- |
+| ~~**Add Playwright E2E tests for happy paths**~~ | ~~2-3 days~~ | ~~🟢 High~~   | ✅ Done (REQ-046) - 29 tests passing          |
+| **Split `timesheet.js` into modules**            | 1-2 days     | 🟢 High       | Easier debugging, parallel development        |
+| ~~**Add API response standardization**~~         | ~~1 day~~    | ~~🟢 High~~   | ✅ Done (REQ-035) - errors.py + validation.py |
+| **Containerize test database**                   | 0.5 day      | 🟡 Medium     | Faster CI, isolated test runs                 |
+| ~~**Add health check endpoint**~~                | ~~0.5 day~~  | ~~🟡 Medium~~ | ✅ Done (REQ-043) - /health endpoint          |
 
 ### Medium-Term Wins:
 
@@ -197,25 +197,25 @@
 
 ### Production Blockers:
 
-| Blocker                                        | Severity    | Status                 | Path to Resolution                  |
-| ---------------------------------------------- | ----------- | ---------------------- | ----------------------------------- |
-| **Attachment storage on container filesystem** | 🔴 Critical | Planned (REQ-033)      | Migrate to S3/R2                    |
-| **No horizontal scaling**                      | 🔴 Critical | Blocked by attachments | Object storage + stateless sessions |
-| **Synchronous notifications**                  | 🟠 High     | Planned (REQ-034)      | Add RQ/Celery                       |
-| **Limited test coverage on critical paths**    | 🟠 High     | 74% coverage           | Add route + JS tests                |
-| **No structured logging**                      | 🟡 Medium   | Planned (REQ-036)      | Add JSON logging + request IDs      |
-| **No rate limiting**                           | 🟡 Medium   | Not started            | Add Flask-Limiter                   |
-| **No backup/restore procedure**                | 🟠 High     | Not documented         | Document pg_dump process            |
-| **Azure AD not fully validated**               | 🟡 Medium   | Partial                | Complete REQ-015, REQ-030           |
+| Blocker                                         | Severity      | Status                    | Path to Resolution                  |
+| ----------------------------------------------- | ------------- | ------------------------- | ----------------------------------- |
+| **Attachment storage on container filesystem**  | 🔴 Critical   | Planned (REQ-033)         | Migrate to S3/R2                    |
+| **No horizontal scaling**                       | 🔴 Critical   | Blocked by attachments    | Object storage + stateless sessions |
+| **Synchronous notifications**                   | 🟠 High       | Planned (REQ-034)         | Add RQ/Celery                       |
+| ~~**Limited test coverage on critical paths**~~ | ~~🟠 High~~   | ✅ **Improved**           | E2E tests (29) + unit tests added   |
+| ~~**No structured logging**~~                   | ~~🟡 Medium~~ | ✅ **Complete (REQ-036)** | JSON logging + request IDs          |
+| ~~**No rate limiting**~~                        | ~~🟡 Medium~~ | ✅ **Complete (REQ-042)** | Flask-Limiter on auth endpoints     |
+| ~~**No backup/restore procedure**~~             | ~~🟠 High~~   | ✅ **Complete (REQ-045)** | BACKUP.md with full procedures      |
+| **Azure AD not fully validated**                | 🟡 Medium     | Partial                   | Complete REQ-015, REQ-030           |
 
 ### Production Readiness Checklist:
 
 - [ ] Attachments on object storage
 - [ ] Background job queue operational
-- [ ] 90%+ test coverage on routes
-- [ ] Structured logging with request tracing
-- [ ] Rate limiting on auth endpoints
-- [ ] Documented backup/restore
+- [x] ~~90%+ test coverage on routes~~ E2E tests + improved unit tests
+- [x] Structured logging with request tracing (REQ-036)
+- [x] Rate limiting on auth endpoints (REQ-042)
+- [x] Documented backup/restore (REQ-045)
 - [ ] Load testing completed
 - [ ] Security audit passed (REQ-032)
 
@@ -231,4 +231,4 @@
 
 ---
 
-_Document created January 8, 2026_
+_Document created January 8, 2026, updated January 9, 2026_

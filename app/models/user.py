@@ -155,17 +155,15 @@ class User(db.Model):
 
     def get_notification_emails(self):
         """Get list of notification emails with primary email fallback."""
-        emails = list(self.notification_emails or [])
-        if self.email and self.email not in emails:
-            emails.insert(0, self.email)
-        return emails
+        if self.notification_emails is not None:
+            return list(self.notification_emails)
+        return [self.email] if self.email else []
 
     def get_notification_phones(self):
         """Get list of notification phones with primary phone fallback."""
-        phones = list(self.notification_phones or [])
-        if self.phone and self.phone not in phones:
-            phones.insert(0, self.phone)
-        return phones
+        if self.notification_phones is not None:
+            return list(self.notification_phones)
+        return [self.phone] if self.phone else []
 
     def to_dict(self):
         """Serialize user to dictionary."""
