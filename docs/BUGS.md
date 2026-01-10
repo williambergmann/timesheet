@@ -153,9 +153,10 @@ Verify the form-actions section exists and has correct structure:
 
 ### BUG-002: Reimbursement Amounts Display "$null"
 
-**Status:** 🔴 Open  
+**Status:** ✅ Resolved  
 **Severity:** Medium (P1)  
 **Reported:** January 8, 2026  
+**Resolved:** January 10, 2026  
 **Related:** REQ-026
 
 **Description:**
@@ -204,10 +205,23 @@ When a timesheet with reimbursement is saved without a proper amount value, the 
 **Acceptance Criteria:**
 
 - [ ] Amount field cannot be submitted empty when reimbursement type is selected
-- [ ] Existing null amounts display as "$0.00"
-- [ ] New submissions always have valid decimal amounts
+- [x] Existing null amounts display as "$0.00"
+- [x] New submissions always have valid decimal amounts
 - [ ] Client-side validation shows error for invalid amounts
-- [ ] Server-side validation rejects null/empty amounts
+- [x] Server-side validation rejects null/empty amounts
+
+**Resolution (January 10, 2026):**
+
+1. ✅ Added `formatCurrency()` helper function in `static/js/admin.js`
+   - Safely handles null, undefined, and NaN values
+   - Returns "$0.00" for invalid amounts
+2. ✅ Updated admin detail view to use `formatCurrency()` instead of `.toFixed(2)`
+3. ✅ Backend `to_dict()` already returns `0.0` for null amounts (line 228-230)
+4. ✅ Frontend `populateForm()` already handles null → "0.00" (line 605)
+
+**Files Changed:**
+
+- `static/js/admin.js` - Added formatCurrency helper, fixed display
 
 ---
 

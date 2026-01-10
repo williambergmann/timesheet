@@ -27,6 +27,19 @@ function formatExpenseType(type) {
     return `${icon} ${type}`;
 }
 
+/**
+ * BUG-002 Fix: Safely format currency amounts.
+ * Returns "$0.00" for null, undefined, or invalid values.
+ * @param {number|null|undefined} amount - The amount to format
+ * @returns {string} Formatted currency string (e.g., "$45.00")
+ */
+function formatCurrency(amount) {
+    if (amount === null || amount === undefined || isNaN(amount)) {
+        return '$0.00';
+    }
+    return `$${Number(amount).toFixed(2)}`;
+}
+
 function escapeHtml(value) {
     return String(value || '').replace(/[&<>"']/g, (char) => ({
         '&': '&amp;',
@@ -572,7 +585,7 @@ function showAdminTimesheetDetail(timesheet) {
                     ${timesheet.reimbursement_needed ? `
                         <div class="detail-item">
                             <label>Reimbursement</label>
-                            <span class="value">${formatExpenseType(timesheet.reimbursement_type)}: $${timesheet.reimbursement_amount.toFixed(2)}</span>
+                            <span class="value">${formatExpenseType(timesheet.reimbursement_type)}: ${formatCurrency(timesheet.reimbursement_amount)}</span>
                         </div>
                     ` : ''}
                 </div>

@@ -89,10 +89,10 @@ REQ-015 (Azure AD) code is fully implemented. Production validation requires rea
 
 **🐛 Bugs To Fix Today:**
 
-| Bug ID  | Severity | Description                           | Status     |
-| ------- | -------- | ------------------------------------- | ---------- |
-| BUG-002 | P1       | Reimbursement amounts display "$null" | 🔧 Fix Now |
-| BUG-003 | P0       | Dev login causes duplicate key error  | 🔍 Verify  |
+| Bug ID  | Severity | Description                           | Status      |
+| ------- | -------- | ------------------------------------- | ----------- |
+| BUG-002 | P1       | Reimbursement amounts display "$null" | ✅ Complete |
+| BUG-003 | P0       | Dev login causes duplicate key error  | 🔍 Verify   |
 
 **🔒 Security Tasks Today:**
 
