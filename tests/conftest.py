@@ -62,6 +62,7 @@ def sample_user(app):
             "email": user.email,
             "display_name": user.display_name,
             "is_admin": user.is_admin,
+            "role": "staff",
         }
 
 
@@ -86,6 +87,7 @@ def sample_admin(app):
             "email": admin.email,
             "display_name": admin.display_name,
             "is_admin": admin.is_admin,
+            "role": "admin",
         }
 
 

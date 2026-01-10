@@ -112,7 +112,7 @@ class TestSendSMS:
             app.config["TWILIO_PHONE_NUMBER"] = "+15551234567"
             
             # Mock the Twilio client
-            with patch("app.utils.sms.Client") as MockClient:
+            with patch("twilio.rest.Client") as MockClient:
                 mock_client = MagicMock()
                 mock_message = MagicMock()
                 mock_message.sid = "SM123456"
@@ -137,7 +137,7 @@ class TestSendSMS:
             app.config["TWILIO_PHONE_NUMBER"] = "+15551234567"
             
             # Mock the Twilio client to raise an exception
-            with patch("app.utils.sms.Client") as MockClient:
+            with patch("twilio.rest.Client") as MockClient:
                 from twilio.base.exceptions import TwilioRestException
                 mock_client = MagicMock()
                 mock_client.messages.create.side_effect = TwilioRestException(

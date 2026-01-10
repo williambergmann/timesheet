@@ -71,7 +71,7 @@ def list_timesheets():
         TimesheetStatus.APPROVED,
         TimesheetStatus.NEEDS_APPROVAL,
     ]:
-        query = query.filter_by(status=status)
+        query = query.filter(Timesheet.status == status)
 
     # Filter by user
     user_id = request.args.get("user_id")
