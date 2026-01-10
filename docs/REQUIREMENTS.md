@@ -86,6 +86,11 @@
    - Verify Microsoft login works with real Azure credentials
    - Test user provisioning flow in staging environment
 
+3. **REQ-005: Current Week Filter** (P1)
+
+   - Add "This Week" quick filter on admin dashboard
+   - Works alongside pay period filter (REQ-004)
+
 **Completed Today:**
 
 | Requirement | Description                 | Status      |
