@@ -73,30 +73,23 @@
 
 ### 🚀 January 10, 2026 - Start Here
 
-**Carryover from January 9:**
+**Open Items:**
 
-1. **REQ-033: Attachment Storage Strategy** (High Impact)
-
-   - Decide S3/R2 vs SharePoint for production storage
-   - Unblocks horizontal scaling
-   - REQ-010 implemented SharePoint sync; confirm if additional object storage needed
-
-2. **REQ-015: Azure AD Integration** (P0 - Production Validation)
+1. **REQ-015: Azure AD Integration** (P0 - Production Validation)
 
    - Verify Microsoft login works with real Azure credentials
    - Test user provisioning flow in staging environment
 
-3. **REQ-005: Current Week Filter** (P1)
-
-   - Add "This Week" quick filter on admin dashboard
-   - Works alongside pay period filter (REQ-004)
-
 **Completed Today:**
 
-| Requirement | Description                 | Status      |
-| ----------- | --------------------------- | ----------- |
-| —           | Fix 26 failing tests        | ✅ Complete |
-| —           | Email service documentation | ✅ Complete |
+| Requirement | Description                                         | Status      |
+| ----------- | --------------------------------------------------- | ----------- |
+| REQ-033     | Attachment Storage Strategy (already in storage.py) | ✅ Complete |
+| REQ-005     | Current Week Filter (already implemented)           | ✅ Complete |
+| —           | Fix 26 failing tests                                | ✅ Complete |
+| —           | Email service documentation                         | ✅ Complete |
+
+---
 
 ## 🎯 Priority Legend
 
@@ -221,23 +214,24 @@ Add ability to filter timesheets by current pay period (biweekly).
 
 ---
 
-### REQ-005: Current Week Filter (P1)
+### REQ-005: Current Week Filter (P1) ✅
 
 Add quick filter for current week's timesheets or the current pay period (biweekly).
 
-**Status: 📋 Planned**
+**Status: ✅ IMPLEMENTED (January 2026)**
 
 **Features:**
 
-- "This Week" quick filter button on admin dashboard
-- Shows only timesheets with `week_start` = current Sunday
-- Works alongside pay period filter (REQ-004)
+- ✅ "This Week" quick filter button on admin dashboard
+- ✅ Shows only timesheets with `week_start` = current Sunday
+- ✅ Works alongside pay period filter (REQ-004)
 
 **Implementation:**
 
-- `getWeekStart()` calculates current week's Sunday
-- Filter button in admin dashboard toolbar
-- Clears when "Reset" clicked
+- ✅ Button in `templates/index.html` (id: `admin-this-week-btn`)
+- ✅ Handler in `static/js/admin.js` calculates current week's Sunday
+- ✅ Clears pay period filter when activated
+- ✅ Shows toast notification with week range
 
 ---
 
