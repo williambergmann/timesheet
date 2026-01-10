@@ -227,9 +227,10 @@ When a timesheet with reimbursement is saved without a proper amount value, the 
 
 ### BUG-003: Dev Login Causes Duplicate Key Error
 
-**Status:** 🔴 Open  
+**Status:** ✅ Resolved  
 **Severity:** High (P0)  
 **Reported:** January 8, 2026  
+**Resolved:** January 10, 2026 (verified - fix was already in place)  
 **Related:** REQ-015, REQ-030
 
 **Description:**
@@ -249,62 +250,35 @@ DETAIL: Key (azure_id)=(dev-user-001) already exists.
 2. Log in as any dev user (Admin, Support, etc.)
 3. Log out
 4. Try to log in again with any dev user
-5. **Error:** Internal Server Error
+5. **Expected (now fixed):** Login succeeds without error
 
 **Root Cause:**
 
-The dev authentication bypass in `app/routes/auth.py` always tries to INSERT a new user instead of checking if the user already exists. The code should use a "get or create" pattern.
+The dev authentication bypass in `app/routes/auth.py` originally always tried to INSERT a new user instead of checking if the user already exists.
 
-**Affected Files:**
+**Fix Applied:**
 
-- `app/routes/auth.py` - Dev authentication bypass logic
+All three authentication routes now use the "get-or-create" pattern:
 
-**Current Code (Problematic):**
-
-```python
-# Creates a new user every time, causing duplicate key error
-user = User(
-    azure_id='dev-user-001',
-    email='dev@localhost',
-    display_name='Development User',
-    ...
-)
-db.session.add(user)
-db.session.commit()
-```
-
-**Fix Required:**
-
-```python
-# Check if user exists first, only create if missing
-user = User.query.filter_by(azure_id='dev-user-001').first()
-if not user:
-    user = User(
-        azure_id='dev-user-001',
-        email='dev@localhost',
-        display_name='Development User',
-        ...
-    )
-    db.session.add(user)
-    db.session.commit()
-```
-
-**Workaround (until fixed):**
-
-Reset the database to clear duplicate users:
-
-```bash
-cd docker
-docker compose down -v
-docker compose up --build -d
-```
+1. `/auth/login` (lines 66-78): Checks `azure_id` then `email` before creating
+2. `/auth/dev-login` (lines 248-261): Checks `email` before creating
+3. `/auth/callback` (lines 142-161): Checks `azure_id` before creating
 
 **Acceptance Criteria:**
 
-- [ ] Dev users can log in multiple times without error
-- [ ] Existing dev users are retrieved, not duplicated
-- [ ] Same fix applied to MSAL callback for Azure users
-- [ ] No unique constraint violations on repeated logins
+- [x] Dev users can log in multiple times without error
+- [x] Existing dev users are retrieved, not duplicated
+- [x] Same fix applied to MSAL callback for Azure users
+- [x] No unique constraint violations on repeated logins
+
+**Verification (January 10, 2026):**
+
+Browser testing confirmed:
+
+1. First login as Admin → Success
+2. Logout → Success
+3. Second login as Admin → Success (no duplicate key error)
+4. App dashboard loads correctly with "Admin User" displayed
 
 ---
 
