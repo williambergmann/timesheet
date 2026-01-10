@@ -4,7 +4,7 @@
 >
 > **Source:** Design decisions captured in [DESIGN.md](DESIGN.md), plus roadmap/security/testing notes in `docs/`
 >
-> **Last Updated:** January 8, 2026
+> **Last Updated:** January 10, 2026
 
 ---
 
@@ -36,38 +36,38 @@
 
 ---
 
-### 🚀 January 9, 2026 - Start Here
+### ✅ January 9, 2026 - Completed
 
-**Recommended Priority Order:**
+**Recommended Priority Order (ALL COMPLETED):**
 
-1. **REQ-043: Health Check Endpoint** (Quick Win - ~30 min)
+1. ✅ **REQ-043: Health Check Endpoint** - Added `/health` endpoint
+2. ✅ **BUG-003: Draft Timesheet Buttons** - Fixed, buttons now visible
+3. ✅ **REQ-042: Rate Limiting** - Added Flask-Limiter to auth endpoints
+4. ✅ **REQ-046: E2E Tests** - Set up Playwright with 29 passing tests
 
-   - Add `/health` endpoint for load balancer integration
-   - No auth required, check DB + Redis connectivity
+**Additional Work Completed:**
 
-2. **Verify BUG-003: Draft Timesheet Buttons**
+| Requirement | Description                                 | Status      |
+| ----------- | ------------------------------------------- | ----------- |
+| REQ-003     | User notification preferences UI            | ✅ Complete |
+| REQ-006     | Biweekly pay period confirmation            | ✅ Complete |
+| REQ-010     | SharePoint sync for attachments             | ✅ Complete |
+| REQ-011     | Email notifications (SMTP)                  | ✅ Complete |
+| REQ-012     | Teams bot notifications                     | ✅ Complete |
+| REQ-019     | Export format options (CSV/Excel/PDF)       | ✅ Complete |
+| REQ-021     | Per-option reimbursement attachments        | ✅ Complete |
+| REQ-035     | API validation module                       | ✅ Complete |
+| REQ-036     | Observability/structured logging            | ✅ Complete |
+| REQ-037     | Unit tests (validation, SMS, notifications) | ✅ Complete |
+| REQ-038     | UX and accessibility updates                | ✅ Complete |
+| REQ-039     | Admin data report view                      | ✅ Complete |
+| REQ-044     | Frontend JS modularization                  | ✅ Complete |
+| REQ-045     | Backup/restore documentation                | ✅ Complete |
 
-   - Test that Save Draft / Submit buttons appear on draft timesheets
-   - Fix if broken (see BUGS.md for implementation steps)
+**P0 Items Status:**
 
-3. **REQ-033: Attachment Storage Strategy** (High Impact)
-
-   - Decide S3/R2 vs SharePoint for production storage
-   - Unblocks horizontal scaling
-
-4. **REQ-042: Rate Limiting** (~1-2 hours)
-
-   - Add Flask-Limiter to auth endpoints
-   - Protects against brute force attacks
-
-5. **REQ-046: E2E Tests** (Foundation for future)
-   - Set up Playwright test framework
-   - Add 2-3 happy path tests
-
-**P0 Items Still Open:**
-
-- REQ-030: Auth/session hardening (Partial - needs nonce verification)
-- REQ-015: Azure AD integration (needs production validation)
+- ✅ REQ-030: Auth/session hardening - Complete with nonce verification
+- 🔄 REQ-015: Azure AD integration - Needs production validation
 
 ---
 
