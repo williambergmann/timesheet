@@ -63,7 +63,7 @@ class TestNotificationService:
             
             # Should create a notification
             assert result is not None
-            assert result.notification_type == NotificationType.APPROVED
+            assert result.type == NotificationType.APPROVED
 
     @patch("app.services.notification.send_sms")
     def test_notify_approved_sends_sms(self, mock_send_sms, app, mock_timesheet):
@@ -90,6 +90,7 @@ class TestNotificationService:
             
             # Create user without phone
             user = UserModel(
+                azure_id="no-phone-user-11111",
                 email="no_phone@test.com",
                 display_name="No Phone User",
                 phone=None
@@ -144,7 +145,7 @@ class TestNotificationService:
             result = NotificationService.notify_needs_attention(timesheet)
             
             if result:
-                assert result.notification_type == NotificationType.NEEDS_ATTENTION
+                assert result.type == NotificationType.NEEDS_ATTACHMENT
 
     @patch("app.services.notification.send_sms")
     def test_send_weekly_reminder(self, mock_send_sms, app, sample_user):
@@ -159,7 +160,7 @@ class TestNotificationService:
                 result = NotificationService.send_weekly_reminder(user, date(2024, 1, 7))
                 
                 if result:
-                    assert result.notification_type == NotificationType.REMINDER
+                    assert result.type == NotificationType.REMINDER
 
     @patch("app.services.notification.send_sms")
     def test_notify_unsubmitted(self, mock_send_sms, app, sample_user):
@@ -174,7 +175,7 @@ class TestNotificationService:
                 result = NotificationService.notify_unsubmitted(user, date(2024, 1, 7))
                 
                 if result:
-                    assert result.notification_type == NotificationType.UNSUBMITTED
+                    assert result.type == NotificationType.UNSUBMITTED
 
 
 class TestNotificationMessageContent:
@@ -190,6 +191,7 @@ class TestNotificationMessageContent:
             from app.models import User as UserModel, Timesheet as TimesheetModel
             
             user = UserModel(
+                azure_id="message-test-user-22222",
                 email="message_test@test.com",
                 display_name="Message Test",
                 phone="+15551234567"
@@ -215,7 +217,10 @@ class TestNotificationMessageContent:
             # Message should contain week information
             assert "1/7" in message or "Jan" in message or "approved" in message.lower()
             
-            # Cleanup
+            # Cleanup (delete in correct order due to foreign keys)
+            from app.models import Notification as NotificationModel
+            NotificationModel.query.filter_by(user_id=user.id).delete()
             db.session.delete(timesheet)
             db.session.delete(user)
             db.session.commit()
+
