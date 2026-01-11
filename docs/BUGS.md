@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 Bug Index
+
+| ID                                                              | Title                                        | Status      | Severity | Reported |
+| --------------------------------------------------------------- | -------------------------------------------- | ----------- | -------- | -------- |
+| [BUG-001](#bug-001-submitted-timesheets-allow-editing-)         | Submitted Timesheets Allow Editing           | ✅ Resolved | P0       | Jan 8    |
+| [BUG-002](#bug-002-reimbursement-amounts-display-null)          | Reimbursement Amounts Display "$null"        | ✅ Resolved | P1       | Jan 8    |
+| [BUG-003](#bug-003-dev-login-causes-duplicate-key-error)        | Dev Login Causes Duplicate Key Error         | ✅ Resolved | P0       | Jan 8    |
+| [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) | Draft Timesheets Missing Save/Submit Buttons | ✅ Resolved | P1       | Jan 8    |
+| [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | 🟡 Open     | P2       | Jan 11   |
+
+---
+
 ## 🐛 Active Issues
 
 ### BUG-001: Submitted Timesheets Allow Editing ✅
@@ -66,7 +78,7 @@ When a user views a timesheet they've submitted, the form should be read-only.
 
 ---
 
-### BUG-003: Draft Timesheets Missing Save/Submit Buttons
+### BUG-004: Draft Timesheets Missing Save/Submit Buttons
 
 **Status:** ✅ Resolved  
 **Severity:** Medium (P1)  
@@ -298,7 +310,7 @@ Browser testing confirmed:
 
 ---
 
-### BUG-004: Leading Zero Not Removed from Hour Inputs
+### BUG-005: Leading Zero Not Removed from Hour Inputs
 
 **Status:** 🟡 Open  
 **Severity:** Low (P2)  
@@ -385,6 +397,10 @@ Resolved January 10, 2026. See [BUG-002](#bug-002-reimbursement-amounts-display-
 ### BUG-003: Dev Login Causes Duplicate Key Error
 
 Resolved January 10, 2026 (verified - fix was already in place). See [BUG-003](#bug-003-dev-login-causes-duplicate-key-error) above for details.
+
+### BUG-004: Draft Timesheets Missing Save/Submit Buttons
+
+Resolved January 9, 2026. See [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) above for details.
 
 ---
 
