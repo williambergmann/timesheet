@@ -125,6 +125,14 @@ REQ-015 (Azure AD) code is fully implemented. Production validation requires rea
 - `templates/index.html` - Updated CSS/JS version strings
 - `docs/BUGS.md` - Renumbered bugs, added index table
 - `docs/REQUIREMENTS.md` - Added REQ-047, file references, status updates
+- `tests/test_events.py` - Added SSE endpoint tests (11 tests, all passing)
+- `app/routes/events.py` - Fixed session context bug in SSE generator
+
+**Recently Completed:**
+
+| Task | Priority | Status | Reference |
+| ---- | -------- | ------ | --------- |
+| Add `test_events.py` (SSE tests) | P2 | ✅ Done | Created `tests/test_events.py`, test `app/routes/events.py` SSE endpoints |
 
 **Still Planned:**
 
