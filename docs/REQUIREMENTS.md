@@ -153,16 +153,39 @@ REQ-015 (Azure AD) code is fully implemented. Production validation requires rea
 | `app/routes/main.py`   | 24%    | 97%   | ✅ Done |
 | `app/routes/events.py` | 0%     | 88%   | ✅ Done |
 
-**Still Planned:**
+---
 
-| Task                                 | Priority | Status               | Reference                                                                                          |
-| ------------------------------------ | -------- | -------------------- | -------------------------------------------------------------------------------------------------- |
-| Increase test coverage to 85%        | P1       | 🔄 In Progress (68%) | Add tests for `app/routes/admin.py` (37%), `app/routes/users.py` (16%), `app/utils/teams.py` (32%) |
-| Expand auth tests in `test_auth.py`  | P1       | 📋 Planned           | Add Azure callback tests in `tests/test_auth.py`, mock MSAL                                        |
-| REQ-022: Holiday awareness           | P1       | 📋 Planned           | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js`             |
-| REQ-024: Travel mileage tracking     | P1       | 📋 Planned           | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`                  |
-| REQ-025: Expanded expense types      | P1       | 📋 Planned           | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`               |
-| BUG-005: Leading zero in hour inputs | P2       | 📋 Planned           | See `docs/BUGS.md` BUG-005, add `normalizeHourInput()` to `static/js/timesheet.js`                 |
+### 📅 January 12, 2026 - Tomorrow's Work
+
+**Priority: Continue Test Coverage (68% → 85%)**
+
+Need to cover **432 more statements** to reach 85% target.
+
+| Module                         | Current | Missed    | Action                                  | Priority |
+| ------------------------------ | ------- | --------- | --------------------------------------- | -------- |
+| `app/routes/admin.py`          | 37%     | 347 lines | Create `tests/test_admin_extended.py`   | P1       |
+| `app/routes/users.py`          | 16%     | 79 lines  | Create `tests/test_users.py`            | P1       |
+| `app/utils/teams.py`           | 32%     | 76 lines  | Create `tests/test_teams.py`            | P2       |
+| `app/routes/auth.py`           | 44%     | 65 lines  | Expand `tests/test_auth.py` (mock MSAL) | P2       |
+| `app/services/notification.py` | 77%     | 51 lines  | Expand `tests/test_notification.py`     | P3       |
+
+**Test Files to Create:**
+
+| File                           | Tests       | Coverage Impact |
+| ------------------------------ | ----------- | --------------- |
+| `tests/test_users.py`          | 10-15 tests | +3% (→ 71%)     |
+| `tests/test_admin_extended.py` | 25-30 tests | +7% (→ 78%)     |
+| `tests/test_teams.py`          | 8-10 tests  | +4% (→ 82%)     |
+| Expand existing tests          | 15-20 tests | +3% (→ 85%)     |
+
+**Feature Work (deferred from Jan 11):**
+
+| Task                                 | Priority | Status     | Reference                                                                              |
+| ------------------------------------ | -------- | ---------- | -------------------------------------------------------------------------------------- |
+| REQ-022: Holiday awareness           | P1       | 📋 Planned | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
+| REQ-024: Travel mileage tracking     | P1       | 📋 Planned | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
+| REQ-025: Expanded expense types      | P1       | 📋 Planned | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`   |
+| BUG-005: Leading zero in hour inputs | P2       | 📋 Planned | See `docs/BUGS.md` BUG-005, add `normalizeHourInput()` to `static/js/timesheet.js`     |
 
 **Platform Improvements (Pending):**
 
