@@ -1754,18 +1754,28 @@ The following items were identified by scanning all `.md` files for pending work
 
 ### Testing Gaps (from TESTING.md)
 
-| Area                         | Current Coverage | Target | Priority |
-| ---------------------------- | ---------------- | ------ | -------- |
-| Unit/API Tests               | 85               | 120+   | P1       |
-| Code Coverage                | 74%              | 90%+   | P1       |
-| `app/routes/events.py` (SSE) | 0%               | 80%    | P2       |
-| `app/routes/auth.py`         | ~50%             | 85%    | P1       |
-| Attachment upload tests      | 0%               | 100%   | P1       |
+| Area                         | Current Coverage | Target | Priority | Status         |
+| ---------------------------- | ---------------- | ------ | -------- | -------------- |
+| Total Code Coverage          | 68%              | 85%+   | P1       | 🔄 In Progress |
+| Tests Passing                | 253              | 300+   | P1       | 🔄 In Progress |
+| `app/routes/main.py`         | 97%              | 95%+   | P1       | ✅ Complete    |
+| `app/routes/events.py` (SSE) | 88%              | 80%+   | P2       | ✅ Complete    |
+| `app/routes/admin.py`        | 37%              | 80%+   | P1       | 📋 Planned     |
+| `app/routes/users.py`        | 16%              | 80%+   | P1       | 📋 Planned     |
+| `app/routes/auth.py`         | 44%              | 85%+   | P1       | 📋 Planned     |
+| `app/utils/teams.py`         | 32%              | 70%+   | P2       | 📋 Planned     |
 
-**Test Files Needed:**
+**Test Files Created (Jan 11):**
 
-- `test_attachments.py` - File upload/download tests
-- `test_events.py` - SSE endpoint tests
+- ✅ `tests/test_attachments.py` - File upload/download tests (10 tests)
+- ✅ `tests/test_events.py` - SSE endpoint tests (11 tests)
+- ✅ `tests/test_main.py` - Main routes tests (17 tests)
+
+**Test Files Needed (Jan 12):**
+
+- 📋 `tests/test_users.py` - User settings endpoint tests
+- 📋 `tests/test_admin_extended.py` - Extended admin route tests
+- 📋 `tests/test_teams.py` - Teams integration tests
 
 ---
 
