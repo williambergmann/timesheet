@@ -266,6 +266,28 @@ async function submitTimesheet() {
             return;
         }
     }
+
+    // BUG-002: Validate reimbursement items have valid amounts
+    if (typeof TimesheetModule !== 'undefined' && TimesheetModule.validateReimbursementItems) {
+        const validation = TimesheetModule.validateReimbursementItems();
+        if (!validation.valid) {
+            // Highlight the invalid items
+            TimesheetModule.highlightInvalidReimbursementItems(validation.invalidItems);
+            
+            // Scroll to reimbursement section
+            const reimbursementSection = document.getElementById('reimbursement-section');
+            if (reimbursementSection) {
+                reimbursementSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // Show error toast with the first error
+            showToast(`Validation error: ${validation.errors[0]}`, 'error');
+            return;
+        } else {
+            // Clear any previous validation errors
+            TimesheetModule.clearReimbursementValidationErrors();
+        }
+    }
     
     try {
         const currentId = timesheetId || document.getElementById('timesheet-id').value;

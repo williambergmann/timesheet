@@ -204,10 +204,10 @@ When a timesheet with reimbursement is saved without a proper amount value, the 
 
 **Acceptance Criteria:**
 
-- [ ] Amount field cannot be submitted empty when reimbursement type is selected
+- [x] Amount field cannot be submitted empty when reimbursement type is selected _(Implemented Jan 11, 2026)_
 - [x] Existing null amounts display as "$0.00"
 - [x] New submissions always have valid decimal amounts
-- [ ] Client-side validation shows error for invalid amounts
+- [x] Client-side validation shows error for invalid amounts _(Implemented Jan 11, 2026)_
 - [x] Server-side validation rejects null/empty amounts
 
 **Resolution (January 10, 2026):**
@@ -218,6 +218,22 @@ When a timesheet with reimbursement is saved without a proper amount value, the 
 2. ✅ Updated admin detail view to use `formatCurrency()` instead of `.toFixed(2)`
 3. ✅ Backend `to_dict()` already returns `0.0` for null amounts (line 228-230)
 4. ✅ Frontend `populateForm()` already handles null → "0.00" (line 605)
+
+**Additional Implementation (January 11, 2026):**
+
+5. ✅ Added `validateReimbursementItems()` function in `static/js/timesheet.js`
+   - Validates all items with a type selected have a valid amount > 0
+   - Returns validation result with error messages and invalid item IDs
+6. ✅ Added `highlightInvalidReimbursementItems()` for visual error feedback
+   - Highlights invalid items with red border and shake animation
+   - Highlights specific amount input fields
+7. ✅ Updated `submitTimesheet()` in `static/js/app.js` to validate before submit
+   - Shows error toast with specific validation message
+   - Scrolls to reimbursement section and highlights invalid fields
+8. ✅ Added CSS validation error styles in `static/css/components.css`
+   - `.validation-error` class for item container
+   - `.input-error` class for input fields
+   - Shake animation for attention
 
 **Files Changed:**
 

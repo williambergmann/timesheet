@@ -524,6 +524,71 @@ const TimesheetModule = {
         const attached = new Set(this.getAttachmentReimbursementTypes());
         return needed.filter(type => !attached.has(type));
     },
+
+    /**
+     * Validate reimbursement items before submission (BUG-002)
+     * Ensures all items with a type selected have a valid amount > 0
+     * @returns {Object} { valid: boolean, errors: string[], invalidItems: number[] }
+     */
+    validateReimbursementItems() {
+        const errors = [];
+        const invalidItems = [];
+        
+        // Only validate if reimbursement is needed
+        const reimbursementNeeded = document.getElementById('reimbursement-needed');
+        if (!reimbursementNeeded || !reimbursementNeeded.checked) {
+            return { valid: true, errors: [], invalidItems: [] };
+        }
+        
+        // Check each reimbursement item
+        this.reimbursementItems.forEach(item => {
+            // If type is selected but amount is missing or zero
+            if (item.type && (!item.amount || item.amount <= 0)) {
+                errors.push(`${this.EXPENSE_TYPES[item.type] || item.type}: Amount is required`);
+                invalidItems.push(item.id);
+            }
+        });
+        
+        return {
+            valid: errors.length === 0,
+            errors: errors,
+            invalidItems: invalidItems
+        };
+    },
+
+    /**
+     * Highlight invalid reimbursement items with error styling (BUG-002)
+     * @param {number[]} invalidItemIds - Array of item IDs to highlight
+     */
+    highlightInvalidReimbursementItems(invalidItemIds) {
+        // Clear all previous error highlights
+        document.querySelectorAll('.reimbursement-item').forEach(el => {
+            el.classList.remove('validation-error');
+            const amountInput = el.querySelector('.item-amount');
+            if (amountInput) amountInput.classList.remove('input-error');
+        });
+        
+        // Add error highlight to invalid items
+        invalidItemIds.forEach(id => {
+            const itemEl = document.querySelector(`.reimbursement-item[data-item-id="${id}"]`);
+            if (itemEl) {
+                itemEl.classList.add('validation-error');
+                const amountInput = itemEl.querySelector('.item-amount');
+                if (amountInput) amountInput.classList.add('input-error');
+            }
+        });
+    },
+
+    /**
+     * Clear all reimbursement validation errors
+     */
+    clearReimbursementValidationErrors() {
+        document.querySelectorAll('.reimbursement-item').forEach(el => {
+            el.classList.remove('validation-error');
+            const amountInput = el.querySelector('.item-amount');
+            if (amountInput) amountInput.classList.remove('input-error');
+        });
+    },
     
     /**
      * Populate rows with existing entry data

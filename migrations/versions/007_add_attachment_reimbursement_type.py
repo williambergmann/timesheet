@@ -1,7 +1,7 @@
 """Add reimbursement_type to attachments (REQ-021)
 
-Revision ID: 007_add_attachment_reimbursement_type
-Revises: 006_add_pay_periods
+Revision ID: 007_attach_type
+Revises: 006_pay_periods
 Create Date: 2026-01-09
 """
 from alembic import op
@@ -9,8 +9,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "007_add_attachment_reimbursement_type"
-down_revision = "006_add_pay_periods"
+revision = "007_attach_type"
+down_revision = "006_pay_periods"
 branch_labels = None
 depends_on = None
 

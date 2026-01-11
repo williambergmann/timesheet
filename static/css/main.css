@@ -114,6 +114,11 @@
   --header-bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
 }
 
+/* 
+ * LIGHT MODE STYLES - DISABLED
+ * Uncomment when REQ-047 (User Theme Selection) is implemented.
+ * Light mode CSS backup is stored in: static/css/light-mode-backup/
+ * 
 @media (prefers-color-scheme: light) {
   :root {
     --color-bg-page: #f8fafc;
@@ -181,6 +186,7 @@
     );
   }
 }
+*/
 
 /* ============================================
    Reset & Base Styles
@@ -672,6 +678,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 0.8;
 }
 
+/* DISABLED - Part of REQ-047 theme selection
 @media (prefers-color-scheme: light) {
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: none;
@@ -685,6 +692,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: block;
   }
 }
+*/
 
 .form-row {
   display: grid;

@@ -1,7 +1,7 @@
 """Add Teams conversations table (REQ-012)
 
-Revision ID: 009_add_teams_conversations
-Revises: 008_add_sharepoint_sync_fields
+Revision ID: 009_teams_convos
+Revises: 008_sharepoint
 Create Date: 2026-01-09
 """
 from alembic import op
@@ -9,8 +9,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "009_add_teams_conversations"
-down_revision = "008_add_sharepoint_sync_fields"
+revision = "009_teams_convos"
+down_revision = "008_sharepoint"
 branch_labels = None
 depends_on = None
 

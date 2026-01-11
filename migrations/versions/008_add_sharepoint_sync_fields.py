@@ -1,7 +1,7 @@
 """Add SharePoint sync fields to attachments (REQ-010)
 
-Revision ID: 008_add_sharepoint_sync_fields
-Revises: 007_add_attachment_reimbursement_type
+Revision ID: 008_sharepoint
+Revises: 007_attach_type
 Create Date: 2026-01-09
 """
 from alembic import op
@@ -9,8 +9,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "008_add_sharepoint_sync_fields"
-down_revision = "007_add_attachment_reimbursement_type"
+revision = "008_sharepoint"
+down_revision = "007_attach_type"
 branch_labels = None
 depends_on = None
 

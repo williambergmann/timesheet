@@ -238,6 +238,105 @@ Add a User Settings section where users can configure:
 
 ---
 
+### REQ-047: User Theme Selection (P2) 📋
+
+Add a comprehensive theme selection system to User Settings with automatic mode and multiple theme options.
+
+**Status:** 📋 Planned
+
+**UI Structure (Settings Page):**
+
+When **Automatic is OFF** (manual mode):
+
+```
+┌─────────────────────────────────────────────────┐
+│  🎨 DARK MODE                                   │
+├─────────────────────────────────────────────────┤
+│  ⚙️  Automatic (follow system setting)   [OFF]  │
+│  🌙  Dark Mode                             [ON]  │
+│  ☀️  Light theme                      Northstar  │
+│  🌃  Dark theme                          Night   │
+└─────────────────────────────────────────────────┘
+```
+
+When **Automatic is ON** (Dark Mode toggle disappears):
+
+```
+┌─────────────────────────────────────────────────┐
+│  🎨 DARK MODE                                   │
+├─────────────────────────────────────────────────┤
+│  ⚙️  Automatic (follow system setting)    [ON]  │
+│  ☀️  Light theme                      Northstar  │
+│  🌃  Dark theme                        Midnight  │
+└─────────────────────────────────────────────────┘
+```
+
+**Theme Options:**
+
+| Category  | Theme Name   | Description                           | Primary Color            |
+| --------- | ------------ | ------------------------------------- | ------------------------ |
+| **Light** | Northstar 🌲 | Default light theme (Northstar green) | `#006400` (Forest Green) |
+| **Light** | Sky 🌊       | Blue accent theme                     | `#0284c7` (Sky Blue)     |
+| **Light** | Princess 🌸  | Pink accent theme                     | `#db2777` (Pink)         |
+| **Dark**  | Night 🌙     | Default dark theme                    | Current dark mode colors |
+| **Dark**  | Midnight 🌌  | AMOLED black (true black)             | `#000000` background     |
+
+**Settings Behavior:**
+
+| Setting                   | Default   | Behavior                                                           |
+| ------------------------- | --------- | ------------------------------------------------------------------ |
+| Automatic (follow system) | OFF       | When ON, **hides** Dark Mode toggle and follows OS preference      |
+| Dark Mode                 | ON        | Toggle between dark/light themes (**hidden** when Automatic is ON) |
+| Light theme               | Northstar | Selects which light theme variant to use (always visible)          |
+| Dark theme                | Night     | Selects which dark theme variant to use (always visible)           |
+
+**Features:**
+
+- Toggle between automatic (system) and manual mode
+- Dark Mode on/off toggle **disappears** when Automatic is enabled (not just disabled)
+- Light theme selector: Northstar (Green), Sky (Blue), Princess (Pink)
+- Dark theme selector: Night (Default), Midnight (AMOLED Black)
+- Save preference per-user in database
+- Apply theme immediately without page reload
+- Default to Dark Mode with Night theme for all users
+
+**Current State:**
+
+- ✅ Dark mode (Night) is currently forced as the only theme
+- ✅ Light mode CSS is preserved in `static/css/light-mode-backup/`
+- CSS uses `@media (prefers-color-scheme)` queries ready for re-enabling
+- Main CSS: `static/css/main.css` (search for "REQ-047")
+
+**Implementation Notes:**
+
+1. **User Model Changes:**
+
+   - Add `theme_automatic` (Boolean, default: False)
+   - Add `theme_dark_mode` (Boolean, default: True)
+   - Add `theme_light_variant` (Enum: NORTHSTAR, SKY, PRINCESS, default: NORTHSTAR)
+   - Add `theme_dark_variant` (Enum: NIGHT, MIDNIGHT, default: NIGHT)
+
+2. **CSS Organization:**
+
+   - Create theme CSS files: `themes/light-northstar.css`, `themes/light-sky.css`, `themes/light-princess.css`, `themes/dark-night.css`, `themes/dark-midnight.css`
+   - Use CSS custom properties (variables) for easy switching
+   - Midnight theme should use `--color-bg-page: #000000` for true AMOLED black
+
+3. **Theme Application:**
+
+   - Use CSS classes on `<body>`: `theme-light-northstar`, `theme-light-sky`, `theme-dark-night`, etc.
+   - Store preference in localStorage for instant page loads
+   - Sync with database via settings API
+   - Listen for `prefers-color-scheme` changes when Automatic is enabled
+
+4. **Settings UI:**
+   - Display Appearance section in User Settings
+   - Automatic toggle disables/grays out Dark Mode toggle when ON
+   - Theme selectors show current selection with disclosure arrows
+   - Theme names display with emoji icons for visual appeal
+
+---
+
 ## 📊 Admin Dashboard
 
 ### REQ-004: Pay Period Filter (P1) ✅
