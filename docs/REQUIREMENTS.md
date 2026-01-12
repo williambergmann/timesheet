@@ -155,38 +155,78 @@ REQ-015 (Azure AD) code is fully implemented. Production validation requires rea
 
 ---
 
-### 📅 January 12, 2026 - Today's Work
+### ✅ January 12, 2026 - Completed
 
-**Priority: Continue Test Coverage (68% → 85%)**
+**Test Coverage Push: 53% → 83% (Goal: 85%)**
 
-Need to cover **432 more statements** to reach 85% target.
+Major effort to improve test coverage. Created 137 new tests across multiple test files.
 
-| Module                         | Current | Missed    | Action                                  | Priority |
-| ------------------------------ | ------- | --------- | --------------------------------------- | -------- |
-| `app/routes/admin.py`          | 37%     | 347 lines | Create `tests/test_admin_extended.py`   | P1       |
-| `app/routes/users.py`          | 16%     | 79 lines  | Create `tests/test_users.py`            | P1       |
-| `app/utils/teams.py`           | 32%     | 76 lines  | Create `tests/test_teams.py`            | P2       |
-| `app/routes/auth.py`           | 44%     | 65 lines  | Expand `tests/test_auth.py` (mock MSAL) | P2       |
-| `app/services/notification.py` | 77%     | 51 lines  | Expand `tests/test_notification.py`     | P3       |
+**Completed Today:**
 
-**Test Files to Create:**
+| Task                        | Description                                  | Status      |
+| --------------------------- | -------------------------------------------- | ----------- |
+| `tests/test_users.py`       | User settings endpoint tests (31 tests)      | ✅ Complete |
+| `tests/test_admin_extended` | Extended admin route tests (55 tests)        | ✅ Complete |
+| `tests/test_auth.py`        | Auth flow tests with MSAL mocking (30 tests) | ✅ Complete |
+| `tests/test_teams.py`       | Teams integration tests (22 tests)           | ✅ Complete |
+| `tests/test_notification`   | Notification service edge cases (15 tests)   | ✅ Complete |
+| Bug fix                     | Ambiguous join in admin.py data report       | ✅ Complete |
+| Documentation               | Testing infrastructure guidelines            | ✅ Complete |
 
-| File                           | Tests       | Coverage Impact |
-| ------------------------------ | ----------- | --------------- |
-| `tests/test_users.py`          | 10-15 tests | +3% (→ 71%)     |
-| `tests/test_admin_extended.py` | 25-30 tests | +7% (→ 78%)     |
-| `tests/test_teams.py`          | 8-10 tests  | +4% (→ 82%)     |
-| Expand existing tests          | 15-20 tests | +3% (→ 85%)     |
+**Test Coverage Results:**
 
-**Feature Work (deferred from Jan 11):**
+| Module                         | Before | After | Target  |
+| ------------------------------ | ------ | ----- | ------- |
+| **Total Coverage**             | 53%    | 83%   | 85%     |
+| **Tests Passing**              | 253    | 390   | 300+ ✅ |
+| `app/routes/users.py`          | 16%    | 98%   | ✅ Done |
+| `app/routes/auth.py`           | 44%    | 91%   | ✅ Done |
+| `app/routes/admin.py`          | 37%    | 74%   | 80%     |
+| `app/services/notification.py` | 77%    | 82%   | ✅ Done |
+| `app/utils/teams.py`           | 32%    | 57%   | 70%     |
 
-| Task                                 | Priority | Status      | Reference                                                                              |
-| ------------------------------------ | -------- | ----------- | -------------------------------------------------------------------------------------- |
-| REQ-022: Holiday awareness           | P1       | 📋 Planned  | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
-| REQ-024: Travel mileage tracking     | P1       | 📋 Planned  | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
-| REQ-025: Expanded expense types      | P1       | 📋 Planned  | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`   |
-| BUG-005: Leading zero in hour inputs | P2       | ✅ Complete | Added `normalizeHourInput()` to `static/js/timesheet.js`                               |
-| BUG-006: Upload error logic          | P1       | 🔴 Open     | Investigate strict read-only logic blocking uploads                                    |
+**Bug Fixed:**
+
+- **admin.py line 151** — Ambiguous join error in `timesheet_data_report`. Fixed by adding explicit `onclause` for Timesheet-User join (user_id vs approved_by).
+
+**Documentation Added:**
+
+- **TESTING.md** — New "Testing Infrastructure Guidelines" section with:
+  - Mocking strategies for MSAL, Twilio, Teams Bot Framework
+  - PDF/Excel export testing patterns
+  - Test fixture patterns for role-based access (REQ-041)
+  - Common pitfalls and solutions
+  - Endpoint testing checklist
+
+**Key Commits:**
+
+1. `test: improve coverage to 80% with 344 tests`
+2. `test: push coverage to 83% with 383 tests`
+3. `test: push coverage to 83% with 390 tests`
+4. `docs: update testing status to 83% coverage, 390 tests`
+5. `docs: add testing infrastructure guidelines for 85%+ coverage`
+
+**Remaining to Hit 85%:**
+
+| Module                       | Gap                               | Strategy                             |
+| ---------------------------- | --------------------------------- | ------------------------------------ |
+| `app/routes/admin.py` (74%)  | PDF generation, export pay period | Mock ReportLab, test response format |
+| `app/utils/teams.py` (57%)   | Bot token acquisition, HTTP calls | Full mocking per guidelines          |
+| `app/utils/observability.py` | Metrics, Azure Monitor client     | Mock Azure SDK                       |
+
+---
+
+### 📅 January 13, 2026 - Next Session
+
+**Priority: Push to 85% Coverage**
+
+| Task                             | Priority | Status     | Reference                                                                              |
+| -------------------------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
+| Add PDF/Excel export tests       | P1       | 📋 Planned | Follow TESTING.md guidelines, mock ReportLab                                           |
+| Complete Teams mocking tests     | P2       | 📋 Planned | Mock `_get_bot_token()` and `requests.post`                                            |
+| REQ-022: Holiday awareness       | P1       | 📋 Planned | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
+| REQ-024: Travel mileage tracking | P1       | 📋 Planned | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
+| BUG-006: Upload error logic      | P1       | 🔴 Open    | Investigate strict read-only logic blocking uploads                                    |
 
 **Platform Improvements (Pending):**
 
