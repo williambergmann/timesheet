@@ -222,25 +222,65 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 ---
 
-### 📅 January 13, 2026 - Next Session
+### � January 12, 2026 — Remaining (Next Hour)
 
-**Priority: Remaining Coverage + Features**
+_Current time: 4:25 PM — Target: 5:30 PM_
 
-| Task                             | Priority | Status     | Reference                                                                              |
-| -------------------------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
-| Add PDF/Excel export tests       | P1       | 📋 Planned | Follow TESTING.md guidelines, mock ReportLab                                           |
-| Complete Teams mocking tests     | P2       | 📋 Planned | Mock `_get_bot_token()` and `requests.post`                                            |
-| REQ-022: Holiday awareness       | P1       | 📋 Planned | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
-| REQ-024: Travel mileage tracking | P1       | 📋 Planned | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
-| BUG-006: Upload error logic      | P1       | 🔴 Open    | Investigate strict read-only logic blocking uploads                                    |
+| Task                     | Time Est. | Priority | Status         | Notes                                               |
+| ------------------------ | --------- | -------- | -------------- | --------------------------------------------------- |
+| REQ-051: CONTRIBUTING.md | 30 min    | P2       | 📋 Planned     | Quick doc: clone → run → test → deploy              |
+| BUG-006: Investigation   | 30 min    | P1       | 🔍 Investigate | Identify root cause of upload error on NEEDS_UPLOAD |
 
-**Remaining to Hit 85% Coverage:**
+---
 
-| Module                       | Current | Gap                               | Strategy                             |
-| ---------------------------- | ------- | --------------------------------- | ------------------------------------ |
-| `app/routes/admin.py`        | 74%     | PDF generation, export pay period | Mock ReportLab, test response format |
-| `app/utils/teams.py`         | 57%     | Bot token acquisition, HTTP calls | Full mocking per guidelines          |
-| `app/utils/observability.py` | —       | Metrics, Azure Monitor client     | Mock Azure SDK                       |
+### 📅 January 13, 2026 — Full Day
+
+**Goal: Ship features, push to 85% coverage**
+
+| Task                         | Time Est. | Priority | Status     | Reference                                        |
+| ---------------------------- | --------- | -------- | ---------- | ------------------------------------------------ |
+| BUG-006: Fix implementation  | 1-2 hours | P1       | 🔴 Open    | Fix based on today's investigation               |
+| REQ-022: Holiday awareness   | 2-3 hours | P1       | 📋 Planned | Add holiday detection + warning to timesheet.js  |
+| Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned | Mock ReportLab, push admin.py 74% → 80%+         |
+| Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned | Mock `_get_bot_token()`, push teams.py 57% → 70% |
+
+**Coverage Target:**
+
+| Module                | Current | Target | Strategy                            |
+| --------------------- | ------- | ------ | ----------------------------------- |
+| **Total**             | 83%     | 85%    | +2% from PDF tests + Teams tests    |
+| `app/routes/admin.py` | 74%     | 80%+   | Mock ReportLab, test export formats |
+| `app/utils/teams.py`  | 57%     | 70%+   | Full mocking per TESTING.md         |
+
+---
+
+### 📋 Future Work (After Jan 13)
+
+_Items moved here due to time constraints or lower priority._
+
+**Features:**
+
+| REQ     | Description             | Priority | Rationale                             |
+| ------- | ----------------------- | -------- | ------------------------------------- |
+| REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first |
+| REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture     |
+| REQ-047 | User theme selection    | P2       | UX polish, not blocking launch        |
+
+**Technical Improvements:**
+
+| REQ     | Description                | Priority | Rationale                              |
+| ------- | -------------------------- | -------- | -------------------------------------- |
+| REQ-048 | Architecture diagram       | P2       | Documentation quality, not blocking    |
+| REQ-049 | API versioning             | P2       | No breaking changes planned short-term |
+| REQ-050 | OpenAPI/Swagger spec       | P2       | Nice for external devs, not urgent     |
+| REQ-052 | Database-driven hour types | P3       | Config flexibility, not needed for MVP |
+
+**Testing:**
+
+| Task                    | Priority | Rationale                        |
+| ----------------------- | -------- | -------------------------------- |
+| Push coverage to 90%    | P2       | 85% is acceptable for launch     |
+| Add observability tests | P3       | Azure Monitor mocking is complex |
 
 ---
 
