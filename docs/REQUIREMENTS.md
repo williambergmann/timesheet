@@ -1758,14 +1758,15 @@ The following items were identified by scanning all `.md` files for pending work
 
 | Area                         | Current Coverage | Target | Priority | Status         |
 | ---------------------------- | ---------------- | ------ | -------- | -------------- |
-| Total Code Coverage          | 80%              | 85%+   | P1       | 🔄 In Progress |
-| Tests Passing                | 344              | 300+   | P1       | ✅ Complete    |
+| Total Code Coverage          | 83%              | 85%+   | P1       | 🔄 In Progress |
+| Tests Passing                | 390              | 300+   | P1       | ✅ Complete    |
 | `app/routes/main.py`         | 97%              | 95%+   | P1       | ✅ Complete    |
 | `app/routes/events.py` (SSE) | 88%              | 80%+   | P2       | ✅ Complete    |
-| `app/routes/admin.py`        | 72%              | 80%+   | P1       | 🔄 In Progress |
+| `app/routes/admin.py`        | 74%              | 80%+   | P1       | 🔄 In Progress |
 | `app/routes/users.py`        | 98%              | 80%+   | P1       | ✅ Complete    |
-| `app/routes/auth.py`         | 69%              | 85%+   | P1       | 🔄 In Progress |
-| `app/utils/teams.py`         | 32%              | 70%+   | P2       | 📋 Planned     |
+| `app/routes/auth.py`         | 91%              | 85%+   | P1       | ✅ Complete    |
+| `app/services/notification`  | 82%              | 80%+   | P1       | ✅ Complete    |
+| `app/utils/teams.py`         | 57%              | 70%+   | P2       | � In Progress  |
 
 **Test Files Created (Jan 11):**
 
