@@ -327,7 +327,7 @@ const TimesheetModule = {
                            max="24" 
                            step="0.5"
                            placeholder="0"
-                           oninput="TimesheetModule.updateRowTotal('${hourType}')"
+                           oninput="TimesheetModule.normalizeHourInput(this); TimesheetModule.updateRowTotal('${hourType}')"
                            onblur="TimesheetModule.checkHolidayInput(this)">
                 </div>
             `;
@@ -356,6 +356,21 @@ const TimesheetModule = {
         // Update field hours warning if Field type was added
         if (hourType === 'Field') {
             this.updateFieldHoursWarning();
+        }
+    },
+    
+    /**
+     * Normalize hour input to remove leading zeros (BUG-005)
+     * e.g., "08" -> "8", "00" -> "0"
+     * @param {HTMLInputElement} input - The hour input element
+     */
+    normalizeHourInput(input) {
+        // If value starts with 0 and has another digit (e.g., '05'), strip leading zero
+        // Regex: ^0+ matches starting zeros
+        // (?=\d) lookahead ensures we only strip if another digit follows
+        // This preserves "0" and "0.5" but fixes "08" -> "8"
+        if (/^0+(?=\d)/.test(input.value)) {
+            input.value = input.value.replace(/^0+(?=\d)/, '');
         }
     },
     
