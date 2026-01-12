@@ -4,7 +4,7 @@
 >
 > **Source:** Design decisions captured in [DESIGN.md](DESIGN.md), plus roadmap/security/testing notes in `docs/`
 >
-> **Last Updated:** January 11, 2026
+> **Last Updated:** January 12, 2026
 
 ---
 
@@ -180,12 +180,12 @@ Need to cover **432 more statements** to reach 85% target.
 
 **Feature Work (deferred from Jan 11):**
 
-| Task                                 | Priority | Status     | Reference                                                                              |
-| ------------------------------------ | -------- | ---------- | -------------------------------------------------------------------------------------- |
-| REQ-022: Holiday awareness           | P1       | 📋 Planned | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
-| REQ-024: Travel mileage tracking     | P1       | 📋 Planned | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
-| REQ-025: Expanded expense types      | P1       | 📋 Planned | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`   |
-| BUG-005: Leading zero in hour inputs | P2       | 📋 Planned | See `docs/BUGS.md` BUG-005, add `normalizeHourInput()` to `static/js/timesheet.js`     |
+| Task                                 | Priority | Status      | Reference                                                                              |
+| ------------------------------------ | -------- | ----------- | -------------------------------------------------------------------------------------- |
+| REQ-022: Holiday awareness           | P1       | 📋 Planned  | See [REQ-022](#req-022-holiday-awareness--warning-p1), add to `static/js/timesheet.js` |
+| REQ-024: Travel mileage tracking     | P1       | 📋 Planned  | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
+| REQ-025: Expanded expense types      | P1       | 📋 Planned  | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`   |
+| BUG-005: Leading zero in hour inputs | P2       | ✅ Complete | Added `normalizeHourInput()` to `static/js/timesheet.js`                               |
 
 **Platform Improvements (Pending):**
 

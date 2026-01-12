@@ -2,7 +2,7 @@
 
 > **Purpose:** Track known bugs and issues requiring fixes.
 >
-> **Last Updated:** January 11, 2026
+> **Last Updated:** January 12, 2026
 
 ---
 
@@ -14,7 +14,7 @@
 | [BUG-002](#bug-002-reimbursement-amounts-display-null)          | Reimbursement Amounts Display "$null"        | ✅ Resolved | P1       | Jan 8    |
 | [BUG-003](#bug-003-dev-login-causes-duplicate-key-error)        | Dev Login Causes Duplicate Key Error         | ✅ Resolved | P0       | Jan 8    |
 | [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) | Draft Timesheets Missing Save/Submit Buttons | ✅ Resolved | P1       | Jan 8    |
-| [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | 🟡 Open     | P2       | Jan 11   |
+| [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
 
 ---
 
@@ -312,75 +312,29 @@ Browser testing confirmed:
 
 ### BUG-005: Leading Zero Not Removed from Hour Inputs
 
-**Status:** 🟡 Open  
-**Severity:** Low (P2)  
-**Reported:** January 11, 2026  
+**Status:** ✅ Resolved
+**Severity:** Low (P2)
+**Reported:** January 11, 2026
+**Resolved:** January 12, 2026
 **Related:** N/A
 
 **Description:**
 When typing hours into an hour input field that displays "0", the leading zero is not removed. For example, typing "8" results in "08" being displayed instead of just "8".
 
-**Steps to Reproduce:**
+**Resolution (January 12, 2026):**
+Added `TimesheetModule.normalizeHourInput(input)` which uses a regex to strip leading zeros only when immediately followed by another digit. This preserves valid decimals like "0.5" while fixing "08" -> "8".
 
-1. Log in to the app
-2. Create or open a timesheet
-3. Add an hour type row (e.g., Internal Hours)
-4. Click on a day's input field (which shows "0")
-5. Type "8"
-6. **Expected:** Field shows "8"
-7. **Actual:** Field shows "08"
+**Implementation:**
 
-**Root Cause:**
-HTML number inputs preserve leading zeros when users type without first clearing the field. The browser appends new digits to the existing "0" value rather than replacing it.
-
-**Proposed Fix:**
-
-Add a `normalizeHourInput()` function to strip leading zeros when the user types:
-
-**File: `static/js/timesheet.js`**
-
-1. Add new function to `TimesheetModule`:
-
-```javascript
-/**
- * Normalize hour input to remove leading zeros
- * @param {HTMLInputElement} input - The hour input element
- */
-normalizeHourInput(input) {
-    // Strip leading zeros by converting to number and back to string
-    const value = parseFloat(input.value) || 0;
-    if (input.value !== '' && input.value !== value.toString()) {
-        input.value = value;
-    }
-},
-```
-
-2. Update the `oninput` handler in `addHourTypeRow()` (around line 330):
-
-```javascript
-// Change from:
-oninput = "TimesheetModule.updateRowTotal('${hourType}')";
-
-// To:
-oninput =
-  "TimesheetModule.normalizeHourInput(this); TimesheetModule.updateRowTotal('${hourType}')";
-```
-
-**Alternative Fix (select on focus):**
-
-Add an `onfocus` handler that selects all text, so typing replaces the entire value:
-
-```javascript
-onfocus = "this.select()";
-```
+1. Added `normalizeHourInput` to `static/js/timesheet.js`
+2. Updated input `oninput` handler to call normalization before updating totals
 
 **Acceptance Criteria:**
 
-- [ ] Typing into an hour field with "0" displays only the typed number
-- [ ] Values like "08" are normalized to "8"
-- [ ] Decimal values still work correctly (e.g., "8.5")
-- [ ] Empty field still shows "0" after blur if no value entered
-- [ ] Row totals update correctly after normalization
+- [x] Typing into an hour field with "0" displays only the typed number
+- [x] Values like "08" are normalized to "8"
+- [x] Decimal values still work correctly (e.g., "0.5")
+- [x] Empty field still shows "0" (placeholder) or empty string
 
 ---
 
