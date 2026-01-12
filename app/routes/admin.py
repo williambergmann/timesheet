@@ -148,7 +148,9 @@ def timesheet_data_report():
         page: Page number (default 1)
         per_page: Items per page (default 200)
     """
-    query = TimesheetEntry.query.join(Timesheet).join(User)
+    query = TimesheetEntry.query.join(Timesheet).join(
+        User, Timesheet.user_id == User.id
+    )
 
     # Exclude drafts by default
     query = query.filter(Timesheet.status != TimesheetStatus.NEW)

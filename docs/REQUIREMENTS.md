@@ -344,7 +344,7 @@ When **Automatic is ON** (Dark Mode toggle disappears):
 | --------- | ------------ | ------------------------------------- | ------------------------ |
 | **Light** | Northstar 🌲 | Default light theme (Northstar green) | `#006400` (Forest Green) |
 | **Light** | Sky 🌊       | Blue accent theme                     | `#0284c7` (Sky Blue)     |
-| **Light** | Princess 🌸  | Pink accent theme                     | `#db2777` (Pink)         |
+| **Light** | Sakura 🌸    | Pink accent theme                     | `#db2777` (Pink)         |
 | **Dark**  | Night 🌙     | Default dark theme                    | Current dark mode colors |
 | **Dark**  | Midnight 🌌  | AMOLED black (true black)             | `#000000` background     |
 
@@ -361,7 +361,7 @@ When **Automatic is ON** (Dark Mode toggle disappears):
 
 - Toggle between automatic (system) and manual mode
 - Dark Mode on/off toggle **disappears** when Automatic is enabled (not just disabled)
-- Light theme selector: Northstar (Green), Sky (Blue), Princess (Pink)
+- Light theme selector: Northstar (Green), Sky (Blue), Sakura (Pink)
 - Dark theme selector: Night (Default), Midnight (AMOLED Black)
 - Save preference per-user in database
 - Apply theme immediately without page reload
@@ -1758,13 +1758,13 @@ The following items were identified by scanning all `.md` files for pending work
 
 | Area                         | Current Coverage | Target | Priority | Status         |
 | ---------------------------- | ---------------- | ------ | -------- | -------------- |
-| Total Code Coverage          | 68%              | 85%+   | P1       | 🔄 In Progress |
-| Tests Passing                | 253              | 300+   | P1       | 🔄 In Progress |
+| Total Code Coverage          | 80%              | 85%+   | P1       | 🔄 In Progress |
+| Tests Passing                | 344              | 300+   | P1       | ✅ Complete    |
 | `app/routes/main.py`         | 97%              | 95%+   | P1       | ✅ Complete    |
 | `app/routes/events.py` (SSE) | 88%              | 80%+   | P2       | ✅ Complete    |
-| `app/routes/admin.py`        | 37%              | 80%+   | P1       | 📋 Planned     |
-| `app/routes/users.py`        | 16%              | 80%+   | P1       | 📋 Planned     |
-| `app/routes/auth.py`         | 44%              | 85%+   | P1       | 📋 Planned     |
+| `app/routes/admin.py`        | 72%              | 80%+   | P1       | 🔄 In Progress |
+| `app/routes/users.py`        | 98%              | 80%+   | P1       | ✅ Complete    |
+| `app/routes/auth.py`         | 69%              | 85%+   | P1       | 🔄 In Progress |
 | `app/utils/teams.py`         | 32%              | 70%+   | P2       | 📋 Planned     |
 
 **Test Files Created (Jan 11):**
@@ -1773,11 +1773,11 @@ The following items were identified by scanning all `.md` files for pending work
 - ✅ `tests/test_events.py` - SSE endpoint tests (11 tests)
 - ✅ `tests/test_main.py` - Main routes tests (17 tests)
 
-**Test Files Needed (Jan 12):**
+**Test Files Created (Jan 12):**
 
-- 📋 `tests/test_users.py` - User settings endpoint tests
-- 📋 `tests/test_admin_extended.py` - Extended admin route tests
-- 📋 `tests/test_teams.py` - Teams integration tests
+- ✅ `tests/test_users.py` - User settings endpoint tests (31 tests)
+- ✅ `tests/test_admin_extended.py` - Extended admin route tests (48 tests)
+- ✅ `tests/test_auth.py` - Auth flow tests expanded (25 tests)
 
 ---
 

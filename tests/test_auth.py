@@ -174,3 +174,163 @@ class TestRateLimiting:
         response = client.get("/auth/login")
         assert response.status_code == 429
 
+
+class TestDevLogin:
+    """Tests for POST /auth/dev-login endpoint (REQ-002/REQ-017)."""
+
+    def test_dev_login_trainee_success(self, client, app):
+        """Test successful trainee login."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "trainee", "password": "trainee"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+        assert "/app" in response.location
+
+        with client.session_transaction() as sess:
+            assert "user" in sess
+            assert sess["user"]["role"] == "trainee"
+
+    def test_dev_login_staff_success(self, client, app):
+        """Test successful staff login."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "staff", "password": "staff"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with client.session_transaction() as sess:
+            assert sess["user"]["role"] == "staff"
+
+    def test_dev_login_support_success(self, client, app):
+        """Test successful support login."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "support", "password": "support"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with client.session_transaction() as sess:
+            assert sess["user"]["role"] == "support"
+
+    def test_dev_login_admin_success(self, client, app):
+        """Test successful admin login."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "admin", "password": "password"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with client.session_transaction() as sess:
+            assert sess["user"]["role"] == "admin"
+            assert sess["user"]["is_admin"] is True
+
+    def test_dev_login_legacy_user_success(self, client, app):
+        """Test successful legacy 'user' login for backwards compatibility."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "user", "password": "user"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with client.session_transaction() as sess:
+            assert sess["user"]["role"] == "staff"
+
+    def test_dev_login_invalid_username(self, client, app):
+        """Test login with invalid username."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "nonexistent", "password": "password"},
+        )
+        assert response.status_code == 200
+        assert b"Invalid username or password" in response.data
+
+    def test_dev_login_invalid_password(self, client, app):
+        """Test login with invalid password."""
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "admin", "password": "wrongpassword"},
+        )
+        assert response.status_code == 200
+        assert b"Invalid username or password" in response.data
+
+    def test_dev_login_creates_user_in_database(self, client, app):
+        """Test that dev login creates user record in database."""
+        from app.models import User
+
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "trainee", "password": "trainee"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with app.app_context():
+            user = User.query.filter_by(email="trainee@localhost").first()
+            assert user is not None
+            assert user.display_name == "Test Trainee"
+
+    def test_dev_login_updates_existing_user(self, client, app):
+        """Test that dev login updates existing user role."""
+        from app.models import User
+        from app.models.user import UserRole
+        from app.extensions import db
+
+        # Create user with wrong role
+        with app.app_context():
+            existing = User(
+                azure_id="dev-trainee-001",
+                email="trainee@localhost",
+                display_name="Old Name",
+                role=UserRole.STAFF,  # Wrong role
+            )
+            db.session.add(existing)
+            db.session.commit()
+
+        # Login should update role
+        response = client.post(
+            "/auth/dev-login",
+            data={"username": "trainee", "password": "trainee"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+
+        with app.app_context():
+            user = User.query.filter_by(email="trainee@localhost").first()
+            assert user.role == UserRole.TRAINEE
+            assert user.display_name == "Test Trainee"
+
+
+class TestOAuthCallback:
+    """Tests for GET /auth/callback endpoint."""
+
+    def test_callback_error_in_params(self, client):
+        """Test callback with error parameter."""
+        response = client.get("/auth/callback?error=access_denied&error_description=User%20cancelled")
+        assert response.status_code == 400
+        assert b"access_denied" in response.data
+
+    def test_callback_missing_code(self, client):
+        """Test callback without authorization code."""
+        response = client.get("/auth/callback")
+        assert response.status_code == 400
+        assert b"No authorization code" in response.data
+
+
+class TestLoginRoute:
+    """Tests for GET /auth/login endpoint."""
+
+    def test_login_in_dev_mode_auto_redirects(self, client, app):
+        """Test that login in dev mode creates session and redirects."""
+        # The test config has no Azure credentials, so it's in dev mode
+        response = client.get("/auth/login", follow_redirects=False)
+        assert response.status_code == 302
+        assert "/app" in response.location
+
+        with client.session_transaction() as sess:
+            assert "user" in sess
