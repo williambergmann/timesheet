@@ -155,7 +155,7 @@ REQ-015 (Azure AD) code is fully implemented. Production validation requires rea
 
 ---
 
-### 📅 January 12, 2026 - Tomorrow's Work
+### 📅 January 12, 2026 - Today's Work
 
 **Priority: Continue Test Coverage (68% → 85%)**
 
@@ -186,6 +186,7 @@ Need to cover **432 more statements** to reach 85% target.
 | REQ-024: Travel mileage tracking     | P1       | 📋 Planned  | See [REQ-024](#req-024-travel-mileage-tracking-p1), extend `templates/index.html`      |
 | REQ-025: Expanded expense types      | P1       | 📋 Planned  | See [REQ-025](#req-025-expanded-expense-types-p1), update dropdown in `timesheet.js`   |
 | BUG-005: Leading zero in hour inputs | P2       | ✅ Complete | Added `normalizeHourInput()` to `static/js/timesheet.js`                               |
+| BUG-006: Upload error logic          | P1       | 🔴 Open     | Investigate strict read-only logic blocking uploads                                    |
 
 **Platform Improvements (Pending):**
 
@@ -1729,7 +1730,8 @@ The following items were identified by scanning all `.md` files for pending work
 | BUG-002 | P1       | Reimbursement amounts display "$null"     | ✅ Resolved |
 | BUG-003 | P0       | Dev login causes duplicate key error      | ✅ Resolved |
 | BUG-004 | P1       | Draft timesheets missing Save/Submit      | ✅ Resolved |
-| BUG-005 | P2       | Leading zero not removed from hour inputs | 🟡 Open     |
+| BUG-005 | P2       | Leading zero not removed from hour inputs | ✅ Resolved |
+| BUG-006 | P1       | Upload error on NEEDS_UPLOAD status       | 🔴 Open     |
 
 **BUG-005 Fix Plan:**
 

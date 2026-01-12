@@ -15,6 +15,7 @@
 | [BUG-003](#bug-003-dev-login-causes-duplicate-key-error)        | Dev Login Causes Duplicate Key Error         | ✅ Resolved | P0       | Jan 8    |
 | [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) | Draft Timesheets Missing Save/Submit Buttons | ✅ Resolved | P1       | Jan 8    |
 | [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
+| [BUG-006](#bug-006-upload-error-on-needs_upload-status)         | Upload Error on NEEDS_UPLOAD Status          | 🔴 Open     | P1       | Jan 12   |
 
 ---
 
@@ -321,8 +322,18 @@ Browser testing confirmed:
 **Description:**
 When typing hours into an hour input field that displays "0", the leading zero is not removed. For example, typing "8" results in "08" being displayed instead of just "8".
 
-**Resolution (January 12, 2026):**
-Added `TimesheetModule.normalizeHourInput(input)` which uses a regex to strip leading zeros only when immediately followed by another digit. This preserves valid decimals like "0.5" while fixing "08" -> "8".
+**Steps to Reproduce:**
+
+1. Log in to the app
+2. Create or open a timesheet
+3. Add an hour type row (e.g., Internal Hours)
+4. Click on a day's input field (which shows "0")
+5. Type "8"
+6. **Expected:** Field shows "8"
+7. **Actual:** Field shows "08"
+
+**Root Cause:**
+HTML number inputs preserve leading zeros when users type without first clearing the field. The browser appends new digits to the existing "0" value rather than replacing it.
 
 **Implementation:**
 
@@ -335,6 +346,43 @@ Added `TimesheetModule.normalizeHourInput(input)` which uses a regex to strip le
 - [x] Values like "08" are normalized to "8"
 - [x] Decimal values still work correctly (e.g., "0.5")
 - [x] Empty field still shows "0" (placeholder) or empty string
+
+---
+
+---
+
+### BUG-006: Upload Error on NEEDS_UPLOAD Status
+
+**Status:** 🔴 Open
+**Severity:** Medium (P1)
+**Reported:** January 12, 2026
+**Related:** REQ-014
+
+**Description:**
+When a timesheet has a status requiring an upload (e.g., trying to resolve a "Field Hours require attachment" warning), uploading the file triggers an error message prevents further editing or submission.
+
+**Error Message:**
+
+> "Only draft or rejected timesheets can be edited"
+
+**Steps to Reproduce:**
+
+1. Create a timesheet with Field Hours but NO attachment.
+2. Try to submit -> Warning "Field Hours require attachment" appears.
+3. Select "Submit Anyway" (or similar workflow that sets an intermediate status).
+4. Later, open the timesheet to upload the missing file.
+5. Upload a file.
+6. **Expected:** File uploads, and user can now Submit.
+7. **Actual:** Error banner appears: "Only draft or rejected timesheets can be edited."
+
+**Root Cause (Hypothesis):**
+The `isTimesheetEditable()` check in `static/js/timesheet.js` or the backend decorators likely default to `False` for any status that is not explicitly `NEW` or `NEEDS_APPROVAL`. The intermediate status (likely `NEEDS_UPLOAD` or similar) is being treated as read-only.
+
+**Proposed Resolution:**
+
+1. Verify the exact status code being used (e.g., `NEEDS_UPLOAD` or `PENDING`).
+2. Update `isTimesheetEditable` to include this status.
+3. Update backend validation in `app/routes/timesheets.py` to allow edits/uploads for this status.
 
 ---
 
