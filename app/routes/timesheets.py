@@ -513,9 +513,10 @@ def upload_attachment(timesheet_id):
     )
     db.session.add(attachment)
 
-    # If timesheet was NEEDS_APPROVAL, update to SUBMITTED
-    if timesheet.status == TimesheetStatus.NEEDS_APPROVAL:
-        timesheet.status = TimesheetStatus.SUBMITTED
+    # BUG-006 FIX: Removed auto-status-change from NEEDS_APPROVAL → SUBMITTED
+    # Previously, uploading an attachment would auto-submit the timesheet,
+    # which locked it and prevented further edits. Now users must explicitly
+    # click "Submit" after uploading missing attachments.
 
     db.session.commit()
 

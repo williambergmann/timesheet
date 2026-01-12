@@ -340,3 +340,78 @@ class TestTimesheetNotes:
             json={"content": "  "}
         )
         assert response.status_code == 400
+
+
+class TestBug006UploadOnNeedsApproval:
+    """Tests for BUG-006: Upload on NEEDS_APPROVAL should not lock timesheet."""
+
+    def test_upload_does_not_change_status(self, auth_client, app, needs_approval_timesheet, tmp_path):
+        """BUG-006: Uploading to NEEDS_APPROVAL should NOT auto-change to SUBMITTED."""
+        import io
+        
+        # Verify initial status
+        response = auth_client.get(f"/api/timesheets/{needs_approval_timesheet['id']}")
+        assert response.get_json()["status"] == "NEEDS_APPROVAL"
+        
+        # Upload a file
+        data = {
+            "file": (io.BytesIO(b"%PDF-1.4 fake pdf content"), "receipt.pdf")
+        }
+        response = auth_client.post(
+            f"/api/timesheets/{needs_approval_timesheet['id']}/attachments",
+            data=data,
+            content_type="multipart/form-data"
+        )
+        assert response.status_code == 201
+        
+        # Verify status is STILL NEEDS_APPROVAL (not auto-changed to SUBMITTED)
+        response = auth_client.get(f"/api/timesheets/{needs_approval_timesheet['id']}")
+        data = response.get_json()
+        assert data["status"] == "NEEDS_APPROVAL", \
+            "BUG-006: Upload should NOT auto-change status from NEEDS_APPROVAL to SUBMITTED"
+
+    def test_can_edit_after_upload(self, auth_client, app, needs_approval_timesheet, tmp_path):
+        """BUG-006: User can still edit timesheet after uploading attachment."""
+        import io
+        
+        # Upload a file first
+        data = {
+            "file": (io.BytesIO(b"%PDF-1.4 fake pdf"), "doc.pdf")
+        }
+        auth_client.post(
+            f"/api/timesheets/{needs_approval_timesheet['id']}/attachments",
+            data=data,
+            content_type="multipart/form-data"
+        )
+        
+        # Now try to edit the timesheet (this was failing before the fix)
+        response = auth_client.put(
+            f"/api/timesheets/{needs_approval_timesheet['id']}",
+            json={"user_notes": "Updated after upload"}
+        )
+        assert response.status_code == 200, \
+            "BUG-006: Should be able to edit timesheet after upload"
+        assert response.get_json()["user_notes"] == "Updated after upload"
+
+    def test_can_resubmit_after_upload(self, auth_client, app, needs_approval_timesheet, tmp_path):
+        """BUG-006: User can re-submit timesheet after uploading missing attachment."""
+        import io
+        
+        # Upload a file
+        data = {
+            "file": (io.BytesIO(b"%PDF-1.4 fake pdf"), "approval.pdf")
+        }
+        auth_client.post(
+            f"/api/timesheets/{needs_approval_timesheet['id']}/attachments",
+            data=data,
+            content_type="multipart/form-data"
+        )
+        
+        # Re-submit the timesheet
+        response = auth_client.post(f"/api/timesheets/{needs_approval_timesheet['id']}/submit")
+        assert response.status_code == 200, \
+            "BUG-006: Should be able to re-submit after uploading attachment"
+        
+        # Now it should be SUBMITTED (user explicitly submitted)
+        data = response.get_json()
+        assert data["status"] == "SUBMITTED"

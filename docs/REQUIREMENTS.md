@@ -188,6 +188,7 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | Documentation Cleanup         | Removed 137 lines of stale duplicate content         | ✅ Complete |
 | REQ-051: CONTRIBUTING.md      | Contributor guide: clone, run, test, deploy          | ✅ Complete |
 | BUG-006: Investigation        | Root cause identified (auto-status-change on upload) | ✅ Complete |
+| BUG-006: Fix                  | Removed auto-status-change, added 3 tests            | ✅ Complete |
 
 **Test Coverage Results:**
 
@@ -224,6 +225,7 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 6. `feat: add CI/CD pipeline with GitHub Actions and pre-commit hooks`
 7. `docs: add CONTRIBUTING.md (REQ-051)`
 8. `docs: complete BUG-006 investigation`
+9. `fix: resolve BUG-006 upload on NEEDS_APPROVAL status`
 
 ---
 
@@ -233,7 +235,6 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 | Task                         | Time Est. | Priority | Status     | Reference                                        |
 | ---------------------------- | --------- | -------- | ---------- | ------------------------------------------------ |
-| BUG-006: Fix implementation  | 1-2 hours | P1       | 🔴 Open    | Fix based on today's investigation               |
 | REQ-022: Holiday awareness   | 2-3 hours | P1       | 📋 Planned | Add holiday detection + warning to timesheet.js  |
 | Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned | Mock ReportLab, push admin.py 74% → 80%+         |
 | Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned | Mock `_get_bot_token()`, push teams.py 57% → 70% |

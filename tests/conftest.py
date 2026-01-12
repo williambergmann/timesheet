@@ -227,3 +227,39 @@ def approved_timesheet(app, sample_user, sample_admin, sample_week_start):
             "week_start": week_start.isoformat(),
             "status": timesheet.status,
         }
+
+
+@pytest.fixture
+def needs_approval_timesheet(app, sample_user, sample_week_start):
+    """Create a NEEDS_APPROVAL timesheet (field hours without attachment)."""
+    with app.app_context():
+        # Use a different week to avoid conflicts
+        week_start = sample_week_start - timedelta(weeks=3)
+        
+        timesheet = Timesheet(
+            user_id=sample_user["id"],
+            week_start=week_start,
+            status=TimesheetStatus.NEEDS_APPROVAL,
+        )
+        db.session.add(timesheet)
+        db.session.flush()
+        
+        # Add 40 hours of field work (requires attachment)
+        for day_offset in range(1, 6):
+            entry_date = week_start + timedelta(days=day_offset)
+            entry = TimesheetEntry(
+                timesheet_id=timesheet.id,
+                entry_date=entry_date,
+                hour_type=HourType.FIELD,
+                hours=Decimal("8.0"),
+            )
+            db.session.add(entry)
+        
+        db.session.commit()
+        
+        return {
+            "id": timesheet.id,
+            "user_id": timesheet.user_id,
+            "week_start": week_start.isoformat(),
+            "status": timesheet.status,
+        }

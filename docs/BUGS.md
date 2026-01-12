@@ -15,7 +15,7 @@
 | [BUG-003](#bug-003-dev-login-causes-duplicate-key-error)        | Dev Login Causes Duplicate Key Error         | ✅ Resolved | P0       | Jan 8    |
 | [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) | Draft Timesheets Missing Save/Submit Buttons | ✅ Resolved | P1       | Jan 8    |
 | [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
-| [BUG-006](#bug-006-upload-error-on-needs_upload-status)         | Upload Error on NEEDS_UPLOAD Status          | 🔴 Open     | P1       | Jan 12   |
+| [BUG-006](#bug-006-upload-error-on-needs_approval-status)       | Upload Error on NEEDS_APPROVAL Status        | ✅ Resolved | P1       | Jan 12   |
 
 ---
 
@@ -353,10 +353,11 @@ HTML number inputs preserve leading zeros when users type without first clearing
 
 ### BUG-006: Upload Error on NEEDS_APPROVAL Status
 
-**Status:** 🔍 Root Cause Identified
+**Status:** ✅ Resolved
 **Severity:** Medium (P1)
 **Reported:** January 12, 2026
 **Investigated:** January 12, 2026
+**Resolved:** January 12, 2026
 **Related:** REQ-014
 
 **Description:**
@@ -436,19 +437,25 @@ if (timesheet.status == TimesheetStatus.NEEDS_APPROVAL
 
 **Recommendation:** Option A is simplest and maintains user control.
 
-**Implementation Plan (for Jan 13):**
+**Implementation (January 12, 2026):**
 
-1. Remove auto-status-change in `upload_attachment()` (lines 516-518)
-2. After upload, refresh UI state from server OR show "Re-submit" button
-3. Add test for upload on `NEEDS_APPROVAL` timesheet
-4. Verify user can still submit after uploading missing attachment
+1. ✅ Removed auto-status-change in `upload_attachment()` (lines 516-518)
+2. ✅ Added comment explaining the fix
+3. ✅ Added `needs_approval_timesheet` fixture in `tests/conftest.py`
+4. ✅ Added 3 tests in `TestBug006UploadOnNeedsApproval` class
+
+**Files Changed:**
+
+- `app/routes/timesheets.py` — Removed auto-status-change on upload
+- `tests/conftest.py` — Added `needs_approval_timesheet` fixture
+- `tests/test_timesheets.py` — Added `TestBug006UploadOnNeedsApproval` test class
 
 **Acceptance Criteria:**
 
-- [ ] Upload on `NEEDS_APPROVAL` timesheet does NOT auto-change status
-- [ ] User can edit form after uploading attachment
-- [ ] User can successfully re-submit after uploading attachment
-- [ ] Test coverage for this scenario
+- [x] Upload on `NEEDS_APPROVAL` timesheet does NOT auto-change status
+- [x] User can edit form after uploading attachment
+- [x] User can successfully re-submit after uploading attachment
+- [x] Test coverage for this scenario (3 tests)
 
 ---
 
