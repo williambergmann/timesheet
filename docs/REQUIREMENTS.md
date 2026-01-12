@@ -1766,7 +1766,7 @@ The following items were identified by scanning all `.md` files for pending work
 | `app/routes/users.py`        | 98%              | 80%+   | P1       | ✅ Complete    |
 | `app/routes/auth.py`         | 91%              | 85%+   | P1       | ✅ Complete    |
 | `app/services/notification`  | 82%              | 80%+   | P1       | ✅ Complete    |
-| `app/utils/teams.py`         | 57%              | 70%+   | P2       | � In Progress  |
+| `app/utils/teams.py`         | 57%              | 70%+   | P2       | 🔄 In Progress |
 
 **Test Files Created (Jan 11):**
 
@@ -1777,10 +1777,21 @@ The following items were identified by scanning all `.md` files for pending work
 **Test Files Created (Jan 12):**
 
 - ✅ `tests/test_users.py` - User settings endpoint tests (31 tests)
-- ✅ `tests/test_admin_extended.py` - Extended admin route tests (48 tests)
-- ✅ `tests/test_auth.py` - Auth flow tests expanded (25 tests)
+- ✅ `tests/test_admin_extended.py` - Extended admin route tests (55 tests)
+- ✅ `tests/test_auth.py` - Auth flow tests expanded (30 tests)
+- ✅ `tests/test_teams.py` - Teams integration tests (22 tests)
+- ✅ `tests/test_notification.py` - Notification service tests expanded (15 tests)
 
----
+**Testing Infrastructure (see [TESTING.md](TESTING.md#-testing-infrastructure-guidelines)):**
+
+Guidelines documented for reaching 85%+ coverage including:
+
+- Mocking MSAL/Azure AD authentication
+- Mocking Twilio SMS
+- Mocking Teams Bot Framework
+- PDF/Excel export testing strategies
+- Test fixture patterns for role-based access (REQ-041)
+- Common pitfalls and solutions
 
 ### Platform Improvements (from roadmap.md)
 
