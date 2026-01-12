@@ -228,7 +228,7 @@ _Current time: 4:25 PM — Target: 5:30 PM_
 
 | Task                     | Time Est. | Priority | Status         | Notes                                               |
 | ------------------------ | --------- | -------- | -------------- | --------------------------------------------------- |
-| REQ-051: CONTRIBUTING.md | 30 min    | P2       | 📋 Planned     | Quick doc: clone → run → test → deploy              |
+| REQ-051: CONTRIBUTING.md | 30 min    | P2       | ✅ Complete    | `CONTRIBUTING.md` created                           |
 | BUG-006: Investigation   | 30 min    | P1       | 🔍 Investigate | Identify root cause of upload error on NEEDS_UPLOAD |
 
 ---
@@ -1795,7 +1795,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-048     | 📋 Planned  | Architecture diagram                 | Add to `docs/IMPLEMENTATION.md` (from CHECKIN.md §8)                                                            |
 | REQ-049     | 📋 Planned  | API versioning                       | Add `/api/v1/` prefix, version header support (from CHECKIN.md §4)                                              |
 | REQ-050     | 📋 Planned  | OpenAPI/Swagger spec                 | Document API contract for frontend developers (from CHECKIN.md §5)                                              |
-| REQ-051     | 📋 Planned  | CONTRIBUTING.md                      | How to submit changes, run tests, deploy (from CHECKIN.md §8)                                                   |
+| REQ-051     | ✅ Complete | CONTRIBUTING.md                      | `/CONTRIBUTING.md` — clone, run, test, deploy guide                                                             |
 | REQ-052     | 📋 Future   | Database-driven hour types           | Make hour types configurable without code changes (from CHECKIN.md §4)                                          |
 
 ---
