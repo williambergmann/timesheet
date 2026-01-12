@@ -351,15 +351,16 @@ HTML number inputs preserve leading zeros when users type without first clearing
 
 ---
 
-### BUG-006: Upload Error on NEEDS_UPLOAD Status
+### BUG-006: Upload Error on NEEDS_APPROVAL Status
 
-**Status:** 🔴 Open
+**Status:** 🔍 Root Cause Identified
 **Severity:** Medium (P1)
 **Reported:** January 12, 2026
+**Investigated:** January 12, 2026
 **Related:** REQ-014
 
 **Description:**
-When a timesheet has a status requiring an upload (e.g., trying to resolve a "Field Hours require attachment" warning), uploading the file triggers an error message prevents further editing or submission.
+When a timesheet with `NEEDS_APPROVAL` status (field hours submitted without attachment) has a file uploaded, subsequent edit/submit attempts fail with an error.
 
 **Error Message:**
 
@@ -368,21 +369,86 @@ When a timesheet has a status requiring an upload (e.g., trying to resolve a "Fi
 **Steps to Reproduce:**
 
 1. Create a timesheet with Field Hours but NO attachment.
-2. Try to submit -> Warning "Field Hours require attachment" appears.
-3. Select "Submit Anyway" (or similar workflow that sets an intermediate status).
+2. Submit → Warning "Field Hours require attachment" appears.
+3. Select "Submit Anyway" → Status becomes `NEEDS_APPROVAL`.
 4. Later, open the timesheet to upload the missing file.
-5. Upload a file.
-6. **Expected:** File uploads, and user can now Submit.
-7. **Actual:** Error banner appears: "Only draft or rejected timesheets can be edited."
+5. Upload a file → **Upload succeeds**.
+6. Try to edit anything or re-submit.
+7. **Actual:** Error "Only draft or rejected timesheets can be edited."
 
-**Root Cause (Hypothesis):**
-The `isTimesheetEditable()` check in `static/js/timesheet.js` or the backend decorators likely default to `False` for any status that is not explicitly `NEW` or `NEEDS_APPROVAL`. The intermediate status (likely `NEEDS_UPLOAD` or similar) is being treated as read-only.
+**Root Cause (Confirmed):**
 
-**Proposed Resolution:**
+Located in `app/routes/timesheets.py` lines 516-518:
 
-1. Verify the exact status code being used (e.g., `NEEDS_UPLOAD` or `PENDING`).
-2. Update `isTimesheetEditable` to include this status.
-3. Update backend validation in `app/routes/timesheets.py` to allow edits/uploads for this status.
+```python
+# If timesheet was NEEDS_APPROVAL, update to SUBMITTED
+if timesheet.status == TimesheetStatus.NEEDS_APPROVAL:
+    timesheet.status = TimesheetStatus.SUBMITTED
+```
+
+**The bug flow:**
+
+1. User submits with field hours but no attachment → Status: `NEEDS_APPROVAL`
+2. User uploads an attachment → `upload_attachment()` succeeds
+3. **Line 517-518**: Backend auto-changes status `NEEDS_APPROVAL` → `SUBMITTED`
+4. User tries to edit/submit → Status is now `SUBMITTED` (read-only) → **FAIL**
+
+The upload succeeded, but the auto-status-change locked the timesheet prematurely.
+
+**Why the frontend shows the error:**
+
+- After upload, frontend has stale state (`status: NEEDS_APPROVAL`)
+- User clicks "Submit" or edits a field
+- `submitTimesheet()` calls `API.updateTimesheet()` first (line 297 in app.js)
+- Backend rejects because status is now `SUBMITTED`
+- Error displayed to user
+
+**Fix Options:**
+
+**Option A (Backend - Recommended):**
+Remove the auto-status-change on upload. Let the user explicitly re-submit:
+
+```python
+# In upload_attachment():
+# REMOVE lines 516-518
+# User must click "Submit" again to change status
+```
+
+**Option B (Frontend - Alternative):**
+Refresh timesheet state after upload to get new status:
+
+```javascript
+// In handleFileUpload():
+const timesheet = await API.getTimesheet(timesheetId);
+TimesheetModule.populateForm(timesheet); // Refresh entire form
+```
+
+**Option C (Backend - Advanced):**
+Auto-submit only if ALL requirements are now met:
+
+```python
+# After upload, check if timesheet is now complete
+if (timesheet.status == TimesheetStatus.NEEDS_APPROVAL
+    and not timesheet.requires_attachment()
+    and not timesheet.get_missing_reimbursement_attachments()):
+    timesheet.status = TimesheetStatus.SUBMITTED
+```
+
+**Recommendation:** Option A is simplest and maintains user control.
+
+**Implementation Plan (for Jan 13):**
+
+1. Remove auto-status-change in `upload_attachment()` (lines 516-518)
+2. After upload, refresh UI state from server OR show "Re-submit" button
+3. Add test for upload on `NEEDS_APPROVAL` timesheet
+4. Verify user can still submit after uploading missing attachment
+
+**Acceptance Criteria:**
+
+- [ ] Upload on `NEEDS_APPROVAL` timesheet does NOT auto-change status
+- [ ] User can edit form after uploading attachment
+- [ ] User can successfully re-submit after uploading attachment
+- [ ] Test coverage for this scenario
 
 ---
 

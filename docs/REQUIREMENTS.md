@@ -226,10 +226,10 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 _Current time: 4:25 PM — Target: 5:30 PM_
 
-| Task                     | Time Est. | Priority | Status         | Notes                                               |
-| ------------------------ | --------- | -------- | -------------- | --------------------------------------------------- |
-| REQ-051: CONTRIBUTING.md | 30 min    | P2       | ✅ Complete    | `CONTRIBUTING.md` created                           |
-| BUG-006: Investigation   | 30 min    | P1       | 🔍 Investigate | Identify root cause of upload error on NEEDS_UPLOAD |
+| Task                     | Time Est. | Priority | Status      | Notes                                                  |
+| ------------------------ | --------- | -------- | ----------- | ------------------------------------------------------ |
+| REQ-051: CONTRIBUTING.md | 30 min    | P2       | ✅ Complete | `CONTRIBUTING.md` created                              |
+| BUG-006: Investigation   | 30 min    | P1       | ✅ Complete | Root cause: auto-status-change on upload (see BUGS.md) |
 
 ---
 
