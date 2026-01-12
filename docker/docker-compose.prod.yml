@@ -1,0 +1,121 @@
+# Northstar Timesheet - Production Docker Compose with SSL/TLS
+#
+# This configuration extends the base docker-compose.yml for production use.
+# It adds HTTPS support via Let's Encrypt or custom SSL certificates.
+#
+# Usage:
+#   # Initial setup with Let's Encrypt:
+#   docker compose -f docker/docker-compose.prod.yml run --rm certbot certonly \
+#     --webroot -w /var/www/certbot -d your-domain.com --email admin@your-domain.com --agree-tos
+#
+#   # Start production stack:
+#   docker compose -f docker/docker-compose.prod.yml up -d
+#
+#   # Renew certificates (run via cron):
+#   docker compose -f docker/docker-compose.prod.yml run --rm certbot renew
+#
+# See docs/SSL-SETUP.md for detailed instructions.
+
+name: timesheet-prod
+
+services:
+  # ==========================================================================
+  # Nginx reverse proxy with SSL termination
+  # ==========================================================================
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-ssl.conf:/etc/nginx/nginx.conf:ro
+      # Let's Encrypt certificates
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-var:/var/lib/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+      # Custom certificates (uncomment if using your own certs)
+      # - ./ssl:/etc/nginx/ssl:ro
+    environment:
+      - SSL_DOMAIN=${SSL_DOMAIN:-example.com}
+    depends_on:
+      - web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/.well-known/acme-challenge/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================================================
+  # Flask application
+  # ==========================================================================
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    expose:
+      - "5000"
+    env_file:
+      - ../.env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-timesheet}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-timesheet}
+      - REDIS_URL=redis://redis:6379/0
+      - FLASK_ENV=production
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # ==========================================================================
+  # PostgreSQL database
+  # ==========================================================================
+  db:
+    image: postgres:15-alpine
+    # NOTE: Do NOT expose port 5432 in production (removed from dev config)
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-timesheet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required - set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-timesheet}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-timesheet}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Redis for caching and SSE pub/sub
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Certbot for Let's Encrypt certificate management
+  # ==========================================================================
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - certbot-www:/var/www/certbot
+    # Certbot runs as a one-off command, not a long-running service
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    profiles:
+      - certbot-renew  # Only starts when explicitly requested
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads:
+  certbot-etc:
+  certbot-var:
+  certbot-www:

@@ -177,7 +177,7 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 | Module                         | Before | After | Target  |
 | ------------------------------ | ------ | ----- | ------- |
-| **Total Coverage**             | 53%    | 83%   | 85%     |
+| **Total Coverage**             | 68%    | 83%   | 85%     |
 | **Tests Passing**              | 253    | 390   | 300+ ✅ |
 | `app/routes/users.py`          | 16%    | 98%   | ✅ Done |
 | `app/routes/auth.py`           | 44%    | 91%   | ✅ Done |
@@ -230,12 +230,12 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 **Platform Improvements (Pending):**
 
-| Task                                    | Priority | Status     | Reference                                                              |
-| --------------------------------------- | -------- | ---------- | ---------------------------------------------------------------------- |
-| Configure HTTPS/SSL for production      | P0       | 📋 Planned | Update `docker/nginx.conf`, add SSL certs, see `docs/SECURITY.md`      |
-| Change database password from default   | P0       | 📋 Planned | Update `docker/docker-compose.yml` and `.env`, see `docs/SECURITY.md`  |
-| Rotate Azure credentials for production | P0       | 📋 Planned | Update `.env` with new client secret, see `docs/AZURE.md`              |
-| Enable error monitoring (Sentry)        | P1       | 📋 Planned | Add `sentry-sdk` to `requirements.txt`, configure in `app/__init__.py` |
+| Task                                    | Priority | Status      | Reference                                                                           |
+| --------------------------------------- | -------- | ----------- | ----------------------------------------------------------------------------------- |
+| Configure HTTPS/SSL for production      | P0       | ✅ Complete | Created `docker/nginx-ssl.conf`, `docker-compose.prod.yml`, see `docs/SSL-SETUP.md` |
+| Change database password from default   | P0       | 📋 Planned  | Update `docker/docker-compose.yml` and `.env`, see `docs/SECURITY.md`               |
+| Rotate Azure credentials for production | P0       | 📋 Planned  | Update `.env` with new client secret, see `docs/AZURE.md`                           |
+| Enable error monitoring (Sentry)        | P1       | 📋 Planned  | Add `sentry-sdk` to `requirements.txt`, configure in `app/__init__.py`              |
 
 **CI/CD Setup (Pending):**
 
@@ -1758,149 +1758,11 @@ Add end-to-end browser tests for critical user flows.
 
 ---
 
-## 🚀 Future Work (Compiled from All Documentation)
+_Document maintained as the authoritative source for feature requirements. For other topics, see:_
 
-The following items were identified by scanning all `.md` files for pending work, TODOs, and future enhancements.
+- _Bugs: [`BUGS.md`](BUGS.md)_
+- _Security: [`SECURITY.md`](SECURITY.md)_
+- _Testing: [`TESTING.md`](TESTING.md)_
+- _Roadmap: [`roadmap.md`](roadmap.md)_
 
-### Open Bugs (from BUGS.md)
-
-| Bug ID  | Severity | Description                               | Status      |
-| ------- | -------- | ----------------------------------------- | ----------- |
-| BUG-001 | P0       | Submitted Timesheets Allow Editing        | ✅ Resolved |
-| BUG-002 | P1       | Reimbursement amounts display "$null"     | ✅ Resolved |
-| BUG-003 | P0       | Dev login causes duplicate key error      | ✅ Resolved |
-| BUG-004 | P1       | Draft timesheets missing Save/Submit      | ✅ Resolved |
-| BUG-005 | P2       | Leading zero not removed from hour inputs | ✅ Resolved |
-| BUG-006 | P1       | Upload error on NEEDS_UPLOAD status       | 🔴 Open     |
-
-**BUG-005 Fix Plan:**
-
-- Add `normalizeHourInput()` function in `static/js/timesheet.js`
-- Strip leading zeros when user types into hour fields
-- Alternative: select all text on focus so typing replaces value
-
----
-
-### Security Hardening (from SECURITY.md)
-
-| Item                                    | Priority | Status      |
-| --------------------------------------- | -------- | ----------- |
-| Generate strong production `SECRET_KEY` | P0       | ✅ Complete |
-| Rotate Azure credentials for production | P0       | ⏳ Pending  |
-| Configure HTTPS/SSL for production      | P0       | ⏳ Pending  |
-| Change database password from default   | P0       | ⏳ Pending  |
-| Enable error monitoring (Sentry)        | P1       | 📋 Planned  |
-| Automated security scanning (Bandit)    | P2       | 📋 Planned  |
-
----
-
-### Testing Gaps (from TESTING.md)
-
-| Area                         | Current Coverage | Target | Priority | Status         |
-| ---------------------------- | ---------------- | ------ | -------- | -------------- |
-| Total Code Coverage          | 83%              | 85%+   | P1       | 🔄 In Progress |
-| Tests Passing                | 390              | 300+   | P1       | ✅ Complete    |
-| `app/routes/main.py`         | 97%              | 95%+   | P1       | ✅ Complete    |
-| `app/routes/events.py` (SSE) | 88%              | 80%+   | P2       | ✅ Complete    |
-| `app/routes/admin.py`        | 74%              | 80%+   | P1       | 🔄 In Progress |
-| `app/routes/users.py`        | 98%              | 80%+   | P1       | ✅ Complete    |
-| `app/routes/auth.py`         | 91%              | 85%+   | P1       | ✅ Complete    |
-| `app/services/notification`  | 82%              | 80%+   | P1       | ✅ Complete    |
-| `app/utils/teams.py`         | 57%              | 70%+   | P2       | 🔄 In Progress |
-
-**Test Files Created (Jan 11):**
-
-- ✅ `tests/test_attachments.py` - File upload/download tests (10 tests)
-- ✅ `tests/test_events.py` - SSE endpoint tests (11 tests)
-- ✅ `tests/test_main.py` - Main routes tests (17 tests)
-
-**Test Files Created (Jan 12):**
-
-- ✅ `tests/test_users.py` - User settings endpoint tests (31 tests)
-- ✅ `tests/test_admin_extended.py` - Extended admin route tests (55 tests)
-- ✅ `tests/test_auth.py` - Auth flow tests expanded (30 tests)
-- ✅ `tests/test_teams.py` - Teams integration tests (22 tests)
-- ✅ `tests/test_notification.py` - Notification service tests expanded (15 tests)
-
-**Testing Infrastructure (see [TESTING.md](TESTING.md#-testing-infrastructure-guidelines)):**
-
-Guidelines documented for reaching 85%+ coverage including:
-
-- Mocking MSAL/Azure AD authentication
-- Mocking Twilio SMS
-- Mocking Teams Bot Framework
-- PDF/Excel export testing strategies
-- Test fixture patterns for role-based access (REQ-041)
-- Common pitfalls and solutions
-
-### Platform Improvements (from roadmap.md)
-
-| Area                    | Recommendation                             | Status     |
-| ----------------------- | ------------------------------------------ | ---------- |
-| Session storage         | Consider Redis-backed server-side sessions | 📋 Planned |
-| API versioning          | Add versioning for future breaking changes | 📋 Planned |
-| Audit logging           | Add audit log table for status changes     | 📋 Planned |
-| Hour type configuration | Make hour types database-driven            | 📋 Future  |
-| Error monitoring        | Integrate Sentry                           | 📋 Planned |
-| Uptime monitoring       | Set up external monitoring                 | 📋 Planned |
-
----
-
-### UX & Feature Enhancements (from IMPLEMENTATION.md)
-
-| Feature                                            | REQ     | Status      |
-| -------------------------------------------------- | ------- | ----------- |
-| Holiday awareness & warning                        | REQ-022 | 📋 Planned  |
-| Travel mileage tracking                            | REQ-024 | 📋 Planned  |
-| Expanded expense types (Gas, Hotel, Parking, Toll) | REQ-025 | 📋 Planned  |
-| Per-option reimbursement attachments               | REQ-021 | ✅ Complete |
-| Biweekly pay period confirmation                   | REQ-006 | ✅ Complete |
-
----
-
-### Open Questions (from IMPLEMENTATION.md)
-
-1. **Hosting Platform**: Managed platform vs ECS/K8s decision
-2. **Domain/TLS**: Production URL and certificate approach
-3. **Environment Strategy**: dev/staging/prod separation
-4. **Data Retention Policy**: How long to keep timesheets and attachments
-5. **Mobile Experience**: Target scope for mobile UX and offline support
-6. **Audit/Compliance**: Audit logging level and GDPR/privacy requirements
-
----
-
-### CI/CD Improvements (from TESTING.md)
-
-| Item                              | Status     |
-| --------------------------------- | ---------- |
-| GitHub Actions workflow for tests | 📋 Planned |
-| Pre-commit hook for tests         | 📋 Planned |
-| Codecov integration               | 📋 Planned |
-| Container vulnerability scanning  | 📋 Planned |
-
----
-
-### Recommended Next Steps
-
-**Immediate (This Week):**
-
-1. Fix BUG-002 (Reimbursement $null display)
-2. Verify BUG-003 is resolved, update BUGS.md
-3. Generate production `SECRET_KEY`
-
-**Short-Term (Next 2 Weeks):**
-
-1. Add `test_attachments.py` for file upload tests
-2. REQ-022: Holiday awareness & warning
-3. REQ-024: Travel mileage tracking
-
-**Medium-Term (Next Month):**
-
-1. Increase test coverage to 85%
-2. REQ-025: Expanded expense types
-3. Set up error monitoring (Sentry)
-4. Production deployment with HTTPS
-
----
-
-_Document updated January 10, 2026_
+_Last updated: January 12, 2026_

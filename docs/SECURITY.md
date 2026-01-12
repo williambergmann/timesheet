@@ -132,8 +132,8 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### SSL/TLS Configuration
 
-- [ ] **Enable HTTPS in production** - All traffic must use HTTPS
-- [ ] **Set `SESSION_COOKIE_SECURE = True`** - Cookies only sent over HTTPS
+- [x] **Enable HTTPS in production** - ✅ Created `docker/nginx-ssl.conf` and `docker-compose.prod.yml` (Jan 12, 2026)
+- [x] **Set `SESSION_COOKIE_SECURE = True`** - ✅ Already configured in `ProductionConfig`
 - [ ] **Update `AZURE_REDIRECT_URI`** - Must be `https://` in production
 - [ ] **Update `APP_URL`** - Used in SMS notifications, must be `https://`
 
@@ -258,7 +258,7 @@ Before deploying to production, run through this comprehensive checklist to ensu
 ### ⚠️ Areas Requiring Attention Before Production
 
 1. **Production secrets** - Must rotate `SECRET_KEY` and credentials from default/placeholder values
-2. **HTTPS enforcement** - Must configure SSL/TLS for production
+2. ~~**HTTPS enforcement**~~ - ✅ SSL configuration created (see `docs/SSL-SETUP.md`)
 3. ~~**Rate limiting**~~ - ✅ Implemented via Flask-Limiter (REQ-042)
 4. ~~**Audit logging**~~ - ✅ Structured logging with request IDs (REQ-036)
 5. **Database password** - Change from default `timesheet` in production
@@ -273,18 +273,18 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 ### Audit Summary
 
-| Category           | Status     | Notes                                     |
-| ------------------ | ---------- | ----------------------------------------- |
-| Authentication     | ✅ Pass    | Session-based auth with secure cookies    |
-| Authorization      | ✅ Pass    | Role-based access with server-side checks |
-| Input Validation   | ✅ Pass    | SQLAlchemy ORM + file validation          |
-| Rate Limiting      | ✅ Pass    | Flask-Limiter on auth endpoints           |
-| CSRF Protection    | ✅ Pass    | Flask-WTF CSRF tokens                     |
-| XSS Prevention     | ✅ Pass    | Jinja2 auto-escaping                      |
-| SQL Injection      | ✅ Pass    | Parameterized queries via ORM             |
-| File Upload        | ✅ Pass    | Extension + magic number validation       |
-| Secrets Management | ⚠️ Partial | Dev env uses placeholder values           |
-| HTTPS              | ⏳ Pending | Required for production deployment        |
+| Category           | Status     | Notes                                       |
+| ------------------ | ---------- | ------------------------------------------- |
+| Authentication     | ✅ Pass    | Session-based auth with secure cookies      |
+| Authorization      | ✅ Pass    | Role-based access with server-side checks   |
+| Input Validation   | ✅ Pass    | SQLAlchemy ORM + file validation            |
+| Rate Limiting      | ✅ Pass    | Flask-Limiter on auth endpoints             |
+| CSRF Protection    | ✅ Pass    | Flask-WTF CSRF tokens                       |
+| XSS Prevention     | ✅ Pass    | Jinja2 auto-escaping                        |
+| SQL Injection      | ✅ Pass    | Parameterized queries via ORM               |
+| File Upload        | ✅ Pass    | Extension + magic number validation         |
+| Secrets Management | ⚠️ Partial | Dev env uses placeholder values             |
+| HTTPS              | ✅ Pass    | SSL config created, see `docs/SSL-SETUP.md` |
 
 ### Recommendations
 
@@ -329,6 +329,6 @@ If you discover a security vulnerability in this application:
 
 ---
 
-**Last Updated:** 2026-01-10  
+**Last Updated:** 2026-01-12  
 **Security Audit:** ✅ Passed (January 9, 2026)  
 **Review Schedule:** Quarterly or before major releases
