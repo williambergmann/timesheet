@@ -25,7 +25,10 @@ Before deploying to production, run through this comprehensive checklist to ensu
     SECRET_KEY=<paste-64-character-hex-string-here>
     ```
   - ⚠️ **Important:** Without a persistent SECRET_KEY, sessions will be invalidated on restart
-- [ ] **Rotate Azure credentials** - Ensure `AZURE_CLIENT_ID` and `AZURE_CLIENT_SECRET` are production values (not placeholder `your-azure-*` values)
+- [x] **Rotate Azure credentials** - ✅ Procedure documented in [AZURE.md](AZURE.md#-production-credential-rotation-p0) (Jan 12, 2026)
+
+  Before production: Create new client secret in Azure Portal and update `AZURE_CLIENT_SECRET` in `.env`
+
 - [ ] **Secure Twilio credentials** - Verify `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` are properly configured
 - [ ] **Use secrets manager in production** - Consider AWS Secrets Manager, Azure Key Vault, or HashiCorp Vault for production deployments
 
@@ -50,9 +53,23 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 #### PostgreSQL Configuration
 
-- [ ] **Strong database password** - Ensure PostgreSQL password is not the default `timesheet`
+- [x] **Strong database password** - ✅ Production compose requires `POSTGRES_PASSWORD` env var (Jan 12, 2026)
+
+  **To set production database password:**
+
+  ```bash
+  # Generate a strong password
+  openssl rand -base64 32
+
+  # Add to .env file
+  POSTGRES_PASSWORD=<paste-generated-password-here>
+  ```
+
+  > ⚠️ The development `docker-compose.yml` uses default `timesheet` password.  
+  > Production `docker-compose.prod.yml` **requires** `POSTGRES_PASSWORD` to be set or it will fail to start.
+
 - [ ] **Database user permissions** - Use principle of least privilege (app user shouldn't have `SUPERUSER` rights)
-- [ ] **Network isolation** - Database should only be accessible from application server (not public internet)
+- [x] **Network isolation** - ✅ Production compose does not expose port 5432 to host (Jan 12, 2026)
 - [x] **Parameterized queries** - ✅ All queries use SQLAlchemy ORM (no raw SQL concatenation)
 
 #### Data Protection
@@ -261,7 +278,8 @@ Before deploying to production, run through this comprehensive checklist to ensu
 2. ~~**HTTPS enforcement**~~ - ✅ SSL configuration created (see `docs/SSL-SETUP.md`)
 3. ~~**Rate limiting**~~ - ✅ Implemented via Flask-Limiter (REQ-042)
 4. ~~**Audit logging**~~ - ✅ Structured logging with request IDs (REQ-036)
-5. **Database password** - Change from default `timesheet` in production
+5. ~~**Database password**~~ - ✅ Production compose enforces `POSTGRES_PASSWORD` (see above)
+6. ~~**Azure credentials**~~ - ✅ Rotation procedure documented (see [AZURE.md](AZURE.md#-production-credential-rotation-p0))
 
 ---
 

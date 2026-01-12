@@ -287,6 +287,72 @@ DETAIL: Key (azure_id)=(dev-user-001) already exists.
 
 ---
 
+## 🔄 Production Credential Rotation (P0)
+
+Before deploying to production, you **must** create new credentials. Development placeholders are not secure.
+
+### Rotate Azure Client Secret
+
+Azure client secrets expire. Create a new secret before production deployment and set calendar reminders for rotation.
+
+**Step 1: Create a new secret**
+
+1. Go to [Azure Portal](https://portal.azure.com) → **App registrations** → **Northstar Timesheet**
+2. Navigate to **Certificates & secrets** → **Client secrets**
+3. Click **New client secret**
+4. Set description: `Production - Expires YYYY-MM-DD`
+5. Choose expiration: **24 months** (recommended) or per security policy
+6. Click **Add** and **immediately copy the Value**
+
+**Step 2: Update production environment**
+
+```bash
+# Update .env file
+AZURE_CLIENT_SECRET=your-new-secret-value-here
+```
+
+**Step 3: Set expiration reminder**
+
+Add a calendar reminder 30 days before expiration to rotate again.
+
+**Step 4: Restart the application**
+
+```bash
+docker compose -f docker/docker-compose.prod.yml down
+docker compose -f docker/docker-compose.prod.yml up -d
+```
+
+### Monitor Secret Expiration
+
+Check secret expiration dates via Azure CLI:
+
+```bash
+# List all secrets for your app
+az ad app credential list --id $AZURE_CLIENT_ID --query "[].{description:displayName, expires:endDateTime}" -o table
+```
+
+**Example output:**
+
+```
+Description              Expires
+-----------------------  -------------------------
+Production - 2027-01-12  2027-01-12T00:00:00+00:00
+```
+
+### Rotation Checklist
+
+| Task                                                     | Status |
+| -------------------------------------------------------- | ------ |
+| Create new client secret in Azure Portal                 | ⬜     |
+| Copy secret value immediately (shown only once)          | ⬜     |
+| Update `AZURE_CLIENT_SECRET` in production `.env`        | ⬜     |
+| Restart application                                      | ⬜     |
+| Verify login works with new secret                       | ⬜     |
+| Set calendar reminder for next rotation                  | ⬜     |
+| Delete old secret from Azure Portal (after verification) | ⬜     |
+
+---
+
 ## Optional: Add More Redirect URIs
 
 If you need multiple environments, you can add additional redirect URIs:
@@ -586,4 +652,4 @@ Free tier available for testing:
 
 ---
 
-_Document updated January 9, 2026_
+_Document updated January 12, 2026_
