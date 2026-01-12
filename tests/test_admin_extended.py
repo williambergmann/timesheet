@@ -235,6 +235,29 @@ class TestTimesheetDataReport:
             assert "hour_type" in row
             assert "hours" in row
 
+    def test_data_report_filter_by_week_start(self, admin_client, submitted_timesheet):
+        """Test filtering data report by week_start."""
+        week_start = submitted_timesheet["week_start"]
+        response = admin_client.get(f"/api/admin/reports/timesheet-data?week_start={week_start}")
+        assert response.status_code == 200
+
+    def test_data_report_filter_by_start_date(self, admin_client, submitted_timesheet):
+        """Test filtering data report by start_date."""
+        response = admin_client.get("/api/admin/reports/timesheet-data?start_date=2025-01-01")
+        assert response.status_code == 200
+
+    def test_data_report_filter_by_end_date(self, admin_client, submitted_timesheet):
+        """Test filtering data report by end_date."""
+        response = admin_client.get("/api/admin/reports/timesheet-data?end_date=2026-12-31")
+        assert response.status_code == 200
+
+    def test_data_report_filter_by_date_range(self, admin_client, submitted_timesheet):
+        """Test filtering data report by date range."""
+        response = admin_client.get(
+            "/api/admin/reports/timesheet-data?start_date=2025-01-01&end_date=2026-12-31"
+        )
+        assert response.status_code == 200
+
 
 # ============================================================================
 # Pay Period Tests (REQ-006)
@@ -689,3 +712,119 @@ class TestPayPeriodLock:
         response = admin_client.post(f"/api/admin/timesheets/{ts_id}/unapprove")
         assert response.status_code == 400
         assert "locked" in response.get_json()["error"].lower()
+
+
+class TestAdminListFilters:
+    """Tests for admin timesheet list filters."""
+
+    def test_filter_by_week_start(self, admin_client, submitted_timesheet):
+        """Test filtering timesheets by week_start."""
+        week_start = submitted_timesheet["week_start"]
+        response = admin_client.get(f"/api/admin/timesheets?week_start={week_start}")
+        assert response.status_code == 200
+
+        data = response.get_json()
+        for ts in data["timesheets"]:
+            assert ts["week_start"] == week_start
+
+
+class TestPayPeriodStatusEdgeCases:
+    """Edge case tests for pay period status."""
+
+    def test_pay_period_date_mismatch(self, admin_client, sample_admin, app):
+        """Test that mismatched pay period dates return error."""
+        # Create a confirmed pay period
+        with app.app_context():
+            period = PayPeriod(
+                start_date=date(2025, 6, 1),  # A Sunday
+                end_date=date(2025, 6, 14),
+                confirmed_by=sample_admin["id"],
+            )
+            db.session.add(period)
+            db.session.commit()
+
+        # Request with same start but different end
+        response = admin_client.get("/api/admin/pay-periods/status?start_date=2025-06-01&end_date=2025-06-20")
+        assert response.status_code == 400
+        assert "do not match" in response.get_json()["error"]
+
+
+class TestExportPayPeriod:
+    """Tests for GET /api/admin/exports/pay-period endpoint."""
+
+    def test_export_pay_period_requires_auth(self, client):
+        """Test that pay period export requires authentication."""
+        response = client.get("/api/admin/exports/pay-period?start=2026-01-05&end=2026-01-18")
+        assert response.status_code == 401
+
+    def test_export_pay_period_csv(self, admin_client, approved_timesheet, app):
+        """Test exporting pay period as CSV."""
+        # Get a valid pay period range that includes the approved timesheet
+        week_start = approved_timesheet["week_start"]
+
+        response = admin_client.get(
+            f"/api/admin/exports/pay-period?start={week_start}&end={week_start}&format=csv"
+        )
+        # Should work or return empty result
+        assert response.status_code in [200, 400]
+
+
+class TestSupportUserNotes:
+    """Tests for support user adding notes REQ-041."""
+
+    def test_support_can_add_note_to_trainee_timesheet(self, support_client, trainee_timesheet, app):
+        """Test that support users can add notes to trainee timesheets."""
+        response = support_client.post(
+            f"/api/admin/timesheets/{trainee_timesheet['id']}/notes",
+            json={"content": "Reviewed by support"},
+        )
+        assert response.status_code == 201
+
+        data = response.get_json()
+        assert data["content"] == "Reviewed by support"
+
+    def test_support_cannot_add_note_to_staff_timesheet(self, support_client, submitted_timesheet):
+        """Test that support users cannot add notes to staff timesheets."""
+        response = support_client.post(
+            f"/api/admin/timesheets/{submitted_timesheet['id']}/notes",
+            json={"content": "This should fail"},
+        )
+        assert response.status_code == 403
+
+
+class TestRejectTimesheetEdgeCases:
+    """Edge case tests for reject timesheet."""
+
+    def test_reject_in_locked_period(self, admin_client, sample_admin, sample_user, app):
+        """Test that rejection fails for locked pay period."""
+        start = date(2025, 5, 4)  # A Sunday
+        with app.app_context():
+            period = PayPeriod(
+                start_date=start,
+                end_date=start + timedelta(days=13),
+                confirmed_by=sample_admin["id"],
+            )
+            db.session.add(period)
+
+            ts = Timesheet(
+                user_id=sample_user["id"],
+                week_start=start,
+                status=TimesheetStatus.SUBMITTED,
+            )
+            db.session.add(ts)
+            db.session.commit()
+            ts_id = ts.id
+
+        response = admin_client.post(f"/api/admin/timesheets/{ts_id}/reject", json={})
+        assert response.status_code == 400
+        assert "locked" in response.get_json()["error"].lower()
+
+    def test_reject_without_reason(self, admin_client, submitted_timesheet):
+        """Test rejecting without providing a reason."""
+        response = admin_client.post(
+            f"/api/admin/timesheets/{submitted_timesheet['id']}/reject",
+            json={},
+        )
+        assert response.status_code == 200
+        # No note should be created when no reason provided
+

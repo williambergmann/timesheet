@@ -334,3 +334,145 @@ class TestLoginRoute:
 
         with client.session_transaction() as sess:
             assert "user" in sess
+
+
+class TestOAuthCallbackWithMock:
+    """Tests for OAuth callback with mocked MSAL."""
+
+    def test_callback_token_error(self, client, app):
+        """Test callback with token exchange error."""
+        from unittest.mock import patch, MagicMock
+
+        # Configure app for production mode
+        app.config["AZURE_CLIENT_ID"] = "real-client-id"
+        app.config["AZURE_CLIENT_SECRET"] = "real-client-secret"
+
+        with patch("app.routes.auth._get_msal_app") as mock_msal:
+            mock_app = MagicMock()
+            mock_app.acquire_token_by_authorization_code.return_value = {
+                "error": "invalid_grant",
+                "error_description": "Code expired",
+            }
+            mock_msal.return_value = mock_app
+
+            response = client.get("/auth/callback?code=test-code")
+            assert response.status_code == 400
+            assert b"Token error" in response.data
+
+    def test_callback_missing_user_info(self, client, app):
+        """Test callback when token has no user info."""
+        from unittest.mock import patch, MagicMock
+
+        app.config["AZURE_CLIENT_ID"] = "real-client-id"
+        app.config["AZURE_CLIENT_SECRET"] = "real-client-secret"
+
+        with patch("app.routes.auth._get_msal_app") as mock_msal:
+            mock_app = MagicMock()
+            mock_app.acquire_token_by_authorization_code.return_value = {
+                "access_token": "test-token",
+                "id_token_claims": {},  # No user info
+            }
+            mock_msal.return_value = mock_app
+
+            response = client.get("/auth/callback?code=test-code")
+            assert response.status_code == 400
+            assert b"Could not get user info" in response.data
+
+    def test_callback_success_creates_user(self, client, app):
+        """Test successful OAuth callback creates user and session."""
+        from unittest.mock import patch, MagicMock
+        from app.models import User
+
+        app.config["AZURE_CLIENT_ID"] = "real-client-id"
+        app.config["AZURE_CLIENT_SECRET"] = "real-client-secret"
+
+        with patch("app.routes.auth._get_msal_app") as mock_msal:
+            mock_app = MagicMock()
+            mock_app.acquire_token_by_authorization_code.return_value = {
+                "access_token": "test-access-token",
+                "id_token_claims": {
+                    "oid": "azure-oid-12345",
+                    "preferred_username": "newuser@company.com",
+                    "name": "New User",
+                },
+            }
+            mock_msal.return_value = mock_app
+
+            response = client.get("/auth/callback?code=valid-code", follow_redirects=False)
+            assert response.status_code == 302
+            assert "/app" in response.location
+
+            # Verify user was created
+            with app.app_context():
+                user = User.query.filter_by(azure_id="azure-oid-12345").first()
+                assert user is not None
+                assert user.email == "newuser@company.com"
+                assert user.display_name == "New User"
+
+    def test_callback_success_updates_existing_user(self, client, app):
+        """Test successful OAuth callback updates existing user."""
+        from unittest.mock import patch, MagicMock
+        from app.models import User
+        from app.extensions import db
+
+        app.config["AZURE_CLIENT_ID"] = "real-client-id"
+        app.config["AZURE_CLIENT_SECRET"] = "real-client-secret"
+
+        # Create existing user
+        with app.app_context():
+            existing = User(
+                azure_id="azure-existing-001",
+                email="old@company.com",
+                display_name="Old Name",
+            )
+            db.session.add(existing)
+            db.session.commit()
+
+        with patch("app.routes.auth._get_msal_app") as mock_msal:
+            mock_app = MagicMock()
+            mock_app.acquire_token_by_authorization_code.return_value = {
+                "access_token": "test-access-token",
+                "id_token_claims": {
+                    "oid": "azure-existing-001",
+                    "preferred_username": "updated@company.com",
+                    "name": "Updated Name",
+                },
+            }
+            mock_msal.return_value = mock_app
+
+            response = client.get("/auth/callback?code=valid-code", follow_redirects=False)
+            assert response.status_code == 302
+
+            # Verify user was updated
+            with app.app_context():
+                user = User.query.filter_by(azure_id="azure-existing-001").first()
+                assert user.email == "updated@company.com"
+                assert user.display_name == "Updated Name"
+
+    def test_callback_uses_sub_if_oid_missing(self, client, app):
+        """Test callback falls back to 'sub' claim if 'oid' is missing."""
+        from unittest.mock import patch, MagicMock
+        from app.models import User
+
+        app.config["AZURE_CLIENT_ID"] = "real-client-id"
+        app.config["AZURE_CLIENT_SECRET"] = "real-client-secret"
+
+        with patch("app.routes.auth._get_msal_app") as mock_msal:
+            mock_app = MagicMock()
+            mock_app.acquire_token_by_authorization_code.return_value = {
+                "access_token": "test-access-token",
+                "id_token_claims": {
+                    "sub": "azure-sub-claim",  # Using sub instead of oid
+                    "email": "user@example.com",  # Using email instead of preferred_username
+                    "name": "Sub User",
+                },
+            }
+            mock_msal.return_value = mock_app
+
+            response = client.get("/auth/callback?code=valid-code", follow_redirects=False)
+            assert response.status_code == 302
+
+            with app.app_context():
+                user = User.query.filter_by(azure_id="azure-sub-claim").first()
+                assert user is not None
+                assert user.email == "user@example.com"
