@@ -1,0 +1,194 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # ============================================================================
+  # Unit Tests with pytest
+  # ============================================================================
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      # PostgreSQL for integration tests
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: timesheet
+          POSTGRES_PASSWORD: timesheet
+          POSTGRES_DB: timesheet_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      # Redis for rate limiting tests
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov flake8
+
+      - name: Lint with flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings
+          flake8 app --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
+      - name: Run unit tests with coverage
+        env:
+          DATABASE_URL: postgresql://timesheet:timesheet@localhost:5432/timesheet_test
+          REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-secret-key-for-ci
+          FLASK_ENV: testing
+        run: |
+          pytest tests/ \
+            --ignore=tests/e2e \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # ============================================================================
+  # E2E Tests with Playwright
+  # ============================================================================
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests  # Only run E2E if unit tests pass
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Playwright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Start Docker Compose stack
+        run: |
+          cd docker
+          docker compose up -d --build
+          # Wait for services to be healthy
+          sleep 30
+          # Check if services are running
+          docker compose ps
+
+      - name: Wait for application to be ready
+        run: |
+          # Wait for the app to respond
+          for i in {1..30}; do
+            if curl -s http://localhost/health > /dev/null; then
+              echo "Application is ready!"
+              break
+            fi
+            echo "Waiting for application... ($i/30)"
+            sleep 5
+          done
+
+      - name: Run Playwright tests
+        env:
+          CI: true
+          BASE_URL: http://localhost
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Stop Docker Compose stack
+        if: always()
+        run: |
+          cd docker
+          docker compose down -v
+
+  # ============================================================================
+  # Security Scanning
+  # ============================================================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit safety
+
+      - name: Run Bandit security linter
+        run: |
+          bandit -r app -ll -ii -x tests
+
+      - name: Check dependencies for vulnerabilities
+        run: |
+          safety check -r requirements.txt --full-report
+        continue-on-error: true  # Don't fail build on known vulnerabilities

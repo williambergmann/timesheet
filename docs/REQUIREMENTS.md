@@ -237,13 +237,14 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | Rotate Azure credentials for production | P0       | ✅ Complete | Rotation procedure in `docs/AZURE.md` § Production Credential Rotation         |
 | Enable error monitoring (Sentry)        | P1       | ✅ Complete | `sentry-sdk` in requirements, `app/__init__.py`, see `docs/MONITORING.md`      |
 
-**CI/CD Setup (Pending):**
+**CI/CD Setup (Complete):**
 
-| Task                              | Status     | Reference                                                    |
-| --------------------------------- | ---------- | ------------------------------------------------------------ |
-| GitHub Actions workflow for tests | 📋 Planned | Create `.github/workflows/test.yml`, run pytest + playwright |
-| Pre-commit hook for tests         | 📋 Planned | Add `.pre-commit-config.yaml`, run flake8 + pytest           |
-| Codecov integration               | 📋 Planned | Add to GitHub Actions, upload coverage XML                   |
+| Task                              | Status      | Reference                                                   |
+| --------------------------------- | ----------- | ----------------------------------------------------------- |
+| GitHub Actions workflow for tests | ✅ Complete | `.github/workflows/test.yml` (pytest, Playwright, security) |
+| Pre-commit hook for tests         | ✅ Complete | `.pre-commit-config.yaml` (Black, flake8, Bandit, pytest)   |
+| Codecov integration               | ✅ Complete | Integrated in GitHub Actions workflow                       |
+| Security scanning                 | ✅ Complete | Bandit + Safety in workflow, detect-secrets in pre-commit   |
 
 ---
 
