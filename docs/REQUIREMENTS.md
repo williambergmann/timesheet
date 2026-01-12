@@ -1752,6 +1752,11 @@ Add end-to-end browser tests for critical user flows.
 | REQ-045     | ✅ Complete | Backup/restore documentation         | `docs/BACKUP.md`                                                                                                |
 | REQ-046     | ✅ Complete | E2E tests (Playwright)               | `tests/e2e/`, `playwright.config.js`, `docs/TESTING.md`                                                         |
 | REQ-047     | 📋 Planned  | User theme selection                 | `static/css/main.css`, `static/css/light-mode-backup/`                                                          |
+| REQ-048     | 📋 Planned  | Architecture diagram                 | Add to `docs/IMPLEMENTATION.md` (from CHECKIN.md §8)                                                            |
+| REQ-049     | 📋 Planned  | API versioning                       | Add `/api/v1/` prefix, version header support (from CHECKIN.md §4)                                              |
+| REQ-050     | 📋 Planned  | OpenAPI/Swagger spec                 | Document API contract for frontend developers (from CHECKIN.md §5)                                              |
+| REQ-051     | 📋 Planned  | CONTRIBUTING.md                      | How to submit changes, run tests, deploy (from CHECKIN.md §8)                                                   |
+| REQ-052     | 📋 Future   | Database-driven hour types           | Make hour types configurable without code changes (from CHECKIN.md §4)                                          |
 
 ---
 

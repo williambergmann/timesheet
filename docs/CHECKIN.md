@@ -2,7 +2,7 @@
 
 > **Purpose:** Candid assessment of project risks, technical debt, and improvement priorities.
 >
-> **Last Updated:** January 10, 2026
+> **Last Updated:** January 12, 2026
 
 ---
 
@@ -10,13 +10,13 @@
 
 ### High Risk Areas:
 
-| Area                             | Risk Level    | Reasoning                                                                                                                        |
-| -------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| ~~**`static/js/timesheet.js`**~~ | ~~🔴 High~~   | ✅ **Refactored** - Split into 5 modules (REQ-044). Now easier to maintain and test.                                             |
-| **`app/routes/timesheets.py`**   | 🔴 High       | Core business logic for CRUD, status transitions, and validation. Manual testing only.                                           |
-| **Attachment handling**          | 🟠 Medium     | Files stored on container filesystem. No backup, single-instance only. File size/type validation exists but no malware scanning. |
-| ~~**MSAL authentication flow**~~ | ~~🟠 Medium~~ | ✅ **Complete** - REQ-015 Azure AD implemented with proper get-or-create pattern. Dev bypass gated correctly.                    |
-| **CSS specificity**              | 🟡 Low-Med    | Dark mode override required `!important` in places. Layered stylesheets can conflict.                                            |
+| Area                             | Risk Level    | Reasoning                                                                            |
+| -------------------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| ~~**`static/js/timesheet.js`**~~ | ~~🔴 High~~   | ✅ **Refactored** - Split into 5 modules (REQ-044). Now easier to maintain and test. |
+| **`app/routes/timesheets.py`**   | 🟠 Medium     | Core business logic for CRUD, status transitions. Now has E2E test coverage.         |
+| **Attachment handling**          | 🟡 Low-Med    | Storage abstraction complete (REQ-033). Production backup procedures documented.     |
+| ~~**MSAL authentication flow**~~ | ~~🟠 Medium~~ | ✅ **Complete** - REQ-015 Azure AD implemented. 91% test coverage on auth routes.    |
+| **CSS specificity**              | 🟡 Low        | Dark mode override required `!important` in places. Theme system planned (REQ-047).  |
 
 ### Why These Are Risky:
 
@@ -158,13 +158,13 @@
 
 ### Onboarding Friction:
 
-| Issue                                 | Pain Level | Mitigation                                             |
-| ------------------------------------- | ---------- | ------------------------------------------------------ |
-| **No architecture diagram**           | 🔴 High    | Add to IMPLEMENTATION.md                               |
-| **Implicit environment requirements** | 🔴 High    | Docker handles most, but Azure/Twilio setup is manual  |
-| **1,400-line JavaScript file**        | 🔴 High    | No clear entry point, functions call each other freely |
-| **Multiple documentation files**      | 🟠 Medium  | REQUIREMENTS, BUGS, ROADMAP, POWERAPPS—where to start? |
-| **No test suite to verify changes**   | 🔴 High    | 74% coverage but gaps in critical paths                |
+| Issue                                   | Pain Level  | Mitigation                                          |
+| --------------------------------------- | ----------- | --------------------------------------------------- |
+| **No architecture diagram**             | 🟠 Medium   | Add to IMPLEMENTATION.md                            |
+| **Implicit environment requirements**   | 🟡 Low      | Docker handles most; Azure/Twilio docs complete     |
+| ~~**1,400-line JavaScript file**~~      | ~~🔴 High~~ | ✅ **Refactored** - Split into 5 modules (REQ-044)  |
+| **Multiple documentation files**        | 🟡 Low      | Session logs consolidate daily progress             |
+| ~~**No test suite to verify changes**~~ | ~~🔴 High~~ | ✅ **83% coverage** - 390 tests + GitHub Actions CI |
 
 ### What's Missing:
 
@@ -207,6 +207,9 @@
 | ~~**No rate limiting**~~                           | ~~🟡 Medium~~   | ✅ **Complete (REQ-042)** | Flask-Limiter on auth endpoints          |
 | ~~**No backup/restore procedure**~~                | ~~🟠 High~~     | ✅ **Complete (REQ-045)** | BACKUP.md with full procedures           |
 | ~~**Azure AD not fully validated**~~               | ~~🟡 Medium~~   | ✅ **Complete**           | REQ-015 code complete, validated         |
+| ~~**No HTTPS/SSL configuration**~~                 | ~~🔴 Critical~~ | ✅ **Complete**           | nginx-ssl.conf + docker-compose.prod.yml |
+| ~~**No error monitoring**~~                        | ~~🟠 High~~     | ✅ **Complete**           | Sentry integration (P1)                  |
+| ~~**No CI/CD pipeline**~~                          | ~~🟠 High~~     | ✅ **Complete**           | GitHub Actions + pre-commit              |
 
 ### Production Readiness Checklist:
 
@@ -221,14 +224,22 @@
 
 ---
 
-## Summary: Top 5 Priorities
+## Summary: Current Priorities
 
-1. **Move attachments to object storage** — Unblocks horizontal scaling
-2. **Add background job queue** — Reliable notifications, no request blocking
-3. **Split and test `timesheet.js`** — Reduce regression risk in core UI
-4. **Standardize API responses** — Consistent error handling
-5. **Complete auth hardening** — Production security baseline
+1. ~~**Move attachments to object storage**~~ — ✅ Storage abstraction complete (REQ-033)
+2. ~~**Add background job queue**~~ — ✅ Jobs module complete (REQ-034)
+3. ~~**Split and test `timesheet.js`**~~ — ✅ Modularized (REQ-044), 83% coverage
+4. ~~**Standardize API responses**~~ — ✅ Complete (REQ-035)
+5. ~~**Complete auth hardening**~~ — ✅ Complete with 91% test coverage
+
+**New Top 5 Priorities:**
+
+1. **Push test coverage to 85%** — Currently 83%, need PDF/Teams tests
+2. **Deploy to staging** — Validate HTTPS, Azure AD with real credentials
+3. **REQ-022: Holiday awareness** — Improve timesheet UX
+4. **REQ-024: Travel mileage tracking** — Frequently requested feature
+5. **BUG-006: Fix upload error logic** — Blocking some users
 
 ---
 
-_Document created January 8, 2026, updated January 10, 2026_
+_Document created January 8, 2026, updated January 12, 2026_
