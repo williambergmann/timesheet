@@ -246,7 +246,7 @@ Before deploying to production, run through this comprehensive checklist to ensu
 
 - [ ] **Failed login tracking** - Monitor for brute force attempts
 - [x] **Rate limiting** - ✅ Flask-Limiter on auth endpoints (REQ-042)
-- [ ] **Error monitoring** - Use Sentry or similar for error tracking
+- [x] **Error monitoring** - ✅ Sentry integration added (Jan 12, 2026) - see `docs/MONITORING.md`
 
 ---
 

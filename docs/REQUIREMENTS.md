@@ -235,7 +235,7 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | Configure HTTPS/SSL for production      | P0       | ✅ Complete | `docker/nginx-ssl.conf`, `docker-compose.prod.yml`, `docs/SSL-SETUP.md`        |
 | Change database password from default   | P0       | ✅ Complete | `docker-compose.prod.yml` enforces `POSTGRES_PASSWORD`, see `docs/SECURITY.md` |
 | Rotate Azure credentials for production | P0       | ✅ Complete | Rotation procedure in `docs/AZURE.md` § Production Credential Rotation         |
-| Enable error monitoring (Sentry)        | P1       | 📋 Planned  | Add `sentry-sdk` to `requirements.txt`, configure in `app/__init__.py`         |
+| Enable error monitoring (Sentry)        | P1       | ✅ Complete | `sentry-sdk` in requirements, `app/__init__.py`, see `docs/MONITORING.md`      |
 
 **CI/CD Setup (Pending):**
 

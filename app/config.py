@@ -105,6 +105,17 @@ class Config:
     # Application URL (for SMS notification links)
     APP_URL = os.environ.get("APP_URL", "http://localhost/app")
 
+    # Sentry Error Monitoring (Platform Improvement P1)
+    # Set SENTRY_DSN to enable error tracking
+    # Get DSN from: https://sentry.io > Project Settings > Client Keys (DSN)
+    SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+    SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT", "development")
+    # Sample rate for performance monitoring (0.0 to 1.0)
+    # In production, use lower values like 0.1 (10% of transactions)
+    SENTRY_TRACES_SAMPLE_RATE = float(
+        os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "1.0")
+    )
+
     # File uploads
     UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "uploads")
     MAX_CONTENT_LENGTH = int(

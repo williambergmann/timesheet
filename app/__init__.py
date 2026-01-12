@@ -11,6 +11,43 @@ from .config import Config
 from .extensions import db, migrate, csrf, limiter
 
 
+def _init_sentry(config_class):
+    """
+    Initialize Sentry error monitoring if configured.
+    
+    Sentry is only initialized if SENTRY_DSN is set in environment.
+    This should be called BEFORE creating the Flask app for best coverage.
+    """
+    dsn = getattr(config_class, 'SENTRY_DSN', '') or os.environ.get('SENTRY_DSN', '')
+    if not dsn:
+        return  # Sentry not configured, skip initialization
+    
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+        from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+        
+        sentry_sdk.init(
+            dsn=dsn,
+            integrations=[
+                FlaskIntegration(),
+                SqlalchemyIntegration(),
+            ],
+            environment=getattr(config_class, 'SENTRY_ENVIRONMENT', 'development'),
+            # Performance monitoring sample rate
+            traces_sample_rate=getattr(config_class, 'SENTRY_TRACES_SAMPLE_RATE', 1.0),
+            # Send user info with errors (respects privacy - only user ID)
+            send_default_pii=False,
+            # Attach request data to errors
+            request_bodies="medium",
+        )
+        print(f"Sentry initialized for environment: {getattr(config_class, 'SENTRY_ENVIRONMENT', 'development')}")
+    except ImportError:
+        print("Warning: sentry-sdk not installed, error monitoring disabled")
+    except Exception as e:
+        print(f"Warning: Failed to initialize Sentry: {e}")
+
+
 def create_app(config_class=Config):
     """
     Flask application factory.
@@ -21,6 +58,9 @@ def create_app(config_class=Config):
     Returns:
         Flask: Configured Flask application instance
     """
+    # Initialize Sentry before creating the app for maximum error coverage
+    _init_sentry(config_class)
+    
     # Get the project root (parent of the app directory)
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
