@@ -224,3 +224,188 @@ class TestNotificationMessageContent:
             db.session.delete(user)
             db.session.commit()
 
+
+class TestNotificationEdgeCases:
+    """Tests for notification edge cases."""
+
+    @patch("app.services.notification.send_sms")
+    def test_notify_approved_no_user(self, mock_send_sms, app):
+        """Test notify_approved when timesheet has no user."""
+        with app.app_context():
+            from app.extensions import db
+            from app.models import Timesheet as TimesheetModel
+            
+            # Create orphan timesheet
+            timesheet = TimesheetModel(
+                user_id=None,
+                week_start=date(2024, 2, 4),
+                status=TimesheetStatus.SUBMITTED
+            )
+            # Don't commit - just test the method directly
+            
+            class MockTimesheet:
+                user = None
+                id = "test-id"
+            
+            result = NotificationService.notify_approved(MockTimesheet())
+            assert result is None
+            mock_send_sms.assert_not_called()
+
+    @patch("app.services.notification.send_sms")
+    def test_notify_needs_attention_no_user(self, mock_send_sms, app):
+        """Test notify_needs_attention when timesheet has no user."""
+        with app.app_context():
+            class MockTimesheet:
+                user = None
+                id = "test-id"
+            
+            result = NotificationService.notify_needs_attention(MockTimesheet())
+            assert result is None
+            mock_send_sms.assert_not_called()
+
+    @patch("app.services.notification.send_sms")
+    def test_notify_approved_user_not_opted_in(self, mock_send_sms, app):
+        """Test notify_approved when user hasn't opted in for SMS."""
+        with app.app_context():
+            from app.extensions import db
+            from app.models import User as UserModel, Timesheet as TimesheetModel
+            
+            user = UserModel(
+                azure_id="no-opt-in-user-33333",
+                email="no_opt_in@test.com",
+                display_name="No Opt-In",
+                phone="+15551234567",
+                sms_opt_in=False
+            )
+            db.session.add(user)
+            db.session.commit()
+            
+            timesheet = TimesheetModel(
+                user_id=user.id,
+                week_start=date(2024, 2, 11),
+                status=TimesheetStatus.APPROVED
+            )
+            db.session.add(timesheet)
+            db.session.commit()
+            
+            result = NotificationService.notify_approved(timesheet)
+            
+            # Should return None (no SMS for non-opted in users)
+            assert result is None
+            mock_send_sms.assert_not_called()
+            
+            # Cleanup
+            db.session.delete(timesheet)
+            db.session.delete(user)
+            db.session.commit()
+
+    @patch("app.services.notification.send_sms")
+    def test_notify_needs_attention_user_not_opted_in(self, mock_send_sms, app):
+        """Test notify_needs_attention when user hasn't opted in for SMS."""
+        with app.app_context():
+            from app.extensions import db
+            from app.models import User as UserModel, Timesheet as TimesheetModel
+            
+            user = UserModel(
+                azure_id="no-opt-in-user-44444",
+                email="no_opt_in2@test.com",
+                display_name="No Opt-In 2",
+                phone="+15551234567",
+                sms_opt_in=False
+            )
+            db.session.add(user)
+            db.session.commit()
+            
+            timesheet = TimesheetModel(
+                user_id=user.id,
+                week_start=date(2024, 2, 18),
+                status=TimesheetStatus.NEEDS_APPROVAL
+            )
+            db.session.add(timesheet)
+            db.session.commit()
+            
+            result = NotificationService.notify_needs_attention(timesheet)
+            
+            # Should return None (no SMS for non-opted in users)
+            assert result is None
+            mock_send_sms.assert_not_called()
+            
+            # Cleanup
+            db.session.delete(timesheet)
+            db.session.delete(user)
+            db.session.commit()
+
+    @patch("app.services.notification.send_sms")
+    def test_notify_needs_attention_long_reason_truncated(self, mock_send_sms, app):
+        """Test that long reason messages are truncated."""
+        mock_send_sms.return_value = {"success": True, "dev_mode": True}
+        
+        with app.app_context():
+            from app.extensions import db
+            from app.models import User as UserModel, Timesheet as TimesheetModel, Notification as NotificationModel
+            
+            user = UserModel(
+                azure_id="truncate-test-55555",
+                email="truncate@test.com",
+                display_name="Truncate Test",
+                phone="+15551234567",
+                sms_opt_in=True
+            )
+            db.session.add(user)
+            db.session.commit()
+            
+            timesheet = TimesheetModel(
+                user_id=user.id,
+                week_start=date(2024, 2, 25),
+                status=TimesheetStatus.NEEDS_APPROVAL
+            )
+            db.session.add(timesheet)
+            db.session.commit()
+            
+            # Very long reason
+            long_reason = "A" * 200
+            result = NotificationService.notify_needs_attention(timesheet, reason=long_reason)
+            
+            # Message should be truncated to 160 chars
+            mock_send_sms.assert_called_once()
+            _, message = mock_send_sms.call_args[0]
+            assert len(message) <= 160
+            assert message.endswith("...")
+            
+            # Cleanup
+            NotificationModel.query.filter_by(user_id=user.id).delete()
+            db.session.delete(timesheet)
+            db.session.delete(user)
+            db.session.commit()
+
+    def test_send_weekly_reminder_user_not_opted_in(self, app, sample_user):
+        """Test send_weekly_reminder when user hasn't opted in for SMS."""
+        with app.app_context():
+            from app.extensions import db
+            from app.models import User as UserModel
+            
+            user = UserModel.query.filter_by(email=sample_user["email"]).first()
+            if user:
+                user.sms_opt_in = False
+                db.session.commit()
+                
+                result = NotificationService.send_weekly_reminder(user, date(2024, 3, 3))
+                
+                # Should return None
+                assert result is None
+
+    def test_notify_unsubmitted_user_not_opted_in(self, app, sample_user):
+        """Test notify_unsubmitted when user hasn't opted in for SMS."""
+        with app.app_context():
+            from app.extensions import db
+            from app.models import User as UserModel
+            
+            user = UserModel.query.filter_by(email=sample_user["email"]).first()
+            if user:
+                user.sms_opt_in = False
+                db.session.commit()
+                
+                result = NotificationService.notify_unsubmitted(user, date(2024, 3, 3))
+                
+                # Should return None
+                assert result is None
