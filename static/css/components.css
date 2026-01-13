@@ -812,6 +812,13 @@
   background: var(--color-bg-overlay);
 }
 
+/* REQ-055: Over 24 hours per day warning */
+.day-totals-row .over-limit {
+  color: var(--color-danger) !important;
+  background: rgba(239, 68, 68, 0.2) !important;
+  font-weight: 700;
+}
+
 /* ============================================
    Empty Attachments Text (P1 Feature)
    ============================================ */

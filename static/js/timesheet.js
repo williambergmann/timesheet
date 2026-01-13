@@ -334,7 +334,7 @@ const TimesheetModule = {
                            step="0.5"
                            placeholder="0"
                            oninput="TimesheetModule.normalizeHourInput(this); TimesheetModule.updateRowTotal('${hourType}')"
-                           onblur="TimesheetModule.checkHolidayInput(this)">
+                           onblur="TimesheetModule.validateDayHoursCap(this); TimesheetModule.checkHolidayInput(this)">
                 </div>
             `;
         }
@@ -1135,6 +1135,13 @@ const TimesheetModule = {
             const totalCell = dayTotalsRow.querySelector(`.hour-type-day-cell[data-day="${dayIndex}"]`);
             if (totalCell) {
                 totalCell.textContent = columnTotal > 0 ? columnTotal : '0';
+                
+                // REQ-055: Highlight if day exceeds 24 hours
+                if (columnTotal > 24) {
+                    totalCell.classList.add('over-limit');
+                } else {
+                    totalCell.classList.remove('over-limit');
+                }
             }
         }
         
@@ -1143,6 +1150,50 @@ const TimesheetModule = {
         if (grandTotalCell) {
             grandTotalCell.textContent = grandTotal > 0 ? grandTotal : '0';
         }
+    },
+    
+    /**
+     * Validate and enforce 24-hour daily cap (REQ-055)
+     * @param {HTMLInputElement} input - The hour input that was changed
+     * @returns {boolean} - True if valid, false if capped
+     */
+    validateDayHoursCap(input) {
+        const dateStr = input.dataset.date;
+        if (!dateStr) return true;
+        
+        // Calculate total for this day across all hour types
+        const rowsContainer = document.getElementById('hour-type-rows');
+        if (!rowsContainer) return true;
+        
+        let dayTotal = 0;
+        const inputsForDay = rowsContainer.querySelectorAll(`input[data-date="${dateStr}"]`);
+        
+        inputsForDay.forEach(dayInput => {
+            dayTotal += parseFloat(dayInput.value) || 0;
+        });
+        
+        // If total exceeds 24, cap the current input
+        if (dayTotal > 24) {
+            const excess = dayTotal - 24;
+            const currentValue = parseFloat(input.value) || 0;
+            const cappedValue = Math.max(0, currentValue - excess);
+            
+            // Round to nearest 0.5
+            input.value = Math.round(cappedValue * 2) / 2;
+            
+            // Show toast warning
+            if (typeof showToast === 'function') {
+                showToast('Maximum 24 hours per day. Entry has been capped.', 'warning');
+            }
+            
+            // Update the row total
+            this.updateRowTotal(input.dataset.type);
+            this.updateDayTotals();
+            
+            return false;
+        }
+        
+        return true;
     },
     
     /**
