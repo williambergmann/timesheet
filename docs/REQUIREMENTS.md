@@ -233,11 +233,11 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 **Goal: Ship features, push to 85% coverage**
 
-| Task                         | Time Est. | Priority | Status     | Reference                                        |
-| ---------------------------- | --------- | -------- | ---------- | ------------------------------------------------ |
-| REQ-022: Holiday awareness   | 2-3 hours | P1       | 📋 Planned | Add holiday detection + warning to timesheet.js  |
-| Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned | Mock ReportLab, push admin.py 74% → 80%+         |
-| Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned | Mock `_get_bot_token()`, push teams.py 57% → 70% |
+| Task                         | Time Est. | Priority | Status      | Reference                                         |
+| ---------------------------- | --------- | -------- | ----------- | ------------------------------------------------- |
+| REQ-022: Holiday awareness   | 2-3 hours | P1       | ✅ Complete | Verified: indicator, tooltip, warning dialog work |
+| Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned  | Mock ReportLab, push admin.py 74% → 80%+          |
+| Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned  | Mock `_get_bot_token()`, push teams.py 57% → 70%  |
 
 **Coverage Target:**
 
@@ -1761,7 +1761,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-019     | ✅ Complete | Export formats (CSV/XLSX/PDF)        | `app/routes/admin.py` (`/api/admin/export/`), `app/services/export.py`                                          |
 | REQ-020     | ✅ Complete | Travel/expense badges                | `static/js/admin.js` (card rendering), `static/css/components.css`                                              |
 | REQ-021     | ✅ Complete | Per-option reimbursement attachments | `app/models.py` (Attachment.reimbursement_type), `migrations/versions/007_add_attachment_reimbursement_type.py` |
-| REQ-022     | 📋 Planned  | Holiday awareness & warning          | —                                                                                                               |
+| REQ-022     | ✅ Complete | Holiday awareness & warning          | `static/js/timesheet.js` (HOLIDAYS, checkHolidayInput), `static/css/components.css`                             |
 | REQ-023     | ✅ Complete | Read-only submitted timesheets       | `static/js/timesheet.js` (`setFormReadOnly()`), `docs/BUGS.md` (BUG-001)                                        |
 | REQ-024     | 📋 Planned  | Travel mileage tracking              | —                                                                                                               |
 | REQ-025     | 📋 Planned  | Expanded expense types               | —                                                                                                               |
