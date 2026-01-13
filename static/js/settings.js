@@ -12,6 +12,8 @@ const SettingsModule = (() => {
         smsOptIn: true,
         teamsOptIn: true,
         teamsAccount: '',
+        themeAuto: false,
+        themeDark: true,
     };
 
     function setState(data) {
@@ -72,6 +74,18 @@ const SettingsModule = (() => {
         if (emailBody) emailBody.classList.toggle('settings-disabled', !state.emailOptIn);
         if (smsBody) smsBody.classList.toggle('settings-disabled', !state.smsOptIn);
         if (teamsBody) teamsBody.classList.toggle('settings-disabled', !state.teamsOptIn);
+
+        // Theme toggles
+        const themeAutoToggle = document.getElementById('settings-theme-auto');
+        const themeDarkToggle = document.getElementById('settings-theme-dark');
+        const darkModeRow = themeDarkToggle?.closest('.settings-toggle-row');
+
+        if (themeAutoToggle) themeAutoToggle.checked = state.themeAuto;
+        if (themeDarkToggle) {
+            themeDarkToggle.checked = state.themeDark;
+            themeDarkToggle.disabled = state.themeAuto;
+        }
+        if (darkModeRow) darkModeRow.classList.toggle('settings-disabled', state.themeAuto);
     }
 
     function renderTeamsStatus() {
@@ -260,6 +274,27 @@ const SettingsModule = (() => {
         if (teamsToggle) {
             teamsToggle.addEventListener('change', (event) => {
                 state.teamsOptIn = event.target.checked;
+                updateToggles();
+            });
+        }
+
+        // Theme toggles
+        const themeAutoToggle = document.getElementById('settings-theme-auto');
+        if (themeAutoToggle) {
+            themeAutoToggle.addEventListener('change', (event) => {
+                state.themeAuto = event.target.checked;
+                if (state.themeAuto) {
+                    // Detect system preference when automatic is enabled
+                    state.themeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+                updateToggles();
+            });
+        }
+
+        const themeDarkToggle = document.getElementById('settings-theme-dark');
+        if (themeDarkToggle) {
+            themeDarkToggle.addEventListener('change', (event) => {
+                state.themeDark = event.target.checked;
                 updateToggles();
             });
         }
