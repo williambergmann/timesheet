@@ -304,12 +304,12 @@ Day Total       |  0  | 16  | 16  | 16  | 16  | 16  |  0  |   80  |
 
 **Acceptance Criteria:**
 
-- [ ] Day Total row appears at bottom of hour types grid
-- [ ] Shows sum of all hour types for each day (Sun-Sat)
-- [ ] Shows grand total for week in Total column
-- [ ] Updates dynamically when hours are changed
-- [ ] Styled distinctly from data rows (bold/different background)
-- [ ] Works in New Timesheet and existing timesheet views
+- [x] Day Total row appears at bottom of hour types grid
+- [x] Shows sum of all hour types for each day (Sun-Sat)
+- [x] Shows grand total for week in Total column
+- [x] Updates dynamically when hours are changed
+- [x] Styled distinctly from data rows (bold/different background)
+- [x] Works in New Timesheet and existing timesheet views
 
 ---
 
@@ -324,6 +324,42 @@ _Items moved here due to time constraints or lower priority._
 | REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first |
 | REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture     |
 | REQ-047 | User theme selection    | P2       | UX polish, not blocking launch        |
+| REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below |
+
+**REQ-057 UI Redesign Breakdown:**
+
+_Reference designs:_
+
+- **Mockup**: `docs/assets/ui_redesign_mockup.png`
+- **Prototype HTML**: `file:///Users/lappy/.gemini/antigravity/playground/giant-juno/index.html`
+
+| Component           | Change Description                                         | Effort |
+| ------------------- | ---------------------------------------------------------- | ------ |
+| Navigation buttons  | Gradient buttons (green→blue) for New/My Timesheets        | Small  |
+| Icons               | Replace emojis with SVG icons (Lucide/Heroicons)           | Medium |
+| Color palette       | Dark theme: #111827 background, refined accent colors      | Small  |
+| Sidebar styling     | Pill-shaped active states, hover effects with transparency | Medium |
+| Card styling        | Subtle borders, rounded corners, consistent shadows        | Small  |
+| Typography          | Switch to Inter/Outfit font, improved hierarchy            | Small  |
+| User profile        | Avatar with initials badge in header                       | Small  |
+| Status tags         | Pill-shaped badges with color coding                       | Small  |
+| Hour type rows      | Cleaner row styling with subtle separators                 | Medium |
+| Input fields        | Dark theme inputs with focus states                        | Small  |
+| Toast notifications | Modern slide-in toasts with icons                          | Small  |
+| Loading states      | Skeleton loaders instead of spinners                       | Medium |
+
+**Acceptance Criteria:**
+
+- [ ] Gradient primary buttons (green→blue) for main navigation
+- [ ] SVG icons replace all emoji usage
+- [ ] Dark theme color palette applied consistently
+- [ ] Sidebar has pill-shaped active/hover states
+- [ ] Cards have subtle borders and consistent border-radius
+- [ ] Inter or similar modern font applied
+- [ ] User initials avatar in header
+- [ ] Status badges use pill styling with appropriate colors
+- [ ] All forms use dark-themed inputs
+- [ ] Responsive design maintained at all breakpoints
 
 **Technical Improvements:**
 
@@ -338,7 +374,7 @@ _Items moved here due to time constraints or lower priority._
 
 | Task                    | Priority | Rationale                        |
 | ----------------------- | -------- | -------------------------------- |
-| Push coverage to 90%    | P2       | 85% is acceptable for launch     |
+| Push coverage to 90%    | P2       | 87% achieved, 3% remaining       |
 | Add observability tests | P3       | Azure Monitor mocking is complex |
 
 ---
