@@ -1601,9 +1601,10 @@
    Settings View (REQ-003)
    ============================================ */
 .settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
+  max-width: 800px;
 }
 
 .settings-card {
