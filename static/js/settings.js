@@ -86,6 +86,19 @@ const SettingsModule = (() => {
             themeDarkToggle.disabled = state.themeAuto;
         }
         if (darkModeRow) darkModeRow.classList.toggle('settings-disabled', state.themeAuto);
+
+        // Apply theme to document
+        applyTheme();
+    }
+
+    function applyTheme() {
+        // Light theme is applied when dark mode is OFF
+        const isLightMode = !state.themeDark;
+        document.documentElement.classList.toggle('light-theme', isLightMode);
+        
+        // Store preference in localStorage
+        localStorage.setItem('theme', state.themeDark ? 'dark' : 'light');
+        localStorage.setItem('themeAuto', state.themeAuto ? 'true' : 'false');
     }
 
     function renderTeamsStatus() {
@@ -206,6 +219,30 @@ const SettingsModule = (() => {
     }
 
     function init() {
+        // Initialize theme from localStorage
+        const savedTheme = localStorage.getItem('theme');
+        const savedThemeAuto = localStorage.getItem('themeAuto');
+        
+        if (savedThemeAuto === 'true') {
+            state.themeAuto = true;
+            state.themeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } else if (savedTheme) {
+            state.themeDark = savedTheme === 'dark';
+            state.themeAuto = false;
+        }
+        
+        // Apply theme immediately on page load
+        applyTheme();
+        
+        // Listen for system preference changes (for automatic mode)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (state.themeAuto) {
+                state.themeDark = e.matches;
+                applyTheme();
+                updateToggles();
+            }
+        });
+
         const emailAdd = document.getElementById('settings-email-add');
         if (emailAdd) {
             emailAdd.addEventListener('click', addEmail);
