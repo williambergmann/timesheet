@@ -1361,6 +1361,11 @@
     padding: var(--spacing-md);
   }
 
+  /* Hide "New Timesheet" button in header on mobile - accessible via hamburger menu */
+  #create-timesheet-btn {
+    display: none;
+  }
+
   .entries-grid {
     grid-template-columns: 80px repeat(7, 1fr) 60px;
     font-size: var(--font-size-xs);
