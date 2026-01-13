@@ -784,6 +784,34 @@
   background: rgba(74, 222, 128, 0.1);
 }
 
+/* Day Totals Row (REQ-054) */
+.day-totals-row {
+  border-top: 2px solid var(--color-primary);
+  background: var(--color-bg-overlay) !important;
+}
+
+.day-totals-row .hour-type-label-cell {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.day-totals-row .hour-type-day-cell {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-overlay);
+}
+
+.day-totals-row .hour-type-total-cell {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.day-totals-row .hour-type-actions-cell {
+  background: var(--color-bg-overlay);
+}
+
 /* ============================================
    Empty Attachments Text (P1 Feature)
    ============================================ */

@@ -127,6 +127,12 @@ const TimesheetModule = {
             rowsContainer.innerHTML = '';
         }
         
+        // Hide day totals row (REQ-054)
+        const dayTotalsRow = document.getElementById('day-totals-row');
+        if (dayTotalsRow) {
+            dayTotalsRow.classList.add('hidden');
+        }
+        
         // Populate hour type selector based on user role (REQ-013)
         this.populateHourTypeSelector();
         
@@ -357,6 +363,10 @@ const TimesheetModule = {
         if (hourType === 'Field') {
             this.updateFieldHoursWarning();
         }
+        
+        // Show and update day totals row (REQ-054)
+        this.showDayTotalsRow();
+        this.updateDayTotals();
     },
     
     /**
@@ -388,6 +398,10 @@ const TimesheetModule = {
             if (hourType === 'Field') {
                 this.updateFieldHoursWarning();
             }
+            
+            // Update day totals row (REQ-054)
+            this.updateDayTotals();
+            this.showDayTotalsRow();
         }
     },
     
@@ -624,6 +638,10 @@ const TimesheetModule = {
             // Lock the row after populating
             this.toggleEditRow(hourType);
         });
+        
+        // Show and update day totals after all entries loaded (REQ-054)
+        this.showDayTotalsRow();
+        this.updateDayTotals();
     },
     
     /**
@@ -1065,6 +1083,65 @@ const TimesheetModule = {
         const totalCell = row.querySelector('.hour-type-total-cell');
         if (totalCell) {
             totalCell.textContent = total;
+        }
+        
+        // Update day totals row (REQ-054)
+        this.updateDayTotals();
+    },
+    
+    /**
+     * Show or hide the day totals row based on whether there are entries (REQ-054)
+     */
+    showDayTotalsRow() {
+        const dayTotalsRow = document.getElementById('day-totals-row');
+        const rowsContainer = document.getElementById('hour-type-rows');
+        
+        if (!dayTotalsRow || !rowsContainer) return;
+        
+        const hasRows = rowsContainer.querySelectorAll('.hour-type-row').length > 0;
+        
+        if (hasRows) {
+            dayTotalsRow.classList.remove('hidden');
+        } else {
+            dayTotalsRow.classList.add('hidden');
+        }
+    },
+    
+    /**
+     * Update day totals and grand total (REQ-054)
+     */
+    updateDayTotals() {
+        const rowsContainer = document.getElementById('hour-type-rows');
+        const dayTotalsRow = document.getElementById('day-totals-row');
+        if (!rowsContainer || !dayTotalsRow) return;
+        
+        let grandTotal = 0;
+        
+        // Calculate column totals for each day (0-6 for Sun-Sat)
+        for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+            let columnTotal = 0;
+            
+            // Find all inputs in this column position
+            rowsContainer.querySelectorAll('.hour-type-row').forEach(row => {
+                const inputs = row.querySelectorAll('.hour-input');
+                if (inputs[dayIndex]) {
+                    columnTotal += parseFloat(inputs[dayIndex].value) || 0;
+                }
+            });
+            
+            grandTotal += columnTotal;
+            
+            // Update the day totals row cell
+            const totalCell = dayTotalsRow.querySelector(`.hour-type-day-cell[data-day="${dayIndex}"]`);
+            if (totalCell) {
+                totalCell.textContent = columnTotal > 0 ? columnTotal : '0';
+            }
+        }
+        
+        // Update grand total
+        const grandTotalCell = document.getElementById('grand-total');
+        if (grandTotalCell) {
+            grandTotalCell.textContent = grandTotal > 0 ? grandTotal : '0';
         }
     },
     
