@@ -269,9 +269,10 @@
    Timesheets Grid
    ============================================ */
 .timesheets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
+  max-width: 800px;
 }
 
 /* ============================================
@@ -1369,10 +1370,6 @@
   .entries-grid {
     grid-template-columns: 80px repeat(7, 1fr) 60px;
     font-size: var(--font-size-xs);
-  }
-
-  .timesheets-grid {
-    grid-template-columns: 1fr;
   }
 
   .form-actions {
