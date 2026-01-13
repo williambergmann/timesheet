@@ -349,6 +349,8 @@ _Reference designs:_
 | Notification bell   | Bell icon with red dot indicator for pending actions       | Small  |
 | Loading states      | Skeleton loaders instead of spinners                       | Medium |
 | Settings page       | Reorganize into Notifications + Appearance sections (rows) | Medium |
+| Timesheet list      | Single-column layout (full-width cards stacked vertically) | Small  |
+| Date sort toggle    | Sort by date button with ↓/↑ arrow (newest first default)  | Small  |
 
 **Acceptance Criteria:**
 
@@ -365,6 +367,8 @@ _Reference designs:_
 - [ ] Settings page has two sections: Notifications (rows) and Appearance
 - [ ] Responsive design maintained at all breakpoints
 - [ ] Settings page reorganized into Notifications + Appearance sections (rows)
+- [ ] My Timesheets uses single-column layout (full-width cards stacked vertically)
+- [ ] Date sort toggle: button shows ↓ for newest-first (default), ↑ for oldest-first when clicked
 
 **Technical Improvements:**
 

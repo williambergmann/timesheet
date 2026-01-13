@@ -36,8 +36,9 @@ class Config:
     SECRET_KEY = _load_secret_key()
 
     # Database
+    # Default to SQLite for development/testing; use DATABASE_URL for PostgreSQL in production
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "postgresql://timesheet:timesheet@localhost:5432/timesheet"
+        "DATABASE_URL", "sqlite:///timesheet.db"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

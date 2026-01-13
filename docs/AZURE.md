@@ -652,4 +652,114 @@ Free tier available for testing:
 
 ---
 
-_Document updated January 12, 2026_
+## 🧪 Current Test Deployment (Azure Container Instances)
+
+**Deployed: January 13, 2026**
+
+### Live URL
+
+| Resource         | Value                                                         |
+| ---------------- | ------------------------------------------------------------- |
+| **Public URL**   | http://northstar-timesheet-test.eastus.azurecontainer.io:5000 |
+| **IP Address**   | 4.157.156.118                                                 |
+| **Status**       | ✅ Running                                                    |
+| **Health Check** | ✅ HTTP 200 OK at `/health`                                   |
+
+### Azure Resources Created
+
+| Resource           | Name                  | Location |
+| ------------------ | --------------------- | -------- |
+| Resource Group     | `northstar-test-rg`   | East US  |
+| Container Registry | `northstartestcr`     | East US  |
+| Container Instance | `northstar-timesheet` | East US  |
+
+### Test Deployment Configuration
+
+```bash
+# Environment variables set on the container
+FLASK_ENV=development
+SECRET_KEY=test-secret-key-for-demo-only-change-in-prod
+# No DATABASE_URL (uses SQLite default)
+# No REDIS_URL (uses memory rate limiting)
+```
+
+### ⚠️ Test Deployment Limitations
+
+This is a **test/demo deployment only**. Not suitable for production use:
+
+| Limitation                | Impact                               | Production Solution                     |
+| ------------------------- | ------------------------------------ | --------------------------------------- |
+| **SQLite database**       | Data lost on container restart       | Azure Database for PostgreSQL (~$15/mo) |
+| **No Redis**              | Rate limiting uses in-memory storage | Azure Cache for Redis (~$16/mo)         |
+| **HTTP only**             | No encryption in transit             | Azure Application Gateway or Front Door |
+| **No persistent storage** | Uploads lost on restart              | Azure Blob Storage                      |
+| **Dev secret key**        | Not cryptographically secure         | Generate with `secrets.token_hex(32)`   |
+
+### Deployment Fixes Applied
+
+During deployment, several issues were resolved:
+
+1. **`.dockerignore` created** - Excluded `.env` file that was overriding `DATABASE_URL` with PostgreSQL settings meant for docker-compose
+2. **Platform architecture** - Rebuilt image with `--platform linux/amd64` for Azure Container Instances (Mac builds ARM by default)
+3. **SQLite fallback** - Updated `config.py` to use SQLite in development when `DATABASE_URL` not specified
+4. **Test Dockerfile** - Created `docker/Dockerfile.test` and `docker/entrypoint-test.sh` that use `db.create_all()` instead of Flask-Migrate
+
+### Build & Deploy Commands (for reference)
+
+```bash
+# Build for AMD64 (required for Azure)
+docker build --platform linux/amd64 -t northstartestcr.azurecr.io/timesheet:test -f docker/Dockerfile.test .
+
+# Login to Azure Container Registry
+az acr login --name northstartestcr
+
+# Push the image
+docker push northstartestcr.azurecr.io/timesheet:test
+
+# Deploy container
+az container create \
+  --resource-group northstar-test-rg \
+  --name northstar-timesheet \
+  --image northstartestcr.azurecr.io/timesheet:test \
+  --registry-login-server northstartestcr.azurecr.io \
+  --registry-username northstartestcr \
+  --registry-password "<from az acr credential show>" \
+  --dns-name-label northstar-timesheet-test \
+  --os-type Linux \
+  --ports 5000 \
+  --cpu 1 \
+  --memory 1.5 \
+  --environment-variables \
+    FLASK_ENV=development \
+    SECRET_KEY="test-secret-key-for-demo-only-change-in-prod" \
+  -o table
+```
+
+### Cleanup Commands
+
+**To delete the test deployment and avoid charges:**
+
+```bash
+# Delete just the container instance (keeps registry for reuse)
+az container delete --resource-group northstar-test-rg --name northstar-timesheet --yes
+
+# Delete everything (container, registry, resource group)
+az group delete --name northstar-test-rg --yes --no-wait
+```
+
+### View Logs
+
+```bash
+az container logs --resource-group northstar-test-rg --name northstar-timesheet
+```
+
+### Check Status
+
+```bash
+az container show --resource-group northstar-test-rg --name northstar-timesheet \
+  --query "{state:containers[0].instanceView.currentState.state, ip:ipAddress.ip}" -o json
+```
+
+---
+
+_Document updated January 13, 2026_
