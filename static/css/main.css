@@ -583,15 +583,15 @@ summary:focus-visible {
   font-size: var(--font-size-lg);
 }
 
-/* Ghost button - transparent with subtle hover */
+/* Ghost button - gray background with outline on hover */
 .btn-ghost {
-  background: transparent;
+  background: var(--color-hover);
   border: 1px solid transparent;
   color: var(--color-text-secondary);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--color-hover);
+  border-color: var(--color-border-default);
   color: var(--color-text-primary);
 }
 

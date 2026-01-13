@@ -341,24 +341,24 @@ _Reference designs:_
 - **Mockup**: `docs/assets/ui_redesign_mockup.png`
 - **Prototype HTML**: `file:///Users/lappy/.gemini/antigravity/playground/giant-juno/index.html`
 
-| Component           | Change Description                                         | Effort |
-| ------------------- | ---------------------------------------------------------- | ------ |
-| Navigation buttons  | Gradient buttons (green→blue) for New/My Timesheets        | Small  |
-| Icons               | Replace emojis with SVG icons (Lucide/Heroicons)           | Medium |
-| Color palette       | Dark theme: #111827 background, refined accent colors      | Small  |
-| Sidebar styling     | Pill-shaped active states, hover effects with transparency | Medium |
-| Card styling        | Subtle borders, rounded corners, consistent shadows        | Small  |
-| Typography          | Switch to Inter/Outfit font, improved hierarchy            | Small  |
-| User profile        | Avatar with initials badge in header                       | Small  |
-| Status tags         | Pill-shaped badges with color coding                       | Small  |
-| Hour type rows      | Cleaner row styling with subtle separators                 | Medium |
-| Input fields        | Dark theme inputs with focus states                        | Small  |
-| Toast notifications | Modern slide-in toasts with icons                          | Small  |
-| Notification bell   | Bell icon with red dot indicator for pending actions       | Small  |
-| Loading states      | Skeleton loaders instead of spinners                       | Medium |
-| Settings page       | Reorganize into Notifications + Appearance sections (rows) | Medium |
-| Timesheet list      | Single-column layout (full-width cards stacked vertically) | Small  |
-| Date sort toggle    | Sort by date button with ↓/↑ arrow (newest first default)  | Small  |
+| Component           | Change Description                                                             | Effort |
+| ------------------- | ------------------------------------------------------------------------------ | ------ |
+| Navigation buttons  | Gradient buttons (green→blue) for New/My Timesheets                            | Small  |
+| Icons               | Replace emojis with SVG icons (Feather) — ✅ My Timesheets, New Timesheet done | Medium |
+| Color palette       | Dark theme: #111827 background, refined accent colors                          | Small  |
+| Sidebar styling     | Pill-shaped active states, hover effects with transparency                     | Medium |
+| Card styling        | Subtle borders, rounded corners, consistent shadows                            | Small  |
+| Typography          | Switch to Inter/Outfit font, improved hierarchy                                | Small  |
+| User profile        | Avatar with initials badge in header                                           | Small  |
+| Status tags         | Pill-shaped badges with color coding                                           | Small  |
+| Hour type rows      | Cleaner row styling with subtle separators                                     | Medium |
+| Input fields        | Dark theme inputs with focus states                                            | Small  |
+| Toast notifications | Modern slide-in toasts with icons                                              | Small  |
+| Notification bell   | Bell icon with red dot indicator for pending actions                           | Small  |
+| Loading states      | Skeleton loaders instead of spinners                                           | Medium |
+| Settings page       | Reorganize into Notifications + Appearance sections (rows)                     | Medium |
+| Timesheet list      | Single-column layout (full-width cards stacked vertically)                     | Small  |
+| Date sort toggle    | Sort by date button with ↓/↑ arrow (newest first default)                      | Small  |
 
 **Acceptance Criteria:**
 
