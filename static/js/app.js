@@ -200,6 +200,9 @@ async function saveDraft() {
         // Update form with saved data (including any auto-populated entries)
         TimesheetModule.populateForm(timesheet);
         
+        // Clear unsaved changes flag after successful save
+        TimesheetModule.clearChanges();
+        
         // Hide auto-populate checkbox after timesheet is created
         const autoPopulateGroup = document.getElementById('auto-populate-group');
         if (autoPopulateGroup) {

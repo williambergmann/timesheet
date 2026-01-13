@@ -1792,6 +1792,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-050     | 📋 Planned  | OpenAPI/Swagger spec                 | Document API contract for frontend developers (from CHECKIN.md §5)                                              |
 | REQ-051     | ✅ Complete | CONTRIBUTING.md                      | `/CONTRIBUTING.md` — clone, run, test, deploy guide                                                             |
 | REQ-052     | 📋 Future   | Database-driven hour types           | Make hour types configurable without code changes (from CHECKIN.md §4)                                          |
+| REQ-053     | ✅ Complete | Unsaved changes warning              | `static/js/timesheet.js`, `static/js/app.js` — shows/hides warning on form changes                              |
 
 ---
 
