@@ -113,6 +113,19 @@ endblock %} {% block extra_css %}
             </div>
           </div>
         </div>
+
+        <!-- Sort dropdown -->
+        <div class="filter-group">
+          <label class="filter-label">Sort:</label>
+          <select id="sort-timesheets" class="form-select">
+            <option value="newest">Newest ↓</option>
+            <option value="oldest">Oldest ↑</option>
+            <option value="submitted-newest">Submitted ↓</option>
+            <option value="submitted-oldest">Submitted ↑</option>
+            <option value="created-newest">Created ↓</option>
+            <option value="created-oldest">Created ↑</option>
+          </select>
+        </div>
       </div>
 
       <div id="timesheets-list" class="timesheets-grid">

@@ -125,7 +125,15 @@ async function loadTimesheets() {
             return;
         }
         
-        container.innerHTML = data.timesheets.map(ts => `
+        // Get sort preference
+        const sortEl = document.getElementById('sort-timesheets');
+        const sortBy = sortEl ? sortEl.value : 'newest';
+        
+        // Sort timesheets
+        let timesheets = [...data.timesheets];
+        timesheets = sortTimesheets(timesheets, sortBy);
+        
+        container.innerHTML = timesheets.map(ts => `
             <div class="timesheet-card" onclick="openTimesheet('${ts.id}')">
                 <div class="timesheet-card-header">
                     <span class="timesheet-card-week">${TimesheetModule.formatWeekRange(ts.week_start)}</span>
@@ -142,6 +150,41 @@ async function loadTimesheets() {
         showToast(error.message, 'error');
         container.innerHTML = '<div class="empty-state"><p>Error loading timesheets</p></div>';
     }
+}
+
+/**
+ * Sort timesheets array based on the selected sort option.
+ * For "submitted" sorts, drafts (NEW status) are pushed to the bottom.
+ */
+function sortTimesheets(timesheets, sortBy) {
+    const sortFn = {
+        'newest': (a, b) => new Date(b.week_start) - new Date(a.week_start),
+        'oldest': (a, b) => new Date(a.week_start) - new Date(b.week_start),
+        'submitted-newest': (a, b) => {
+            // Drafts go to bottom
+            if (a.status === 'NEW' && b.status !== 'NEW') return 1;
+            if (b.status === 'NEW' && a.status !== 'NEW') return -1;
+            if (a.status === 'NEW' && b.status === 'NEW') {
+                // Sort drafts by created_at
+                return new Date(b.created_at) - new Date(a.created_at);
+            }
+            // Sort by submitted_at
+            return new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0);
+        },
+        'submitted-oldest': (a, b) => {
+            // Drafts go to bottom
+            if (a.status === 'NEW' && b.status !== 'NEW') return 1;
+            if (b.status === 'NEW' && a.status !== 'NEW') return -1;
+            if (a.status === 'NEW' && b.status === 'NEW') {
+                return new Date(a.created_at) - new Date(b.created_at);
+            }
+            return new Date(a.submitted_at || 0) - new Date(b.submitted_at || 0);
+        },
+        'created-newest': (a, b) => new Date(b.created_at) - new Date(a.created_at),
+        'created-oldest': (a, b) => new Date(a.created_at) - new Date(b.created_at),
+    };
+    
+    return timesheets.sort(sortFn[sortBy] || sortFn['newest']);
 }
 
 async function openTimesheet(id) {
@@ -476,6 +519,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterStatus = document.getElementById('filter-status');
     if (filterStatus) {
         filterStatus.addEventListener('change', loadTimesheets);
+    }
+    
+    // Setup sort change handler
+    const sortTimesheetsEl = document.getElementById('sort-timesheets');
+    if (sortTimesheetsEl) {
+        sortTimesheetsEl.addEventListener('change', loadTimesheets);
     }
     
     // Setup sidebar navigation
