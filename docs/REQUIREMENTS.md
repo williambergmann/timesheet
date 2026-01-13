@@ -233,15 +233,22 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 
 **Goal: Ship features, push to 85% coverage**
 
-| Task                         | Time Est. | Priority | Status      | Reference                                         |
-| ---------------------------- | --------- | -------- | ----------- | ------------------------------------------------- |
-| REQ-022: Holiday awareness   | 2-3 hours | P1       | ✅ Complete | Verified: indicator, tooltip, warning dialog work |
-| REQ-053: Unsaved changes fix | 30 min    | P1       | ✅ Complete | Warning clears after Save Draft                   |
-| REQ-054: Daily totals row    | 1-2 hours | P1       | ✅ Complete | Total row + grand total working                   |
-| REQ-055: Day hours cap at 24 | 30 min    | P1       | ✅ Complete | Prevents >24h per day, shows warning toast        |
-| REQ-056: Future week warning | 30 min    | P1       | ✅ Complete | Warn on Submit if week ends after today           |
-| Add PDF/Excel export tests   | 1-2 hours | P1       | ✅ Complete | 28 tests added, admin.py 74% → 84%, fixed bug     |
-| Complete Teams mocking tests | 1 hour    | P2       | ✅ Complete | 14 tests added, teams.py 57% → 99%                |
+| Task                                 | Time Est. | Priority | Status      | Reference                                                                      |
+| ------------------------------------ | --------- | -------- | ----------- | ------------------------------------------------------------------------------ |
+| REQ-022: Holiday awareness           | 2-3 hours | P1       | ✅ Complete | Verified: indicator, tooltip, warning dialog work                              |
+| REQ-053: Unsaved changes fix         | 30 min    | P1       | ✅ Complete | Warning clears after Save Draft                                                |
+| REQ-054: Daily totals row            | 1-2 hours | P1       | ✅ Complete | Total row + grand total working                                                |
+| REQ-055: Day hours cap at 24         | 30 min    | P1       | ✅ Complete | Prevents >24h per day, shows warning toast                                     |
+| REQ-056: Future week warning         | 30 min    | P1       | ✅ Complete | Warn on Submit if week ends after today                                        |
+| Add PDF/Excel export tests           | 1-2 hours | P1       | ✅ Complete | 28 tests added, admin.py 74% → 84%, fixed bug                                  |
+| Complete Teams mocking tests         | 1 hour    | P2       | ✅ Complete | 14 tests added, teams.py 57% → 99%                                             |
+| Azure Container deployment           | 2 hours   | P1       | ✅ Complete | Deployed to ACI, http://northstar-timesheet-test.eastus.azurecontainer.io:5000 |
+| Mobile UI: Hide New Timesheet btn    | 15 min    | P2       | ✅ Complete | Hidden on mobile, accessible in hamburger menu                                 |
+| Mobile UI: Remove Settings from menu | 15 min    | P2       | ✅ Complete | Settings only in user dropdown                                                 |
+| Single-column layout: Timesheets     | 15 min    | P2       | ✅ Complete | Stacked vertical cards on all screen sizes                                     |
+| Single-column layout: Settings       | 15 min    | P2       | ✅ Complete | Notification cards stacked vertically                                          |
+| REQ-058: Notification prompt spec    | 30 min    | P1       | ✅ Complete | Mint green banner documented in REQUIREMENTS.md                                |
+| BUG-007: Document hamburger resize   | 10 min    | P2       | ✅ Complete | Bug logged in BUGS.md                                                          |
 
 **Coverage Target:**
 
