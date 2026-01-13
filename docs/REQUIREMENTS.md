@@ -241,15 +241,15 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | REQ-055: Day hours cap at 24 | 30 min    | P1       | ✅ Complete | Prevents >24h per day, shows warning toast        |
 | REQ-056: Future week warning | 30 min    | P1       | ✅ Complete | Warn on Submit if week ends after today           |
 | Add PDF/Excel export tests   | 1-2 hours | P1       | ✅ Complete | 28 tests added, admin.py 74% → 84%, fixed bug     |
-| Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned  | Mock `_get_bot_token()`, push teams.py 57% → 70%  |
+| Complete Teams mocking tests | 1 hour    | P2       | ✅ Complete | 14 tests added, teams.py 57% → 99%                |
 
 **Coverage Target:**
 
-| Module                | Current | Target | Strategy                    |
-| --------------------- | ------- | ------ | --------------------------- |
-| **Total**             | 85%     | 85%    | ✅ Target reached!          |
-| `app/routes/admin.py` | 84%     | 80%+   | ✅ Complete (was 74%)       |
-| `app/utils/teams.py`  | 57%     | 70%+   | Full mocking per TESTING.md |
+| Module                | Current | Target | Strategy              |
+| --------------------- | ------- | ------ | --------------------- |
+| **Total**             | 87%     | 85%    | ✅ Exceeded target!   |
+| `app/routes/admin.py` | 84%     | 80%+   | ✅ Complete (was 74%) |
+| `app/utils/teams.py`  | 99%     | 70%+   | ✅ Complete (was 57%) |
 
 ---
 

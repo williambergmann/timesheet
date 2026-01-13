@@ -8,9 +8,9 @@
 
 | Metric             | Value   | Target |
 | ------------------ | ------- | ------ |
-| **Unit/API Tests** | 418     | 300+   |
+| **Unit/API Tests** | 432     | 300+   |
 | **E2E Tests**      | 4 files | 6+     |
-| **Code Coverage**  | 85%     | 85%+   |
+| **Code Coverage**  | 87%     | 85%+   |
 | **Test Files**     | 13      | 12+    |
 
 ---
