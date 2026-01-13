@@ -115,6 +115,9 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      - name: Create .env from example
+        run: cp .env.example .env
+
       - name: Start Docker Compose stack
         run: |
           cd docker

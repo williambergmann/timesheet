@@ -47,6 +47,7 @@ coverage.xml
 .pytest_cache/
 
 # Virtual environments
+# Note: .env is gitignored but CI creates it from .env.example
 .env
 .venv
 env/
@@ -112,7 +113,7 @@ node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
-package-lock.json
+# Note: package-lock.json IS committed (not ignored) for reproducible CI builds
 
 # Playwright E2E test artifacts
 test-results/
