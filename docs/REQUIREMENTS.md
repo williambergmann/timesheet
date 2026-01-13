@@ -346,7 +346,9 @@ _Reference designs:_
 | Hour type rows      | Cleaner row styling with subtle separators                 | Medium |
 | Input fields        | Dark theme inputs with focus states                        | Small  |
 | Toast notifications | Modern slide-in toasts with icons                          | Small  |
+| Notification bell   | Bell icon with red dot indicator for pending actions       | Small  |
 | Loading states      | Skeleton loaders instead of spinners                       | Medium |
+| Settings page       | Reorganize into Notifications + Appearance sections (rows) | Medium |
 
 **Acceptance Criteria:**
 
@@ -359,7 +361,10 @@ _Reference designs:_
 - [ ] User initials avatar in header
 - [ ] Status badges use pill styling with appropriate colors
 - [ ] All forms use dark-themed inputs
+- [ ] Notification bell with red dot for pending actions (e.g., needs upload)
+- [ ] Settings page has two sections: Notifications (rows) and Appearance
 - [ ] Responsive design maintained at all breakpoints
+- [ ] Settings page reorganized into Notifications + Appearance sections (rows)
 
 **Technical Improvements:**
 
@@ -463,6 +468,7 @@ Add a User Settings section where users can configure:
 - Email: allow entering one or more email addresses
 - SMS: allow selecting/entering one or more phone numbers
 - Teams: allow connecting a Microsoft account for Teams notifications
+- **Note:** Teams notifications don't require email entry—user is already authenticated via Microsoft SSO
 - Allow multiple emails and phone numbers per user
 
 **Status: ✅ IMPLEMENTED (January 9, 2026)**
