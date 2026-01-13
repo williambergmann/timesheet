@@ -237,7 +237,9 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | ---------------------------- | --------- | -------- | ----------- | ------------------------------------------------- |
 | REQ-022: Holiday awareness   | 2-3 hours | P1       | ✅ Complete | Verified: indicator, tooltip, warning dialog work |
 | REQ-053: Unsaved changes fix | 30 min    | P1       | ✅ Complete | Warning clears after Save Draft                   |
-| REQ-054: Daily totals row    | 1-2 hours | P1       | ✅ Complete | Day Total row + grand total working               |
+| REQ-054: Daily totals row    | 1-2 hours | P1       | ✅ Complete | Total row + grand total working                   |
+| REQ-055: Day hours cap at 24 | 30 min    | P1       | 📋 Next     | Prevent >24h per day in totals (88h bug)          |
+| REQ-056: Future week warning | 30 min    | P1       | 📋 Planned  | Warn on Submit if week ends after today           |
 | Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned  | Mock ReportLab, push admin.py 74% → 80%+          |
 | Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned  | Mock `_get_bot_token()`, push teams.py 57% → 70%  |
 
@@ -1856,6 +1858,8 @@ Add end-to-end browser tests for critical user flows.
 | REQ-052     | 📋 Future   | Database-driven hour types           | Make hour types configurable without code changes (from CHECKIN.md §4)                                          |
 | REQ-053     | ✅ Complete | Unsaved changes warning              | `static/js/timesheet.js`, `static/js/app.js` — shows/hides warning on form changes                              |
 | REQ-054     | ✅ Complete | Daily totals row                     | `static/js/timesheet.js`, `static/css/components.css` — Day Total row shows daily & weekly hour sums            |
+| REQ-055     | 📋 Next     | Day hours cap at 24                  | Validation to prevent >24 hours per day across all hour types                                                   |
+| REQ-056     | 📋 Planned  | Future week submission warning       | Allow saving future weeks but show warning on Submit if week ends after today                                   |
 
 ---
 
