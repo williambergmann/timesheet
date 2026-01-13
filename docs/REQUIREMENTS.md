@@ -325,6 +325,7 @@ _Items moved here due to time constraints or lower priority._
 | REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture     |
 | REQ-047 | User theme selection    | P2       | UX polish, not blocking launch        |
 | REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below |
+| REQ-058 | Notification prompt     | P1       | Encourage users to enable reminders   |
 
 **REQ-057 UI Redesign Breakdown:**
 
@@ -369,6 +370,124 @@ _Reference designs:_
 - [ ] Settings page reorganized into Notifications + Appearance sections (rows)
 - [ ] My Timesheets uses single-column layout (full-width cards stacked vertically)
 - [ ] Date sort toggle: button shows ↓ for newest-first (default), ↑ for oldest-first when clicked
+
+---
+
+**REQ-058: Notification Prompt Popup (P1)**
+
+A mint green notification prompt banner that encourages users to enable notifications. Displays on the My Timesheets view for users who haven't enabled notifications yet.
+
+**UI Design (inline layout matching reference):**
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│  🔔  Never miss a timesheet!  Turn on notifications                              ×   │
+│                                ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾                                │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Visual Specifications:**
+
+| Property      | Value                                                   |
+| ------------- | ------------------------------------------------------- |
+| Background    | Mint green (`#86efac`) - matches app button color       |
+| Border        | 2px solid darker mint (`#6ee79a`) for subtle depth      |
+| Border radius | `var(--radius-lg)` (rounded pill-like)                  |
+| Text color    | Dark text (`#1a1a1a`) for contrast on light background  |
+| Layout        | Single line, centered content, × dismiss on right       |
+| Icon          | 🔔 Alarm bell emoji                                     |
+| Main text     | "Never miss a timesheet!" (regular weight)              |
+| CTA text      | "Turn on notifications" (underlined, clickable link)    |
+| Padding       | `var(--spacing-sm)` vertical, `var(--spacing-lg)` horiz |
+| Position      | Top of My Timesheets view, above filter bar             |
+| Width         | Full-width banner (like reference image)                |
+
+**Behavior:**
+
+1. **Display condition:** Show only if user has no notification channels enabled (no email, SMS, or Teams)
+2. **Click action:** Clicking "Turn on notifications" (underlined text) navigates to User Settings → Notifications section (`#settings` view with scroll to notifications)
+3. **Dismiss option:** × button on right side; stores `notification_prompt_dismissed` in localStorage (don't show again for 30 days)
+4. **Responsive:** Full-width on all screen sizes
+
+**Implementation Notes:**
+
+1. **HTML (`templates/index.html`):**
+
+   - Add a new `#notification-prompt` div above `#timesheets-list`
+   - Initially hidden, shown via JavaScript based on conditions
+
+2. **CSS (`static/css/components.css`):**
+
+   ```css
+   .notification-prompt {
+     background: #86efac;
+     border: 2px solid #6ee79a;
+     border-radius: var(--radius-lg);
+     padding: var(--spacing-sm) var(--spacing-lg);
+     margin-bottom: var(--spacing-lg);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: var(--spacing-sm);
+     color: #1a1a1a;
+     font-size: var(--font-size-sm);
+     position: relative;
+   }
+
+   .notification-prompt-content {
+     display: flex;
+     align-items: center;
+     gap: var(--spacing-sm);
+   }
+
+   .notification-prompt-icon {
+     font-size: 1rem;
+   }
+
+   .notification-prompt-link {
+     color: #1a1a1a;
+     text-decoration: underline;
+     cursor: pointer;
+     margin-left: var(--spacing-xs);
+   }
+
+   .notification-prompt-link:hover {
+     opacity: 0.8;
+   }
+
+   .notification-prompt-dismiss {
+     position: absolute;
+     right: var(--spacing-md);
+     background: none;
+     border: none;
+     color: #1a1a1a;
+     font-size: 1.2rem;
+     cursor: pointer;
+     opacity: 0.6;
+     padding: 0;
+     line-height: 1;
+   }
+
+   .notification-prompt-dismiss:hover {
+     opacity: 1;
+   }
+   ```
+
+3. **JavaScript (`static/js/app.js` or `settings.js`):**
+   - Check user settings on page load
+   - If no notification channels enabled and not dismissed, show prompt
+   - On link click: navigate to `#settings` and scroll to notification section
+
+**Acceptance Criteria:**
+
+- [ ] Mint green banner (`#86efac`) appears at top of My Timesheets view
+- [ ] Contains: 🔔 emoji + "Never miss a timesheet!" + underlined "Turn on notifications"
+- [ ] All content on single line, centered
+- [ ] × dismiss button on right side
+- [ ] Clicking underlined text navigates to Settings → Notifications section
+- [ ] Banner only shows if user has no notifications enabled
+- [ ] Dismiss button stores preference for 30 days in localStorage
+- [ ] Dark text (`#1a1a1a`) on light mint background for readability
 
 **Technical Improvements:**
 
@@ -1963,6 +2082,8 @@ Add end-to-end browser tests for critical user flows.
 | REQ-054     | ✅ Complete | Daily totals row                     | `static/js/timesheet.js`, `static/css/components.css` — Day Total row shows daily & weekly hour sums            |
 | REQ-055     | ✅ Complete | Day hours cap at 24                  | `static/js/timesheet.js` — validates and caps daily total to 24h with toast warning                             |
 | REQ-056     | ✅ Complete | Future week submission warning       | `static/js/app.js` lines 295-321 — warns on Submit if week ends after today, shows confim dialog                |
+| REQ-057     | 📋 Planned  | UI Redesign (Premium)                | See REQ-057 breakdown: gradient buttons, SVG icons, dark theme polish                                           |
+| REQ-058     | 📋 Planned  | Notification prompt popup            | Mint green banner (`#86efac`) prompting users to enable notifications                                           |
 
 ---
 
