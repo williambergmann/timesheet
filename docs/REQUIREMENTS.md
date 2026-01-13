@@ -798,6 +798,63 @@ Send email notifications for timesheet events.
 - Template-based HTML emails for all events
 - Logs in dev mode when SMTP is not configured
 
+**Email Testing with Mailtrap:**
+
+Mailtrap provides a safe email testing environment that catches all outgoing emails without delivering to real users.
+
+_Setup:_
+
+1. Create free account at https://mailtrap.io/register/signup
+2. Go to **Email Testing → Inboxes** to get SMTP credentials
+3. Add credentials to `.env.local` (gitignored):
+
+```bash
+# Mailtrap Sandbox SMTP
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=api
+SMTP_PASSWORD=your_api_token_here
+SMTP_FROM_EMAIL=noreply@northstar-timesheet.com
+SMTP_FROM_NAME=Northstar Timesheet
+```
+
+_Test Script:_
+
+```bash
+# Run email test (requires app context)
+cd timesheet
+python3 -c "
+from app import create_app
+from app.utils.email import send_email, is_smtp_configured
+app = create_app()
+with app.app_context():
+    print('SMTP Configured:', is_smtp_configured())
+    result = send_email(
+        'test@example.com',
+        'Test Email from Northstar',
+        '<h1>Test</h1><p>This is a test email.</p>'
+    )
+    print('Result:', result)
+"
+```
+
+_Dev Mode Behavior:_
+
+When SMTP is **not configured**, emails are logged to console instead of sent:
+
+```
+[DEV EMAIL] To=user@example.com Subject=Timesheet Approved
+```
+
+This allows local development without Mailtrap setup.
+
+_Free Tier Limits:_
+
+| Plan           | Emails/Month | Use Case                    |
+| -------------- | ------------ | --------------------------- |
+| Email Sandbox  | 50           | Safe testing (no delivery)  |
+| Email API/SMTP | 4,000        | Real delivery (150/day max) |
+
 ---
 
 ### REQ-012: Teams Bot Notifications (P2)
