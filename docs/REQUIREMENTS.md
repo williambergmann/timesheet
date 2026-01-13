@@ -236,6 +236,8 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | Task                         | Time Est. | Priority | Status      | Reference                                         |
 | ---------------------------- | --------- | -------- | ----------- | ------------------------------------------------- |
 | REQ-022: Holiday awareness   | 2-3 hours | P1       | ✅ Complete | Verified: indicator, tooltip, warning dialog work |
+| REQ-053: Unsaved changes fix | 30 min    | P1       | ✅ Complete | Warning clears after Save Draft                   |
+| REQ-054: Daily totals row    | 1-2 hours | P1       | 📋 Next     | Add row showing daily + weekly totals             |
 | Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned  | Mock ReportLab, push admin.py 74% → 80%+          |
 | Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned  | Mock `_get_bot_token()`, push teams.py 57% → 70%  |
 
@@ -246,6 +248,66 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | **Total**             | 83%     | 85%    | +2% from PDF tests + Teams tests    |
 | `app/routes/admin.py` | 74%     | 80%+   | Mock ReportLab, test export formats |
 | `app/utils/teams.py`  | 57%     | 70%+   | Full mocking per TESTING.md         |
+
+---
+
+### REQ-054: Daily Totals Row (P1)
+
+**Description:**
+Add a summary row at the bottom of the timesheet hours grid showing the total hours for each day (column totals) and the grand total for the week. This row should appear in both the "New Timesheet" editor and the "My Timesheets" view when viewing an existing timesheet.
+
+**Current State (see screenshot):**
+
+- Each hour type row shows its own row total (e.g., "Internal Hours: 40", "Training: 40")
+- ❌ No daily totals row showing column sums
+- ❌ No grand total for the entire week
+
+**Required:**
+
+| Column    | Content                                    |
+| --------- | ------------------------------------------ |
+| Hour Type | "**Day Total**" (bold label)               |
+| Sun-Sat   | Sum of all hour types for that day         |
+| Total     | Grand total hours for the week (all types) |
+| Actions   | Empty (no edit/delete for totals row)      |
+
+**Example:**
+
+```
+Hour Type       | Sun | Mon | Tue | Wed | Thu | Fri | Sat | Total | Actions
+----------------|-----|-----|-----|-----|-----|-----|-----|-------|--------
+Internal Hours  |  0  |  8  |  8  |  8  |  8  |  8  |  0  |   40  | ✏️ ×
+Training        |  0  |  8  |  8  |  8  |  8  |  8  |  0  |   40  | ✏️ ×
+----------------|-----|-----|-----|-----|-----|-----|-----|-------|--------
+Day Total       |  0  | 16  | 16  | 16  | 16  | 16  |  0  |   80  |
+```
+
+**Implementation Notes:**
+
+1. **Frontend (`static/js/timesheet.js` or `timesheet/entries.js`):**
+
+   - Add `renderDayTotals()` function
+   - Calculate column sums from all `hour-input` values
+   - Append a styled "totals" row to the entries table
+   - Update on any hour input change
+
+2. **Styling (`static/css/components.css`):**
+
+   - Add `.hour-type-row.totals-row` class
+   - Bold text, slightly different background (e.g., darker or primary tint)
+   - Match the existing row styling
+
+3. **Read-only mode:**
+   - Totals row should display in both editable and read-only views
+
+**Acceptance Criteria:**
+
+- [ ] Day Total row appears at bottom of hour types grid
+- [ ] Shows sum of all hour types for each day (Sun-Sat)
+- [ ] Shows grand total for week in Total column
+- [ ] Updates dynamically when hours are changed
+- [ ] Styled distinctly from data rows (bold/different background)
+- [ ] Works in New Timesheet and existing timesheet views
 
 ---
 
@@ -1793,6 +1855,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-051     | ✅ Complete | CONTRIBUTING.md                      | `/CONTRIBUTING.md` — clone, run, test, deploy guide                                                             |
 | REQ-052     | 📋 Future   | Database-driven hour types           | Make hour types configurable without code changes (from CHECKIN.md §4)                                          |
 | REQ-053     | ✅ Complete | Unsaved changes warning              | `static/js/timesheet.js`, `static/js/app.js` — shows/hides warning on form changes                              |
+| REQ-054     | 📋 Next     | Daily totals row                     | Add summary row showing daily + weekly totals in hour grid                                                      |
 
 ---
 
