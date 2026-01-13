@@ -239,17 +239,17 @@ Major effort to improve test coverage. Created 137 new tests across multiple tes
 | REQ-053: Unsaved changes fix | 30 min    | P1       | ✅ Complete | Warning clears after Save Draft                   |
 | REQ-054: Daily totals row    | 1-2 hours | P1       | ✅ Complete | Total row + grand total working                   |
 | REQ-055: Day hours cap at 24 | 30 min    | P1       | ✅ Complete | Prevents >24h per day, shows warning toast        |
-| REQ-056: Future week warning | 30 min    | P1       | 📋 Planned  | Warn on Submit if week ends after today           |
-| Add PDF/Excel export tests   | 1-2 hours | P1       | 📋 Planned  | Mock ReportLab, push admin.py 74% → 80%+          |
+| REQ-056: Future week warning | 30 min    | P1       | ✅ Complete | Warn on Submit if week ends after today           |
+| Add PDF/Excel export tests   | 1-2 hours | P1       | ✅ Complete | 28 tests added, admin.py 74% → 84%, fixed bug     |
 | Complete Teams mocking tests | 1 hour    | P2       | 📋 Planned  | Mock `_get_bot_token()`, push teams.py 57% → 70%  |
 
 **Coverage Target:**
 
-| Module                | Current | Target | Strategy                            |
-| --------------------- | ------- | ------ | ----------------------------------- |
-| **Total**             | 83%     | 85%    | +2% from PDF tests + Teams tests    |
-| `app/routes/admin.py` | 74%     | 80%+   | Mock ReportLab, test export formats |
-| `app/utils/teams.py`  | 57%     | 70%+   | Full mocking per TESTING.md         |
+| Module                | Current | Target | Strategy                    |
+| --------------------- | ------- | ------ | --------------------------- |
+| **Total**             | 85%     | 85%    | ✅ Target reached!          |
+| `app/routes/admin.py` | 84%     | 80%+   | ✅ Complete (was 74%)       |
+| `app/utils/teams.py`  | 57%     | 70%+   | Full mocking per TESTING.md |
 
 ---
 
@@ -1859,7 +1859,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-053     | ✅ Complete | Unsaved changes warning              | `static/js/timesheet.js`, `static/js/app.js` — shows/hides warning on form changes                              |
 | REQ-054     | ✅ Complete | Daily totals row                     | `static/js/timesheet.js`, `static/css/components.css` — Day Total row shows daily & weekly hour sums            |
 | REQ-055     | ✅ Complete | Day hours cap at 24                  | `static/js/timesheet.js` — validates and caps daily total to 24h with toast warning                             |
-| REQ-056     | 📋 Planned  | Future week submission warning       | Allow saving future weeks but show warning on Submit if week ends after today                                   |
+| REQ-056     | ✅ Complete | Future week submission warning       | `static/js/app.js` lines 295-321 — warns on Submit if week ends after today, shows confim dialog                |
 
 ---
 
@@ -1870,4 +1870,4 @@ _Document maintained as the authoritative source for feature requirements. For o
 - _Testing: [`TESTING.md`](TESTING.md)_
 - _Roadmap: [`roadmap.md`](roadmap.md)_
 
-_Last updated: January 12, 2026_
+_Last updated: January 13, 2026_

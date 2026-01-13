@@ -600,7 +600,7 @@ def _build_export_query():
         TimesheetStatus.APPROVED,
         TimesheetStatus.NEEDS_APPROVAL,
     ]:
-        query = query.filter_by(status=status)
+        query = query.filter(Timesheet.status == status)
 
     user_id = request.args.get("user_id")
     if user_id:

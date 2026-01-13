@@ -292,6 +292,34 @@ async function submitTimesheet() {
         }
     }
     
+    // REQ-056: Check if submitting for a future week
+    const weekStart = document.getElementById('week-start').value;
+    if (weekStart) {
+        const startDate = new Date(weekStart + 'T00:00:00');
+        const weekEnd = new Date(startDate);
+        weekEnd.setDate(weekEnd.getDate() + 6); // Saturday
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize to midnight
+        
+        if (weekEnd > today) {
+            const proceed = confirm(
+                '⚠️ Future Week Timesheet\n\n' +
+                'This timesheet is for a week that hasn\'t ended yet.\n\n' +
+                `Week ends: ${weekEnd.toLocaleDateString()}\n` +
+                `Today is: ${today.toLocaleDateString()}\n\n` +
+                'You can save this timesheet as a draft and submit it later.\n\n' +
+                'Click "Cancel" to keep editing.\n' +
+                'Click "OK" to submit anyway.'
+            );
+            
+            if (!proceed) {
+                showToast('Timesheet saved as draft. Submit when the week is complete.', 'info');
+                return;
+            }
+        }
+    }
+    
     try {
         const currentId = timesheetId || document.getElementById('timesheet-id').value;
         
