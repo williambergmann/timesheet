@@ -373,7 +373,7 @@ async function submitTimesheet() {
     if (weekStart) {
         const startDate = new Date(weekStart + 'T00:00:00');
         const weekEnd = new Date(startDate);
-        weekEnd.setDate(weekEnd.getDate() + 6); // Saturday
+        weekEnd.setDate(weekEnd.getDate() + 6); // End of week (Sunday)
         
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Normalize to midnight
@@ -384,12 +384,13 @@ async function submitTimesheet() {
                 'This timesheet is for a week that hasn\'t ended yet.\n\n' +
                 `Week ends: ${weekEnd.toLocaleDateString()}\n` +
                 `Today is: ${today.toLocaleDateString()}\n\n` +
-                'You can save this timesheet as a draft and submit it later.\n\n' +
-                'Click "Cancel" to keep editing.\n' +
-                'Click "OK" to submit anyway.'
+                'Click "Cancel" to save as draft and submit later.\n' +
+                'Click "OK" to submit now.'
             );
             
             if (!proceed) {
+                // Actually save the draft before returning
+                await saveDraft();
                 showToast('Timesheet saved as draft. Submit when the week is complete.', 'info');
                 return;
             }
