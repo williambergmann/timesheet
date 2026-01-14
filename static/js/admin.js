@@ -255,6 +255,27 @@ async function loadAdminTimesheets() {
             allTimesheets = data.timesheets;
         }
         
+        // Sort timesheets based on selected sort option
+        const sortEl = document.getElementById('admin-sort-by');
+        const sortBy = sortEl ? sortEl.value : 'newest';
+        allTimesheets.sort((a, b) => {
+            switch (sortBy) {
+                case 'oldest':
+                    return new Date(a.week_start) - new Date(b.week_start);
+                case 'submitted-newest':
+                    return new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0);
+                case 'submitted-oldest':
+                    return new Date(a.submitted_at || 0) - new Date(b.submitted_at || 0);
+                case 'user-asc':
+                    return (a.user?.display_name || '').localeCompare(b.user?.display_name || '');
+                case 'user-desc':
+                    return (b.user?.display_name || '').localeCompare(a.user?.display_name || '');
+                case 'newest':
+                default:
+                    return new Date(b.week_start) - new Date(a.week_start);
+            }
+        });
+        
         if (allTimesheets.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
@@ -903,6 +924,12 @@ document.addEventListener('DOMContentLoaded', () => {
         hourTypeFilter.addEventListener('change', loadAdminTimesheets);
     }
     
+    // Sort by dropdown
+    const sortByFilter = document.getElementById('admin-sort-by');
+    if (sortByFilter) {
+        sortByFilter.addEventListener('change', loadAdminTimesheets);
+    }
+    
     // Clear filters button
     const clearFiltersBtn = document.getElementById('admin-clear-filters');
     if (clearFiltersBtn) {
@@ -916,6 +943,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userEl) userEl.value = '';
             if (weekEl) weekEl.value = '';
             if (hourTypeEl) hourTypeEl.value = '';
+            
+            // Reset sort dropdown
+            const sortEl = document.getElementById('admin-sort-by');
+            if (sortEl) sortEl.value = 'newest';
             
             // REQ-004: Clear pay period filter
             window.payPeriodFilter = null;
