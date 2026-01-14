@@ -542,8 +542,8 @@ def confirm_pay_period():
     except ValueError:
         return {"error": "Invalid date format"}, 400
 
-    if start.weekday() != 6 or (end - start).days != 13:
-        return {"error": "Pay period must start on Sunday and span 14 days"}, 400
+    if start.weekday() != 0 or (end - start).days != 13:
+        return {"error": "Pay period must start on Monday and span 14 days"}, 400
 
     existing = PayPeriod.query.filter_by(start_date=start).first()
     if existing:
