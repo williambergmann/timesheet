@@ -370,6 +370,8 @@ async function submitTimesheet() {
     
     // REQ-056: Check if submitting for a future week
     const weekStart = document.getElementById('week-start').value;
+    let alreadyConfirmed = false;
+    
     if (weekStart) {
         const startDate = new Date(weekStart + 'T00:00:00');
         const weekEnd = new Date(startDate);
@@ -394,7 +396,14 @@ async function submitTimesheet() {
                 showToast('Timesheet saved as draft. Submit when the week is complete.', 'info');
                 return;
             }
+            alreadyConfirmed = true; // User already confirmed for future week
         }
+    }
+    
+    // Final confirmation for current/past week submissions
+    // (Skip if user already confirmed for future week above)
+    if (!alreadyConfirmed && !confirm('Are you sure you want to submit this timesheet?')) {
+        return;
     }
     
     try {
