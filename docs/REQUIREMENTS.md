@@ -351,11 +351,28 @@ Azure Container Instances deployment tested successfully but will not be used fo
 
 Azure credentials and ACI resources can be removed/deprovisioned.
 
+**Alternative Hosting Options (for reference):**
+
+_If cloud hosting were needed for development/testing, faster free alternatives exist:_
+
+| Service          | Deploy Speed | Free Tier     | Best For        |
+| ---------------- | ------------ | ------------- | --------------- |
+| **Railway.app**  | ~30 seconds  | 500 hrs/month | Quick testing   |
+| **Fly.io**       | ~30 seconds  | 3 shared CPUs | Edge deployment |
+| **Render.com**   | ~1 minute    | 750 hrs/month | Python apps     |
+| **Local Docker** | Instant      | Forever       | Development ✅  |
+
+For production self-hosting, requirements are:
+
+- Docker/Docker Compose installed on servers
+- Reverse proxy (nginx) for SSL — use `docker/nginx-ssl.conf`
+- PostgreSQL and Redis (can run in containers via `docker-compose.prod.yml`)
+
 ---
 
-### 📋 Future Work (After Jan 13)
+### 📋 Backlog (Future Work)
 
-_Items moved here due to time constraints or lower priority._
+_Items below are pending implementation. Priority to be determined._
 
 **Features:**
 
