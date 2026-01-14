@@ -254,6 +254,30 @@ async function loadAdminTimesheets() {
             const data = await API.getAdminTimesheets(params);
             allTimesheets = data.timesheets;
         }
+
+        // Apply sorting
+        const sortEl = document.getElementById('admin-filter-sort');
+        const sortValue = sortEl ? sortEl.value : 'newest';
+        
+        allTimesheets.sort((a, b) => {
+            switch (sortValue) {
+                case 'newest': // Date ↓ (default)
+                    return new Date(b.week_start) - new Date(a.week_start);
+                case 'oldest': // Date ↑
+                    return new Date(a.week_start) - new Date(b.week_start);
+                case 'submitted-newest': // Submitted ↓
+                    // submitted_at might be null for drafts
+                    return new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0);
+                case 'submitted-oldest': // Submitted ↑
+                    return new Date(a.submitted_at || 0) - new Date(b.submitted_at || 0);
+                case 'created-newest': // Created ↓
+                    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                case 'created-oldest': // Created ↑
+                    return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+                default:
+                    return 0;
+            }
+        });
         
         if (allTimesheets.length === 0) {
             container.innerHTML = `
@@ -902,6 +926,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hourTypeFilter) {
         hourTypeFilter.addEventListener('change', loadAdminTimesheets);
     }
+
+    // Sort filter
+    const sortFilter = document.getElementById('admin-filter-sort');
+    if (sortFilter) {
+        sortFilter.addEventListener('change', loadAdminTimesheets);
+    }
     
     // Clear filters button
     const clearFiltersBtn = document.getElementById('admin-clear-filters');
@@ -911,8 +941,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const userEl = document.getElementById('admin-filter-user');
             const weekEl = document.getElementById('admin-filter-week');
             const hourTypeEl = document.getElementById('admin-filter-hourtype');
+            const sortEl = document.getElementById('admin-filter-sort');
             
             if (statusEl) statusEl.value = '';
+            if (sortEl) sortEl.value = 'newest';
             if (userEl) userEl.value = '';
             if (weekEl) weekEl.value = '';
             if (hourTypeEl) hourTypeEl.value = '';
