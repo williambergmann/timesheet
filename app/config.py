@@ -90,12 +90,13 @@ class Config:
     TEAMS_APP_PASSWORD = os.environ.get("TEAMS_APP_PASSWORD", "")
     TEAMS_TENANT_ID = os.environ.get("TEAMS_TENANT_ID", "botframework.com")
 
-    # Redis
-    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    # Redis (optional - used for rate limiting and job queues)
+    # If not set, rate limiting falls back to in-memory storage
+    REDIS_URL = os.environ.get("REDIS_URL", "")
 
     # Rate limiting (REQ-042)
-    # Use Redis as rate limit storage backend
-    RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    # Use Redis if available, otherwise fall back to in-memory storage
+    RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL") or "memory://"
     RATELIMIT_STRATEGY = "fixed-window"  # Simple fixed window counting
     RATELIMIT_HEADERS_ENABLED = True  # Send X-RateLimit-* headers in responses
     # Auth endpoint limits (per IP): 10 requests per minute
