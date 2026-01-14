@@ -894,13 +894,7 @@ endblock %} {% block extra_css %}
             </button>
             <span id="pay-period-confirmed" class="pay-period-confirmed hidden">Confirmed</span>
             {% endif %}
-          </div>
-          <div class="filter-group">
-            <select id="admin-export-format" class="form-select form-select-sm" title="Export format">
-              <option value="csv">CSV</option>
-              <option value="xlsx">Excel (.xlsx)</option>
-              <option value="pdf">PDF</option>
-            </select>
+
             <button
               class="btn btn-ghost btn-sm"
               id="admin-clear-filters"
@@ -908,6 +902,14 @@ endblock %} {% block extra_css %}
             >
               🔄 Reset
             </button>
+          </div>
+          <div class="filter-group">
+            <select id="admin-export-format" class="form-select form-select-sm" title="Export format">
+              <option value="csv">CSV</option>
+              <option value="xlsx">Excel (.xlsx)</option>
+              <option value="pdf">PDF</option>
+            </select>
+
             <button
               class="btn btn-ghost btn-sm"
               id="admin-export-btn"
