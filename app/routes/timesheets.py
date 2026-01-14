@@ -131,12 +131,17 @@ def create_timesheet():
 
     # Auto-populate if requested
     if data.get("auto_populate"):
+        # Determine hour type based on user role
+        from ..models import User, UserRole
+        user = User.query.get(user_id)
+        hour_type = HourType.TRAINING if user and user.role == UserRole.TRAINEE else HourType.FIELD
+        
         for day_offset in range(1, 6):  # Mon=1 through Fri=5
             entry_date = week_start + timedelta(days=day_offset)
             entry = TimesheetEntry(
                 timesheet=timesheet,
                 entry_date=entry_date,
-                hour_type=HourType.FIELD,
+                hour_type=hour_type,
                 hours=8.0,
             )
             db.session.add(entry)

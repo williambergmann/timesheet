@@ -957,15 +957,22 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .toast-success {
   background: var(--color-success);
+  color: #ffffff;
 }
 
 .toast-error {
   background: var(--color-danger);
+  color: #ffffff;
 }
 
 .toast-warning {
   background: var(--color-warning);
   color: var(--color-gray-900);
+}
+
+.toast-info {
+  background: var(--color-info, #06b6d4);
+  color: #ffffff;
 }
 
 @keyframes slideIn {
