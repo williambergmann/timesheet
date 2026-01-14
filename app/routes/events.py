@@ -26,14 +26,14 @@ def event_stream():
     """
     user_id = session["user"]["id"]
     is_admin = session["user"].get("is_admin", False)
+    
+    # Capture config values before entering the generator (fixes application context issue)
+    redis_url = current_app.config.get("REDIS_URL", "redis://localhost:6379/0")
 
     def generate():
         """Generator for SSE messages."""
         import redis
         import json
-
-        # Connect to Redis for pub/sub
-        redis_url = current_app.config.get("REDIS_URL", "redis://localhost:6379/0")
 
         try:
             r = redis.from_url(redis_url)

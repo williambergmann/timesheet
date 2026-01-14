@@ -425,12 +425,13 @@ async function submitTimesheet() {
 async function deleteTimesheet() {
     const timesheetId = document.getElementById('timesheet-id').value;
     
-    if (!timesheetId) {
-        showTimesheetsView();
+    if (!confirm('Are you sure you want to delete this timesheet?')) {
         return;
     }
-    
-    if (!confirm('Are you sure you want to delete timesheet?')) {
+
+    // If no ID, it's a new unsaved timesheet - just discard and go back
+    if (!timesheetId) {
+        showTimesheetsView();
         return;
     }
     
