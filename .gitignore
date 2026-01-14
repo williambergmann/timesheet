@@ -132,3 +132,4 @@ dmypy.json
 *.bak
 *.tmp
 *.temp
+.deployment-notes

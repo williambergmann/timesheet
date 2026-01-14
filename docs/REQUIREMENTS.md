@@ -327,6 +327,7 @@ Day Total       |  0  | 16  | 16  | 16  | 16  | 16  |  0  |   80  |
 | BUG-008: Delete draft not working | Fixed SSE application context error causing network congestion  | ✅ Complete |
 | SSE endpoint fix                  | Moved `redis_url` lookup outside generator to fix context error | ✅ Complete |
 | Sort dropdown wording             | Changed "Sort:" to "Sort by:", "Newest/Oldest" to "Date ↓/↑"    | ✅ Complete |
+| UI Polish                         | Unified logo usage (fixed size mismatch in light/dark modes)    | ✅ Complete |
 | Infrastructure decision           | Azure hosting cancelled — will self-host on existing servers    | ✅ Decided  |
 
 **Bug Root Cause Analysis:**
