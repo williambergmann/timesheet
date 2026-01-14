@@ -4,7 +4,7 @@
 >
 > **Source:** Design decisions captured in [DESIGN.md](DESIGN.md), plus roadmap/security/testing notes in `docs/`
 >
-> **Last Updated:** January 12, 2026
+> **Last Updated:** January 14, 2026
 
 ---
 
@@ -317,6 +317,39 @@ Day Total       |  0  | 16  | 16  | 16  | 16  | 16  |  0  |   80  |
 - [x] Updates dynamically when hours are changed
 - [x] Styled distinctly from data rows (bold/different background)
 - [x] Works in New Timesheet and existing timesheet views
+
+### 📅 January 14, 2026 — Today's Work
+
+**Completed Today:**
+
+| Task                              | Description                                                     | Status      |
+| --------------------------------- | --------------------------------------------------------------- | ----------- |
+| BUG-008: Delete draft not working | Fixed SSE application context error causing network congestion  | ✅ Complete |
+| SSE endpoint fix                  | Moved `redis_url` lookup outside generator to fix context error | ✅ Complete |
+| Sort dropdown wording             | Changed "Sort:" to "Sort by:", "Newest/Oldest" to "Date ↓/↑"    | ✅ Complete |
+| Infrastructure decision           | Azure hosting cancelled — will self-host on existing servers    | ✅ Decided  |
+
+**Bug Root Cause Analysis:**
+
+The delete button appeared to not work for draft timesheets opened from "My Timesheets". Investigation revealed:
+
+1. **Frontend ID handling was correct** — `populateForm()` properly sets `timesheet-id`, `deleteTimesheet()` correctly reads it
+2. **Backend delete API was working** — Direct API calls returned `200 OK`
+3. **Root cause: SSE application context error** — The `/api/events` endpoint was crashing with `RuntimeError: Working outside of application context` because `current_app.config` was accessed inside a generator function
+4. **Cascade effect:** SSE failures → `500 Internal Server Error` → rapid reconnection attempts → `429 Too Many Requests` → network congestion blocked the DELETE fetch request → `TypeError: Failed to fetch`
+
+**Fix:** Moved `redis_url = current_app.config.get("REDIS_URL", ...)` outside the `generate()` function in `app/routes/events.py`.
+
+**Infrastructure Decision:**
+
+Azure Container Instances deployment tested successfully but will not be used for production. Decision made to self-host on existing company servers, which provides:
+
+- No ongoing cloud costs
+- Full control over infrastructure
+- Faster deployment cycles
+- No dependency on Azure credentials
+
+Azure credentials and ACI resources can be removed/deprovisioned.
 
 ---
 
