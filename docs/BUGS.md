@@ -2,7 +2,7 @@
 
 > **Purpose:** Track known bugs and issues requiring fixes.
 >
-> **Last Updated:** January 12, 2026
+> **Last Updated:** January 14, 2026
 
 ---
 
@@ -17,6 +17,7 @@
 | [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
 | [BUG-006](#bug-006-upload-error-on-needs_approval-status)       | Upload Error on NEEDS_APPROVAL Status        | ✅ Resolved | P1       | Jan 12   |
 | [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | 🔴 Open     | P2       | Jan 13   |
+| [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | 🔴 Open     | P0       | Jan 14   |
 
 ---
 
@@ -82,6 +83,66 @@ Force hide the mobile nav above 768px using `!important`:
 - [ ] Mobile menu auto-closes when window is resized above 768px
 - [ ] Hamburger button state resets (not showing X anymore)
 - [ ] No visual artifacts when transitioning between breakpoints
+
+---
+
+### BUG-008: Non-Field Hour Types Reset to Field
+
+**Status:** 🔴 Open  
+**Severity:** High (P0)  
+**Reported:** January 14, 2026  
+**Related:** REQ-044, Hour Type Management
+
+**Description:**
+When creating a new timesheet and selecting non-Field hour types (e.g., PTO, Internal, Training), the entries are incorrectly reset to "Field Hours" upon save/submit. This causes timesheets with only PTO or Internal hours to be rejected for missing attachments (which are only required for Field Hours).
+
+**Steps to Reproduce:**
+
+1. Log in to the app
+2. Click "New Timesheet"
+3. Select a week
+4. Add a row with hour type "PTO" (or Internal, Training, Unpaid, Holiday)
+5. Enter 8 hours on a day
+6. Click "Submit"
+7. **Expected:** Timesheet saved with PTO hours, no attachment required
+8. **Actual:** Hours are saved as "Field Hours", attachment warning appears, timesheet gets NEEDS_APPROVAL status
+
+**Affected Hour Types:**
+
+- PTO → incorrectly becomes Field
+- Internal → incorrectly becomes Field
+- Training → may work (exists in both modules)
+- Unpaid → incorrectly becomes Field
+- Holiday → may work (exists in both modules)
+
+**Root Cause (Suspected):**
+Mismatch between hour type definitions in different modules:
+
+| Module         | Hour Types Available                            |
+| -------------- | ----------------------------------------------- |
+| `timesheet.js` | Field, Internal, Training, PTO, Unpaid, Holiday |
+| `entries.js`   | Work, Training, Field, Holiday                  |
+
+`entries.js` only defines 4 hour types and uses `Work` instead of `Internal`. When a type like `PTO` or `Internal` is used, it may not be properly recognized and defaults to `Field`.
+
+**Affected Files:**
+
+- `static/js/timesheet/entries.js` - Line 9-18: HOUR_TYPES and ALL_HOUR_TYPES are incomplete
+- `static/js/timesheet.js` - Line 29-36: Has correct HOUR_TYPES definition
+
+**Fix Plan:**
+
+1. **Synchronize hour type definitions** - Update `entries.js` to match `timesheet.js`
+2. **Remove duplicate definitions** - Consider a single source of truth for hour types
+3. **Add validation** - Log warning if unknown hour type is passed to prevent silent failures
+
+**Acceptance Criteria:**
+
+- [ ] PTO hours submit correctly without attachment requirement
+- [ ] Internal hours submit correctly without attachment requirement
+- [ ] Training, Unpaid, Holiday hours work correctly
+- [ ] Only Field Hours trigger the attachment requirement
+- [ ] Hour type is preserved through save/submit cycle
 
 ---
 
