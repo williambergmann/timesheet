@@ -392,7 +392,8 @@ summary:focus-visible {
 
 .header-logo {
   height: 40px;
-  width: auto;
+  width: 40px;
+  object-fit: contain;
 }
 
 .logo-light {
