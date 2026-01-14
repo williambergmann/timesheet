@@ -133,7 +133,22 @@ async function loadTimesheets() {
         let timesheets = [...data.timesheets];
         timesheets = sortTimesheets(timesheets, sortBy);
         
-        container.innerHTML = timesheets.map(ts => `
+        container.innerHTML = timesheets.map(ts => {
+            // Determine if we should show Created or Submitted date based on sort
+            let dateInfo = '';
+            if (sortBy.startsWith('created-')) {
+                const createdDate = ts.created_at ? new Date(ts.created_at).toLocaleDateString() : 'Unknown';
+                dateInfo = `<span class="timesheet-card-date">📅 Created: ${createdDate}</span>`;
+            } else if (sortBy.startsWith('submitted-')) {
+                if (ts.status === 'NEW') {
+                    dateInfo = `<span class="timesheet-card-date">📅 Not submitted</span>`;
+                } else {
+                    const submittedDate = ts.submitted_at ? new Date(ts.submitted_at).toLocaleDateString() : 'Unknown';
+                    dateInfo = `<span class="timesheet-card-date">📅 Submitted: ${submittedDate}</span>`;
+                }
+            }
+            
+            return `
             <div class="timesheet-card" onclick="openTimesheet('${ts.id}')">
                 <div class="timesheet-card-header">
                     <span class="timesheet-card-week">${TimesheetModule.formatWeekRange(ts.week_start)}</span>
@@ -142,9 +157,11 @@ async function loadTimesheets() {
                 <div class="timesheet-card-meta">
                     <span>⏱️ ${ts.totals.total}h total</span>
                     <span>💼 ${ts.totals.billable}h billable</span>
+                    ${dateInfo}
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
         
     } catch (error) {
         showToast(error.message, 'error');

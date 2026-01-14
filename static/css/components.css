@@ -373,6 +373,11 @@
   gap: var(--spacing-xs);
 }
 
+.timesheet-card-date {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
 .timesheet-card-user {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
