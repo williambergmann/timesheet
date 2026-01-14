@@ -216,7 +216,7 @@
 }
 
 .light-theme .sidebar-link.active {
-  color: white;
+  color: var(--color-primary);
 }
 
 /*  
