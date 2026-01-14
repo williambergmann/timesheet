@@ -47,6 +47,12 @@ function showNewTimesheetView() {
         autoPopulateGroup.classList.remove('hidden');
     }
     
+    // Show delete button for new timesheets (can delete before saving)
+    const deleteBtn = document.getElementById('delete-timesheet-btn');
+    if (deleteBtn) {
+        deleteBtn.style.display = 'inline-flex';
+    }
+    
     showView('editor');
 }
 
@@ -59,6 +65,12 @@ function showEditTimesheetView(timesheet) {
     const autoPopulateGroup = document.getElementById('auto-populate-group');
     if (autoPopulateGroup) {
         autoPopulateGroup.classList.add('hidden');
+    }
+    
+    // Show delete button only for draft (NEW) timesheets
+    const deleteBtn = document.getElementById('delete-timesheet-btn');
+    if (deleteBtn) {
+        deleteBtn.style.display = timesheet.status === 'NEW' ? 'inline-flex' : 'none';
     }
     
     // Show editor view but keep "My Timesheets" highlighted in sidebar
@@ -414,7 +426,7 @@ async function deleteTimesheet() {
         return;
     }
     
-    if (!confirm('Are you sure you want to delete this draft?')) {
+    if (!confirm('Are you sure you want to delete timesheet?')) {
         return;
     }
     
@@ -597,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.addEventListener('click', submitTimesheet);
     }
 
-    const deleteBtn = document.getElementById('delete-btn');
+    const deleteBtn = document.getElementById('delete-timesheet-btn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', deleteTimesheet);
     }
