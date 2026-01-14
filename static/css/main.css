@@ -650,7 +650,8 @@ summary:focus-visible {
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #dc2626;
+  background-color: var(--color-danger);
+  filter: brightness(0.85);
 }
 
 /* Outlined danger button - matches secondary button style */
@@ -662,7 +663,7 @@ summary:focus-visible {
 
 .btn-danger-outline:hover:not(:disabled) {
   background-color: rgba(248, 113, 113, 0.1);
-  border-color: #dc2626;
+  border-color: var(--color-danger);
 }
 
 .btn-sm {
@@ -907,9 +908,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .alert-error {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--color-danger);
+}
+
+/* Light theme override for alert-error */
+.light-theme .alert-error {
   background: #fef2f2;
   border: 1px solid #fecaca;
-  color: var(--color-danger);
 }
 
 /* ============================================
