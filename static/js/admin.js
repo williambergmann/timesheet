@@ -59,9 +59,9 @@ function populateUserSelect(select, users) {
 }
 
 // REQ-004: Pay Period Configuration
-// Anchor date for biweekly pay periods (must be a Sunday)
+// Anchor date for biweekly pay periods (must be a Monday)
 // Adjust this to match your company's pay period calendar
-const PAY_PERIOD_ANCHOR = new Date('2026-01-04'); // First Sunday of a pay period (must be a Sunday)
+const PAY_PERIOD_ANCHOR = new Date('2025-12-29'); // First Monday of first pay period of 2026
 
 /**
  * Calculate the current pay period (biweekly).
@@ -93,7 +93,7 @@ function getCurrentPayPeriod() {
         end: periodEnd,
         startISO,
         endISO,
-        // Week starts (Sundays) in this period
+        // Week starts (Mondays) in this period
         week1: startISO,
         week2: new Date(periodStart.getTime() + msPerWeek).toISOString().split('T')[0]
     };
@@ -948,14 +948,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (payPeriodDisplay) payPeriodDisplay.style.display = 'none';
             resetPayPeriodConfirmationUI();
             
-            // Calculate current week's Sunday (week start)
+            // Calculate current week's Monday (week start)
             const today = new Date();
-            const dayOfWeek = today.getDay(); // 0 = Sunday
-            const sunday = new Date(today);
-            sunday.setDate(today.getDate() - dayOfWeek);
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            // If Sunday (0), go back 6 days to previous Monday; otherwise go back (dayOfWeek - 1) days
+            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - daysToMonday);
             
             // Format as YYYY-MM-DD for the date input
-            const weekStart = sunday.toISOString().split('T')[0];
+            const weekStart = monday.toISOString().split('T')[0];
             
             // Set the week filter
             const weekEl = document.getElementById('admin-filter-week');

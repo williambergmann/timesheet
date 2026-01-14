@@ -5,8 +5,8 @@
  */
 
 const DateUtils = {
-    // Days of the week (Sunday first)
-    DAYS: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    // Days of the week (Monday first for display, but getDay() returns 0=Sunday)
+    DAYS: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     
     // Company-observed holidays (REQ-022)
     // Format: 'YYYY-MM-DD': 'Holiday Name'
@@ -91,7 +91,7 @@ const DateUtils = {
     },
     
     /**
-     * Get week start date (Sunday) from any date
+     * Get week start date (Monday) from any date
      * @param {Date|string} date - Date object or YYYY-MM-DD string
      * @returns {string} - Week start in YYYY-MM-DD format
      */
@@ -100,16 +100,17 @@ const DateUtils = {
             date = this.parseISO(date);
         }
         
-        const day = date.getDay(); // 0 = Sunday
-        const diff = date.getDate() - day;
+        const day = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        // If Sunday (0), go back 6 days; otherwise go back (day - 1) days
+        const daysToMonday = day === 0 ? 6 : day - 1;
         const weekStart = new Date(date);
-        weekStart.setDate(diff);
+        weekStart.setDate(date.getDate() - daysToMonday);
         
         return this.formatISO(weekStart);
     },
     
     /**
-     * Get current week's Sunday
+     * Get current week's Monday
      * @returns {string} - Week start in YYYY-MM-DD format
      */
     getCurrentWeekStart() {
@@ -182,7 +183,10 @@ const DateUtils = {
      */
     getDayName(dateStr) {
         const date = this.parseISO(dateStr);
-        return this.DAYS[date.getDay()];
+        const jsDay = date.getDay(); // 0 = Sunday
+        // Convert to Monday-first index: Sun=6, Mon=0, Tue=1, etc.
+        const dayIndex = jsDay === 0 ? 6 : jsDay - 1;
+        return this.DAYS[dayIndex];
     },
     
     /**

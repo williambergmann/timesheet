@@ -35,8 +35,8 @@ const TimesheetModule = {
         'Holiday': 'Holiday',
     },
     
-    // Days of the week (Sunday first)
-    DAYS: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    // Days of the week (Monday first)
+    DAYS: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     
     // Company-observed holidays (REQ-022)
     // Format: 'YYYY-MM-DD': 'Holiday Name'
@@ -316,8 +316,8 @@ const TimesheetModule = {
             let value = 0;
             if (existingData) {
                 value = existingData[dateStr] || 0;
-            } else if (shouldAutoFill && i >= 1 && i <= 5) {
-                // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
+            } else if (shouldAutoFill && i >= 0 && i <= 4) {
+                // Mon=0, Tue=1, Wed=2, Thu=3, Fri=4 (Monday-first week)
                 value = 8;
                 autoFillTotal += 8;
             }
@@ -456,12 +456,14 @@ const TimesheetModule = {
     },
     
     /**
-     * Get week start date (Sunday) from a date
+     * Get week start date (Monday) from a date
      */
     getWeekStart(date) {
         const d = new Date(date + 'T00:00:00'); // Parse as local time
-        const day = d.getDay(); // 0 = Sunday
-        d.setDate(d.getDate() - day);
+        const day = d.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        // If Sunday (0), go back 6 days; otherwise go back (day - 1) days
+        const daysToMonday = day === 0 ? 6 : day - 1;
+        d.setDate(d.getDate() - daysToMonday);
         // Format as YYYY-MM-DD using local date (not UTC)
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -470,7 +472,7 @@ const TimesheetModule = {
     },
     
     /**
-     * Get current week's Sunday
+     * Get current week's Monday
      */
     getCurrentWeekStart() {
         return this.getWeekStart(new Date());
