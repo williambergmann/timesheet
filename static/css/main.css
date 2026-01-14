@@ -209,6 +209,16 @@
   background: var(--color-white);
 }
 
+/* Light theme sidebar - lighter background */
+.light-theme .sidebar {
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 0.98) 100%);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .sidebar-link.active {
+  color: white;
+}
+
 /*  
  * LIGHT MODE STYLES - DISABLED
  * Uncomment when REQ-047 (User Theme Selection) is implemented.
