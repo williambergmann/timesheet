@@ -672,11 +672,10 @@ def _summary_headers():
 
 def _summary_row(timesheet):
     totals = timesheet.calculate_totals()
-    reimbursement = "No"
+    reimbursement = ""
     if timesheet.reimbursement_needed:
         amount = float(timesheet.reimbursement_amount or 0)
-        label = timesheet.reimbursement_type or "Reimbursement"
-        reimbursement = f"{label}: ${amount:.2f}"
+        reimbursement = f"${amount:.2f}"
 
     attachments_count = timesheet.attachments.count()
 
@@ -790,12 +789,21 @@ def _send_pdf(headers, rows, filename, title, totals_row=None, extra_tables=None
         from reportlab.lib.pagesizes import letter, landscape
         from reportlab.lib import colors
         from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
     except ImportError:
         return {"error": "PDF export requires reportlab"}, 500
 
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+    # Use smaller margins to fit all columns
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=landscape(letter),
+        leftMargin=0.3*inch,
+        rightMargin=0.3*inch,
+        topMargin=0.5*inch,
+        bottomMargin=0.5*inch
+    )
     styles = getSampleStyleSheet()
     elements = [Paragraph(title, styles["Title"]), Spacer(1, 12)]
 
@@ -803,15 +811,24 @@ def _send_pdf(headers, rows, filename, title, totals_row=None, extra_tables=None
     if totals_row:
         table_data.append(totals_row)
 
-    table = Table(table_data, repeatRows=1)
+    # Calculate column widths based on content
+    # Landscape letter is 11" wide, minus margins = ~10.4" usable
+    num_cols = len(headers)
+    available_width = 10.4 * inch
+    col_width = available_width / num_cols
+
+    table = Table(table_data, repeatRows=1, colWidths=[col_width] * num_cols)
     table.setStyle(
         TableStyle(
             [
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),  # Smaller font for better fit
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
                 ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ]
         )
     )
