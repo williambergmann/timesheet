@@ -17,7 +17,7 @@
 | [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
 | [BUG-006](#bug-006-upload-error-on-needs_approval-status)       | Upload Error on NEEDS_APPROVAL Status        | ✅ Resolved | P1       | Jan 12   |
 | [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | 🔴 Open     | P2       | Jan 13   |
-| [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | 🔴 Open     | P0       | Jan 14   |
+| [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
 
 ---
 
@@ -86,11 +86,12 @@ Force hide the mobile nav above 768px using `!important`:
 
 ---
 
-### BUG-008: Non-Field Hour Types Reset to Field
+### BUG-008: Non-Field Hour Types Reset to Field ✅
 
-**Status:** 🔴 Open  
+**Status:** 🟢 Resolved  
 **Severity:** High (P0)  
 **Reported:** January 14, 2026  
+**Resolved:** January 14, 2026  
 **Related:** REQ-044, Hour Type Management
 
 **Description:**
