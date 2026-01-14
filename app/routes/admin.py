@@ -19,11 +19,18 @@ from ..models import (
     UserRole,
     PayPeriod,
 )
-from ..extensions import db
+from ..extensions import db, limiter
 from ..utils.decorators import login_required, admin_required, can_approve
 from ..utils.pay_periods import get_confirmed_pay_period
 
 admin_bp = Blueprint("admin", __name__)
+
+# Exempt all admin routes from rate limiting
+# Admins need to freely browse the dashboard without hitting limits
+@admin_bp.before_request
+@limiter.exempt
+def exempt_admin_from_rate_limit():
+    pass
 
 
 @admin_bp.route("/timesheets", methods=["GET"])
