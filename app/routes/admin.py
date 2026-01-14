@@ -818,20 +818,29 @@ def _send_pdf(headers, rows, filename, title, totals_row=None, extra_tables=None
     col_width = available_width / num_cols
 
     table = Table(table_data, repeatRows=1, colWidths=[col_width] * num_cols)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTSIZE", (0, 0), (-1, -1), 8),  # Smaller font for better fit
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
-                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ]
-        )
-    )
+    
+    # Build table styles
+    table_styles = [
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1f2937")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),  # Smaller font for better fit
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
+        ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]
+    
+    # Style the totals row distinctly (last row if totals_row was added)
+    if totals_row:
+        last_row = len(table_data) - 1
+        table_styles.extend([
+            ("BACKGROUND", (0, last_row), (-1, last_row), colors.HexColor("#e5e7eb")),
+            ("FONTNAME", (0, last_row), (-1, last_row), "Helvetica-Bold"),
+            ("TEXTCOLOR", (0, last_row), (-1, last_row), colors.HexColor("#1f2937")),
+        ])
+    
+    table.setStyle(TableStyle(table_styles))
     elements.append(table)
 
     if extra_tables:
