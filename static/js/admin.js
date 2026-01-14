@@ -61,7 +61,7 @@ function populateUserSelect(select, users) {
 // REQ-004: Pay Period Configuration
 // Anchor date for biweekly pay periods (must be a Sunday)
 // Adjust this to match your company's pay period calendar
-const PAY_PERIOD_ANCHOR = new Date('2026-01-05'); // First Sunday of a pay period
+const PAY_PERIOD_ANCHOR = new Date('2026-01-04'); // First Sunday of a pay period (must be a Sunday)
 
 /**
  * Calculate the current pay period (biweekly).
