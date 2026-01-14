@@ -6,12 +6,14 @@ Real-time updates for the frontend.
 
 from flask import Blueprint, Response, session, current_app
 from ..utils.decorators import login_required
+from ..extensions import limiter
 
 events_bp = Blueprint("events", __name__)
 
 
 @events_bp.route("/events")
 @login_required
+@limiter.exempt  # SSE connections are long-lived; exempt from rate limiting
 def event_stream():
     """
     SSE endpoint for real-time updates.

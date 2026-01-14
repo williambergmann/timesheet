@@ -101,8 +101,8 @@ class Config:
     RATELIMIT_HEADERS_ENABLED = True  # Send X-RateLimit-* headers in responses
     # Auth endpoint limits (per IP): 10 requests per minute
     RATELIMIT_AUTH_LIMIT = os.environ.get("RATELIMIT_AUTH_LIMIT", "10 per minute")
-    # API limits (per IP): 30 requests per minute
-    RATELIMIT_API_LIMIT = os.environ.get("RATELIMIT_API_LIMIT", "30 per minute")
+    # API limits (per IP): 60 requests per minute (higher for dashboards)
+    RATELIMIT_API_LIMIT = os.environ.get("RATELIMIT_API_LIMIT", "60 per minute")
 
     # Application URL (for SMS notification links)
     APP_URL = os.environ.get("APP_URL", "http://localhost/app")
