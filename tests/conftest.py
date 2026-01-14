@@ -109,11 +109,11 @@ def admin_client(client, sample_admin):
 
 @pytest.fixture
 def sample_week_start():
-    """Get a sample week start date (Sunday)."""
+    """Get a sample week start date (Monday)."""
     today = date.today()
-    # Get Sunday of current week
-    days_since_sunday = (today.weekday() + 1) % 7
-    return today - timedelta(days=days_since_sunday)
+    # Get Monday of current week (weekday() returns 0=Monday, 6=Sunday)
+    days_since_monday = today.weekday()
+    return today - timedelta(days=days_since_monday)
 
 
 @pytest.fixture

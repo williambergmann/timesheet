@@ -288,9 +288,9 @@ def send_daily_reminders_job():
         logger.info("Skipping daily reminders on weekend")
         return {"skipped": True, "reason": "weekend"}
     
-    # Calculate previous week start (Sunday)
-    days_since_sunday = (today.weekday() + 1) % 7
-    current_week_start = today - timedelta(days=days_since_sunday)
+    # Calculate previous week start (Monday)
+    days_since_monday = today.weekday()
+    current_week_start = today - timedelta(days=days_since_monday)
     previous_week_start = current_week_start - timedelta(days=7)
     
     logger.info(f"Checking for unsubmitted timesheets for week of {previous_week_start}")
@@ -343,8 +343,8 @@ def send_weekly_reminders_job():
     from app.services.notification import NotificationService
     
     today = date.today()
-    days_since_sunday = (today.weekday() + 1) % 7
-    current_week_start = today - timedelta(days=days_since_sunday)
+    days_since_monday = today.weekday()
+    current_week_start = today - timedelta(days=days_since_monday)
     
     logger.info(f"Sending weekly reminders for week of {current_week_start}")
     

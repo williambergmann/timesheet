@@ -1586,19 +1586,21 @@ document.addEventListener('DOMContentLoaded', () => {
             TimesheetModule.markAsChanged();
         });
         
-        // Click handler - default to current week's Sunday if empty
+        // Click handler - default to current week's Monday if empty
         weekStartInput.addEventListener('click', (e) => {
             if (!e.target.value) {
-                // Get current week's Sunday
+                // Get current week's Monday
                 const today = new Date();
-                const day = today.getDay(); // 0 = Sunday
-                const sunday = new Date(today);
-                sunday.setDate(today.getDate() - day);
+                const day = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                // If Sunday (0), go back 6 days; otherwise go back (day - 1) days
+                const daysToMonday = day === 0 ? 6 : day - 1;
+                const monday = new Date(today);
+                monday.setDate(today.getDate() - daysToMonday);
                 
                 // Format as YYYY-MM-DD
-                const year = sunday.getFullYear();
-                const month = String(sunday.getMonth() + 1).padStart(2, '0');
-                const dayOfMonth = String(sunday.getDate()).padStart(2, '0');
+                const year = monday.getFullYear();
+                const month = String(monday.getMonth() + 1).padStart(2, '0');
+                const dayOfMonth = String(monday.getDate()).padStart(2, '0');
                 const defaultDate = `${year}-${month}-${dayOfMonth}`;
                 
                 e.target.value = defaultDate;

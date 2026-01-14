@@ -27,18 +27,18 @@ timesheets_bp = Blueprint("timesheets", __name__)
 
 def _get_week_start(date):
     """
-    Get Sunday of the week containing the given date.
+    Get Monday of the week containing the given date.
 
     Args:
         date: Date to find week start for
 
     Returns:
-        date: Sunday of that week
+        date: Monday of that week
     """
     # weekday() returns 0=Monday, 6=Sunday
-    # We want to get to Sunday (start of week)
-    days_since_sunday = (date.weekday() + 1) % 7
-    return date - timedelta(days=days_since_sunday)
+    # We want to get to Monday (start of week)
+    days_since_monday = date.weekday()
+    return date - timedelta(days=days_since_monday)
 
 
 def _reject_if_locked(timesheet):
@@ -109,7 +109,7 @@ def create_timesheet():
     else:
         week_start = _get_week_start(datetime.now().date())
 
-    # Ensure week_start is a Sunday
+    # Ensure week_start is a Monday
     week_start = _get_week_start(week_start)
 
     if get_confirmed_pay_period(week_start):

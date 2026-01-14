@@ -14,15 +14,15 @@ from .notification import NotificationService
 
 def get_previous_week_start():
     """
-    Calculate the start date (Sunday) of the previous week.
+    Calculate the start date (Monday) of the previous week.
 
     Returns:
-        date: The Sunday that begins the previous week
+        date: The Monday that begins the previous week
     """
     today = datetime.now().date()
-    # Days since last Sunday (0 = Sunday, 6 = Saturday)
-    days_since_sunday = (today.weekday() + 1) % 7
-    this_week_start = today - timedelta(days=days_since_sunday)
+    # Days since last Monday (weekday() returns 0=Monday, 6=Sunday)
+    days_since_monday = today.weekday()
+    this_week_start = today - timedelta(days=days_since_monday)
     previous_week_start = this_week_start - timedelta(days=7)
     return previous_week_start
 
@@ -36,7 +36,7 @@ def get_users_with_unsubmitted_timesheets(week_start):
     - The timesheet exists but status is NEW
 
     Args:
-        week_start: The Sunday date of the week to check
+        week_start: The Monday date of the week to check
 
     Returns:
         list: Users who need a reminder
