@@ -6,16 +6,18 @@
  */
 
 const EntriesModule = {
-    // Hour type labels
+    // Hour type labels (synchronized with timesheet.js)
     HOUR_TYPES: {
-        'Work': 'Work',
+        'Field': 'Field Hours',
+        'Internal': 'Internal Hours',
         'Training': 'Training',
-        'Field': 'Field',
+        'PTO': 'PTO',
+        'Unpaid': 'Unpaid Leave',
         'Holiday': 'Holiday',
     },
     
     // All hour types available (non-trainees)
-    ALL_HOUR_TYPES: ['Work', 'Training', 'Field', 'Holiday'],
+    ALL_HOUR_TYPES: ['Field', 'Internal', 'Training', 'PTO', 'Unpaid', 'Holiday'],
     
     // Trainee can only use Training
     TRAINEE_HOUR_TYPES: ['Training'],
