@@ -142,14 +142,26 @@ jobs:
 
       - name: Debug - Check login page content
         run: |
-          echo "=== Checking /login page ==="
-          curl -v http://localhost/login 2>&1 | head -100
+          echo "=== Checking /login page for dev buttons ==="
+          LOGIN_HTML=$(curl -s http://localhost/login)
+          
+          # Check if dev login buttons exist
+          if echo "$LOGIN_HTML" | grep -q 'value="staff"'; then
+            echo "✅ Dev login buttons FOUND in HTML"
+            echo "$LOGIN_HTML" | grep -E 'value="(trainee|staff|support|admin)"' | head -10
+          else
+            echo "❌ Dev login buttons NOT FOUND in HTML"
+            echo ""
+            echo "=== Full HTML response ==="
+            echo "$LOGIN_HTML"
+          fi
+          
           echo ""
           echo "=== Checking /health endpoint ==="
           curl -s http://localhost/health | jq .
           echo ""
           echo "=== Checking docker logs for errors ==="
-          docker compose -f docker/docker-compose.yml logs web 2>&1 | tail -50
+          docker compose -f docker/docker-compose.yml logs web 2>&1 | tail -30
 
       - name: Run Playwright tests
         env:
