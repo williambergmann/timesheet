@@ -129,22 +129,47 @@ def get_role(display_name: str) -> str:
         return 'staff'
 ```
 
-## Monitoring for New Users
+## Azure AD Security Groups
 
-Azure AD groups should be used to manage user roles:
+The following Azure AD security groups control user roles in the Timesheet app:
 
-- Monitor [Azure AD Users](https://portal.azure.com/#view/Microsoft_AAD_UsersAndTenants/UserManagementMenuBlade/~/AllUsers)
-- New trainees will be added to a "Trainees" group
-- New staff will be added to a "Staff" group
+| Azure AD Group         | Timesheet Role | Description                                            |
+| ---------------------- | -------------- | ------------------------------------------------------ |
+| **NSTek-TimeAdmins**   | ADMIN          | Full access: all hour types, approve all timesheets    |
+| **NSTek-TimeEngineer** | STAFF          | Professional staff: all hour types, no approval rights |
+| **NSTek-TimeInternal** | STAFF          | Internal staff: all hour types, no approval rights     |
+| **NSTek-TimeTrainee**  | TRAINEE        | Trainees: Training hours only, no approval rights      |
+
+### Group Management URLs
+
+- **All Groups**: https://portal.azure.com/#view/Microsoft_AAD_IAM/GroupsManagementMenuBlade/~/AllGroups
+- **All Users**: https://portal.azure.com/#view/Microsoft_AAD_UsersAndTenants/UserManagementMenuBlade/~/AllUsers
+
+### Monitoring for New Users
+
+1. **Watch for new trainees** added to `NSTek-TimeTrainee`
+2. **Watch for promotions** from trainee to staff (move to `NSTek-TimeEngineer` or `NSTek-TimeInternal`)
+3. **Watch for new admins** added to `NSTek-TimeAdmins`
 
 ### Future Enhancement: Azure AD Group Sync
 
 Consider implementing automatic sync based on Azure AD group membership:
 
-- `Timesheet-Admins` → ADMIN role
-- `Timesheet-Support` → SUPPORT role
-- `Timesheet-Trainees` → TRAINEE role
-- Default → STAFF role
+```python
+# Proposed group-to-role mapping
+AZURE_GROUP_ROLES = {
+    'NSTek-TimeAdmins': 'admin',
+    'NSTek-TimeEngineer': 'staff',
+    'NSTek-TimeInternal': 'staff',
+    'NSTek-TimeTrainee': 'trainee',
+}
+```
+
+This would require:
+
+1. Microsoft Graph API access to query group memberships
+2. A scheduled job to sync group memberships to user roles
+3. API permissions: `GroupMember.Read.All` or `Group.Read.All`
 
 ## Excluded Accounts
 
