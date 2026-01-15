@@ -620,6 +620,19 @@
   cursor: not-allowed;
 }
 
+/* Hide number input spinner arrows (cross-browser) */
+.hour-type-row .hour-type-day-cell input[type="number"] {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.hour-type-row .hour-type-day-cell input[type="number"]::-webkit-inner-spin-button,
+.hour-type-row .hour-type-day-cell input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .hour-type-row .hour-type-actions-cell {
   display: flex;
   align-items: center;
