@@ -290,7 +290,30 @@ async function saveDraft() {
     }
 }
 
+// Prevent multiple simultaneous submissions
+let isSubmitting = false;
+
 async function submitTimesheet() {
+    // Prevent duplicate submissions
+    if (isSubmitting) {
+        console.log('Submit already in progress, ignoring');
+        return;
+    }
+    isSubmitting = true;
+    
+    // Disable button to prevent double-clicks
+    const submitBtn = document.getElementById('submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+    
+    try {
+        await doSubmitTimesheet();
+    } finally {
+        isSubmitting = false;
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+async function doSubmitTimesheet() {
     const timesheetId = document.getElementById('timesheet-id').value;
     
     if (!timesheetId) {
