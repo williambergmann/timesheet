@@ -547,7 +547,16 @@ async function doSubmitTimesheet() {
 async function deleteTimesheet() {
     const timesheetId = document.getElementById('timesheet-id').value;
     
-    if (!confirm('Are you sure you want to delete this timesheet?')) {
+    // Show custom confirmation dialog
+    const proceed = await showConfirmDialog({
+        title: 'Delete Timesheet',
+        message: 'Are you sure you want to delete this timesheet?\n\nThis action cannot be undone.',
+        icon: '🗑️',
+        okText: 'Delete',
+        cancelText: 'Cancel'
+    });
+    
+    if (!proceed) {
         return;
     }
 
@@ -559,7 +568,7 @@ async function deleteTimesheet() {
     
     try {
         await API.deleteTimesheet(timesheetId);
-        showToast('Draft deleted', 'success');
+        showToast('Timesheet deleted', 'success');
         showTimesheetsView();
     } catch (error) {
         showToast(error.message, 'error');

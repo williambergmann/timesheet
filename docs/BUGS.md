@@ -18,6 +18,7 @@
 | [BUG-006](#bug-006-upload-error-on-needs_approval-status)       | Upload Error on NEEDS_APPROVAL Status        | ✅ Resolved | P1       | Jan 12   |
 | [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | 🔴 Open     | P2       | Jan 13   |
 | [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
+| [BUG-009](#bug-009-delete-button-not-working)                   | Delete Button Not Working                    | ✅ Resolved | P1       | Jan 14   |
 
 ---
 
@@ -144,6 +145,38 @@ Mismatch between hour type definitions in different modules:
 - [ ] Training, Unpaid, Holiday hours work correctly
 - [ ] Only Field Hours trigger the attachment requirement
 - [ ] Hour type is preserved through save/submit cycle
+
+---
+
+### BUG-009: Delete Button Not Working ✅
+
+**Status:** 🟢 Resolved  
+**Severity:** Medium (P1)  
+**Reported:** January 14, 2026  
+**Resolved:** January 14, 2026
+
+**Description:**
+The Delete button on the timesheet editor was not working due to the browser's native `confirm()` dialog disappearing immediately (same root cause as the submit confirmation issue).
+
+**Root Cause:**
+Browser `confirm()` dialogs can be auto-dismissed in certain conditions, preventing user interaction.
+
+**Fix:**
+Replaced `confirm()` with custom `showConfirmDialog()` modal that:
+
+- Shows a styled confirmation dialog with 🗑️ icon
+- Waits for user to click "Delete" or "Cancel"
+- Won't auto-dismiss like browser dialogs
+
+**Affected Files:**
+
+- `static/js/app.js` - `deleteTimesheet()` function
+
+**Acceptance Criteria:**
+
+- [x] Delete button shows confirmation modal
+- [x] Clicking "Delete" removes the timesheet
+- [x] Clicking "Cancel" keeps the timesheet
 
 ---
 
