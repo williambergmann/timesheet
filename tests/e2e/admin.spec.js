@@ -36,27 +36,21 @@ test.describe('Admin Dashboard', () => {
   // This prevents cold-start timeouts in subsequent tests
   test.describe.configure({ mode: 'serial' });
   
-  test('warmup - initialize test users', async ({ page }) => {
-    // This test initializes all test users in the database
+  test('warmup - initialize admin user', async ({ page }) => {
+    // This test initializes the admin user in the database
     // It has a longer timeout because it's the first to hit the DB
     test.setTimeout(180000); // 3 minutes for cold start
     
-    // Login as each role to create the users in the database
-    for (const role of ['admin', 'staff', 'support', 'trainee']) {
-      await page.goto('/login');
-      const btn = page.locator(`button[value="${role}"]`);
-      await expect(btn).toBeVisible({ timeout: 30000 });
-      
-      await Promise.all([
-        page.waitForURL('**/app**', { timeout: 120000, waitUntil: 'domcontentloaded' }),
-        btn.click(),
-      ]);
-      
-      console.log(`Warmup: ${role} user initialized, URL=${page.url()}`);
-      
-      // Logout by going back to login
-      await page.goto('/login');
-    }
+    await page.goto('/login');
+    const btn = page.locator('button[value="admin"]');
+    await expect(btn).toBeVisible({ timeout: 30000 });
+    
+    await Promise.all([
+      page.waitForURL('**/app**', { timeout: 120000, waitUntil: 'domcontentloaded' }),
+      btn.click(),
+    ]);
+    
+    console.log('Warmup: admin user initialized');
   });
   
   test.describe('Dashboard Access', () => {

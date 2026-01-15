@@ -13,20 +13,17 @@ test.describe('Authentication', () => {
   // Run warmup first to initialize test users in the database
   test.describe.configure({ mode: 'serial' });
   
-  test('warmup - initialize test users', async ({ page }) => {
+  test('warmup - initialize staff user', async ({ page }) => {
     test.setTimeout(180000); // 3 minutes for cold start
-    for (const role of ['staff', 'admin', 'trainee', 'support']) {
-      await page.goto('/login');
-      const btn = page.locator(`button[value="${role}"]`);
-      await expect(btn).toBeVisible({ timeout: 30000 });
-      
-      await Promise.all([
-        page.waitForURL('**/app**', { timeout: 120000, waitUntil: 'domcontentloaded' }),
-        btn.click(),
-      ]);
-      console.log(`Warmup: ${role} user initialized`);
-      await page.goto('/login');
-    }
+    await page.goto('/login');
+    const btn = page.locator('button[value="staff"]');
+    await expect(btn).toBeVisible({ timeout: 30000 });
+    
+    await Promise.all([
+      page.waitForURL('**/app**', { timeout: 120000, waitUntil: 'domcontentloaded' }),
+      btn.click(),
+    ]);
+    console.log('Warmup: staff user initialized');
   });
   
   test.describe('Dev Login', () => {
