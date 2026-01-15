@@ -147,3 +147,20 @@ Confidence level: MEDIUM — justified because I have not confirmed whether cont
 - Require explicit Confidence labeling.
 - Require the assistant to ask for permission before implementing the next step.
 - Provide a toggle for Execution Mode that must be opt-in.
+
+## 12 — Short checklist for prompt writers
+
+- Require the assistant to _always_ present alternatives and a rejection reason.
+- Require explicit Confidence labeling.
+- Require the assistant to ask for permission before implementing the next step.
+- Provide a toggle for Execution Mode that must be opt-in.
+
+## 13 — Short checklist for reviewers
+
+- Verify the assistant's response structure is present and ordered correctly.
+- Verify that at least one alternative was explicitly rejected.
+- Verify that confidence level and assumptions are present.
+- Verify that no extra features or placeholder comments were included.
+- Verify that if proceeding, the next step is a single explicit action.
+
+Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps.
