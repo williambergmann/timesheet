@@ -20,22 +20,14 @@ async function devLogin(page, role) {
   await expect(btn).toBeVisible({ timeout: 30000 });
   console.log(`DevLogin: Button visible for role=${role}`);
   
-  // Click and wait for navigation to start
+  // Wait for the form submission to complete and redirect to /app
+  // Using waitForURL instead of waitForNavigation to ensure we reach the target URL
   await Promise.all([
-    page.waitForURL(/.*/, { timeout: 30000 }), // Wait for any URL change
+    page.waitForURL('**/app**', { timeout: 60000, waitUntil: 'domcontentloaded' }),
     btn.click(),
   ]);
   
-  // Log where we ended up
-  console.log(`DevLogin: After click, URL=${page.url()}`);
-  
-  // Check if we need to wait more for /app
-  if (!page.url().includes('/app')) {
-    console.log(`DevLogin: Not at /app yet, waiting...`);
-    await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
-  }
-  
-  console.log(`DevLogin: Final URL=${page.url()}`);
+  console.log(`DevLogin: After navigation, URL=${page.url()}`);
 }
 
 test.describe('Admin Dashboard', () => {
