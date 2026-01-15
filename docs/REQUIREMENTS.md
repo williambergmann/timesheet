@@ -395,6 +395,55 @@ For production self-hosting on company servers, requirements are:
 
 ---
 
+### 📅 January 15, 2026 — Today's Work
+
+**Production Deployment & User Management:**
+
+| Task                          | Description                                            | Status      |
+| ----------------------------- | ------------------------------------------------------ | ----------- |
+| Production Server Setup       | Deployed to `timecardstx888` (172.17.2.27) with Docker | ✅ Complete |
+| HTTPS Configuration           | Self-signed SSL cert, nginx-https.conf                 | ✅ Complete |
+| Azure AD App Registration     | Created "Northstar Timesheet" app in Azure AD          | ✅ Complete |
+| User Seed Script              | `scripts/seed_users.py` to process Azure AD exports    | ✅ Complete |
+| User Database Seeding         | 108 users seeded (3 admin, 1 support, 104 staff)       | ✅ Complete |
+| REQ-061: Enhanced Role System | 5-tier roles with Azure AD group mapping               | ✅ Complete |
+
+**REQ-061: Enhanced Role System Implementation:**
+
+| Component                          | Changes                                                         |
+| ---------------------------------- | --------------------------------------------------------------- |
+| `app/models/user.py`               | New UserRole enum: TRAINEE, INTERNAL, ENGINEER, APPROVER, ADMIN |
+| `migrations/010_enhanced_roles.py` | Database migration for new enum values                          |
+| `app/routes/auth.py`               | Updated dev login with all 5 role test accounts                 |
+| `scripts/seed_users.py`            | Updated to use new role names                                   |
+| `tests/test_auth.py`               | Updated test expectations for new roles                         |
+
+**Azure AD Security Groups:**
+
+| Azure AD Group     | Timesheet Role | Allowed Hour Types             |
+| ------------------ | -------------- | ------------------------------ |
+| NSTek-TimeAdmins   | ADMIN          | All types                      |
+| NSTek-TimeApprover | APPROVER       | All types                      |
+| NSTek-TimeEngineer | ENGINEER       | Field, PTO, Holiday, Unpaid    |
+| NSTek-TimeInternal | INTERNAL       | Internal, PTO, Holiday, Unpaid |
+| NSTek-TimeTrainee  | TRAINEE        | Training only                  |
+
+**Key Files Created:**
+
+| File                                        | Purpose                                |
+| ------------------------------------------- | -------------------------------------- |
+| `docs/USER_SEED_DATA.md`                    | User seeding and role assignment guide |
+| `scripts/seed_users.py`                     | Process Azure AD CSV exports           |
+| `scripts/seed_users.sql`                    | Generated SQL for 108 users            |
+| `migrations/versions/010_enhanced_roles.py` | Add new role enum values               |
+
+**Production URLs:**
+
+- **Internal**: https://172.17.2.27/ (requires VPN)
+- **Domain (pending DNS)**: https://timecards.northstar-tek.com/
+
+---
+
 ### 📋 Backlog (Future Work)
 
 _Items below are pending implementation. Priority to be determined._
