@@ -76,8 +76,8 @@ module.exports = defineConfig({
   // Output folder for test artifacts
   outputDir: 'test-results/',
   
-  // Timeout for each test (2 minutes for slower CI environments)
-  timeout: 120000,
+  // Timeout for each test (5 minutes for CI warmup tests, 2 minutes for local)
+  timeout: process.env.CI ? 300000 : 120000,
   
   // Expect timeout (30 seconds for CI)
   expect: {
