@@ -1352,13 +1352,16 @@ const TimesheetModule = {
         
         if (deleteBtn) deleteBtn.style.display = 'none';
         
-        // Hide field hours warning
-        this.updateFieldHoursWarning();
-        this.updateReimbursementAttachmentWarning();
-        this.updateAttachmentTypeOptions();
+        // Clear hour types tracking FIRST (before updating warnings)
+        this.addedHourTypes.clear();
         
         // Initialize with no week selected - hides add controls
         this.initForWeek(null);
+        
+        // Now update warnings (after addedHourTypes is cleared)
+        this.updateFieldHoursWarning();
+        this.updateReimbursementAttachmentWarning();
+        this.updateAttachmentTypeOptions();
         
         // Clear unsaved changes flag
         this.clearChanges();
