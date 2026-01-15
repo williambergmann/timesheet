@@ -328,7 +328,9 @@ Day Total       |  0  | 16  | 16  | 16  | 16  | 16  |  0  |   80  |
 | SSE endpoint fix                  | Moved `redis_url` lookup outside generator to fix context error | ✅ Complete |
 | Sort dropdown wording             | Changed "Sort:" to "Sort by:", "Newest/Oldest" to "Date ↓/↑"    | ✅ Complete |
 | UI Polish                         | Unified logo usage (fixed size mismatch in light/dark modes)    | ✅ Complete |
-| Infrastructure decision           | Azure hosting cancelled — will self-host on existing servers    | ✅ Decided  |
+| Render.com deployment             | Live at https://northstar-timesheet.onrender.com                | ✅ Complete |
+| REQ-059: Un-approve confirmation  | Confirmation dialog before un-approving timesheets              | ✅ Complete |
+| REQ-060: Reject to Draft          | Return submitted timesheet to draft for re-editing              | 📋 Planned  |
 
 **Bug Root Cause Analysis:**
 
@@ -341,29 +343,51 @@ The delete button appeared to not work for draft timesheets opened from "My Time
 
 **Fix:** Moved `redis_url = current_app.config.get("REDIS_URL", ...)` outside the `generate()` function in `app/routes/events.py`.
 
-**Infrastructure Decision:**
+**Infrastructure Decision (Updated January 14, 2026):**
 
-Azure Container Instances deployment tested successfully but will not be used for production. Decision made to self-host on existing company servers, which provides:
+After evaluating multiple options, **Render.com** was selected for cloud hosting:
 
-- No ongoing cloud costs
-- Full control over infrastructure
-- Faster deployment cycles
-- No dependency on Azure credentials
+1. **Azure Container Instances** — Tested successfully, but requires organization admin access
+2. **Meraki/Self-hosted** — VPN routing issues prevented access to internal servers
+3. **Render.com** — ✅ **Deployed successfully** via Blueprint (Infrastructure as Code)
 
-Azure credentials and ACI resources can be removed/deprovisioned.
+**Render.com Deployment (Live):**
 
-**Alternative Hosting Options (for reference):**
+| Component       | Details                                        |
+| --------------- | ---------------------------------------------- |
+| **Live URL**    | https://northstar-timesheet.onrender.com       |
+| **Web Service** | `northstar-timesheet` (Flask + Gunicorn)       |
+| **Database**    | `northstar-timesheet-db` (PostgreSQL 18)       |
+| **Blueprint**   | `render.yaml` in repo root                     |
+| **Repository**  | `williambergmann/timesheet` (fork of org repo) |
+| **Region**      | Oregon (US West)                               |
+| **Plan**        | Free tier                                      |
+| **Auto-deploy** | Yes, on push to `main` branch                  |
 
-_If cloud hosting were needed for development/testing, faster free alternatives exist:_
+**Render Dashboard:** https://dashboard.render.com
 
-| Service          | Deploy Speed | Free Tier     | Best For        |
-| ---------------- | ------------ | ------------- | --------------- |
-| **Railway.app**  | ~30 seconds  | 500 hrs/month | Quick testing   |
-| **Fly.io**       | ~30 seconds  | 3 shared CPUs | Edge deployment |
-| **Render.com**   | ~1 minute    | 750 hrs/month | Python apps     |
-| **Local Docker** | Instant      | Forever       | Development ✅  |
+**Deployment Notes:**
 
-For production self-hosting, requirements are:
+- Free tier spins down after 15 min inactivity (first request after idle takes ~30s)
+- PostgreSQL free tier is valid for 90 days, then $7/mo
+- `render.yaml` Blueprint enables one-click deployment from GitHub
+- Environment variables auto-configured: `DATABASE_URL`, `SECRET_KEY` (generated), `FLASK_APP`, etc.
+- Redis disabled on free tier (uses in-memory fallback for rate limiting)
+- File uploads use `/tmp/uploads` (ephemeral, lost on redeploy)
+
+**Keeping Fork Synced with Org Repo:**
+
+```bash
+# Add upstream remote (one-time setup)
+git remote add upstream https://github.com/Northstar-Technologies/timesheet.git
+
+# Sync fork with org repo
+git fetch upstream && git merge upstream/main && git push origin main
+```
+
+**Future Production Considerations:**
+
+For production self-hosting on company servers, requirements are:
 
 - Docker/Docker Compose installed on servers
 - Reverse proxy (nginx) for SSL — use `docker/nginx-ssl.conf`
