@@ -116,7 +116,10 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Create .env from example
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          # Disable CSRF for E2E tests - Playwright forms don't handle CSRF well
+          echo "WTF_CSRF_ENABLED=false" >> .env
 
       - name: Start Docker Compose stack
         run: |

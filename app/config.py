@@ -46,6 +46,9 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True  # Prevent XSS access to session cookie
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection for same-site requests
     # Note: SESSION_COOKIE_SECURE should only be True in production with HTTPS
+    
+    # CSRF protection - can be disabled for E2E testing
+    WTF_CSRF_ENABLED = os.environ.get("WTF_CSRF_ENABLED", "true").lower() != "false"
 
     # Azure AD / MSAL
     AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
