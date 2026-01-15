@@ -115,8 +115,17 @@ const AttachmentsModule = {
                 const item = e.target.closest('.attachment-item');
                 const attachmentId = item?.dataset.id;
                 
-                if (attachmentId && confirm('Delete this attachment?')) {
-                    await this.delete(attachmentId);
+                if (attachmentId) {
+                    const proceed = await showConfirmDialog({
+                        title: 'Delete Attachment',
+                        message: 'Are you sure you want to delete this attachment?',
+                        icon: '📎',
+                        okText: 'Delete',
+                        cancelText: 'Cancel'
+                    });
+                    if (proceed) {
+                        await this.delete(attachmentId);
+                    }
                 }
             });
         });

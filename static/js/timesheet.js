@@ -1202,7 +1202,7 @@ const TimesheetModule = {
      * Check if user is entering hours on a holiday and warn them (REQ-022)
      * @param {HTMLInputElement} input - The hour input element
      */
-    checkHolidayInput(input) {
+    async checkHolidayInput(input) {
         const dateStr = input.dataset.date;
         const value = parseFloat(input.value) || 0;
         
@@ -1216,11 +1216,13 @@ const TimesheetModule = {
         if (input.dataset.holidayWarned === dateStr) return;
         
         // Show confirmation dialog
-        const confirmed = confirm(
-            `⚠️ Holiday Warning\n\n` +
-            `This day is a holiday: ${holidayName}\n\n` +
-            `Are you sure you want to enter ${value} hours?`
-        );
+        const confirmed = await showConfirmDialog({
+            title: 'Holiday Warning',
+            message: `This day is a holiday: ${holidayName}\n\nAre you sure you want to enter ${value} hours?`,
+            icon: '🎉',
+            okText: 'Yes, Enter Hours',
+            cancelText: 'Cancel'
+        });
         
         if (confirmed) {
             // Mark as warned so we don't prompt again for this session

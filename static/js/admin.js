@@ -180,9 +180,15 @@ async function confirmPayPeriod() {
         return;
     }
 
-    const message = `Confirm pay period ${formatPayPeriod(window.payPeriodFilter)}?\n\n` +
-        'This will lock all timesheets in the period and prevent edits.';
-    if (!confirm(message)) {
+    const proceed = await showConfirmDialog({
+        title: 'Confirm Pay Period',
+        message: `Confirm pay period ${formatPayPeriod(window.payPeriodFilter)}?\n\nThis will lock all timesheets in the period and prevent edits.`,
+        icon: '📋',
+        okText: 'Confirm',
+        cancelText: 'Cancel'
+    });
+    
+    if (!proceed) {
         return;
     }
 
