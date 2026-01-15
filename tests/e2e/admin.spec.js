@@ -14,20 +14,28 @@ const { test, expect } = require('./fixtures');
  */
 async function devLogin(page, role) {
   await page.goto('/login');
+  console.log(`DevLogin: On login page, URL=${page.url()}`);
+  
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
+  console.log(`DevLogin: Button visible for role=${role}`);
   
-  // Capture the navigation/response after clicking
-  const [response] = await Promise.all([
-    page.waitForResponse(resp => resp.url().includes('/dev-login') || resp.url().includes('/app'), { timeout: 30000 }),
+  // Click and wait for navigation to start
+  await Promise.all([
+    page.waitForURL(/.*/, { timeout: 30000 }), // Wait for any URL change
     btn.click(),
   ]);
   
-  // Log debug info
-  console.log(`DevLogin: Response URL=${response.url()}, Status=${response.status()}`);
+  // Log where we ended up
+  console.log(`DevLogin: After click, URL=${page.url()}`);
   
-  // Wait for final navigation to /app
-  await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
+  // Check if we need to wait more for /app
+  if (!page.url().includes('/app')) {
+    console.log(`DevLogin: Not at /app yet, waiting...`);
+    await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
+  }
+  
+  console.log(`DevLogin: Final URL=${page.url()}`);
 }
 
 test.describe('Admin Dashboard', () => {
