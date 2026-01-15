@@ -140,6 +140,17 @@ jobs:
           docker compose -f docker/docker-compose.yml logs web
           exit 1
 
+      - name: Debug - Check login page content
+        run: |
+          echo "=== Checking /login page ==="
+          curl -v http://localhost/login 2>&1 | head -100
+          echo ""
+          echo "=== Checking /health endpoint ==="
+          curl -s http://localhost/health | jq .
+          echo ""
+          echo "=== Checking docker logs for errors ==="
+          docker compose -f docker/docker-compose.yml logs web 2>&1 | tail -50
+
       - name: Run Playwright tests
         env:
           CI: true
