@@ -20,10 +20,10 @@ test.describe('Authentication', () => {
       
       // Check for dev login buttons (should be visible when Azure is not configured)
       // There are 4 quick login buttons: trainee, staff, support, admin
-      const traineeBtn = page.locator('button.btn-trainee');
-      const staffBtn = page.locator('button.btn-staff');
-      const supportBtn = page.locator('button.btn-support');
-      const adminBtn = page.locator('button.btn-admin');
+      const traineeBtn = page.locator('button[value="trainee"]');
+      const staffBtn = page.locator('button[value="staff"]');
+      const supportBtn = page.locator('button[value="support"]');
+      const adminBtn = page.locator('button[value="admin"]');
       
       await expect(traineeBtn).toBeVisible();
       await expect(staffBtn).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('Authentication', () => {
       await page.waitForLoadState('networkidle');
       
       // Click the Staff login button
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value="staff"]').click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -50,7 +50,7 @@ test.describe('Authentication', () => {
       await page.waitForLoadState('networkidle');
       
       // Click the Admin login button
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value="admin"]').click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -64,7 +64,7 @@ test.describe('Authentication', () => {
       await page.waitForLoadState('networkidle');
       
       // Click the Trainee login button
-      await page.locator('button.btn-trainee').click();
+      await page.locator('button[value="trainee"]').click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -78,7 +78,7 @@ test.describe('Authentication', () => {
       await page.waitForLoadState('networkidle');
       
       // Click the Support login button
-      await page.locator('button.btn-support').click();
+      await page.locator('button[value="support"]').click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -104,7 +104,7 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value="staff"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Now logout - find logout form or link

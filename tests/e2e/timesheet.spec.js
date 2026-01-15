@@ -16,7 +16,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Click "New Timesheet" button (id from index.html)
@@ -30,7 +30,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to new timesheet via sidebar
@@ -52,7 +52,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to new timesheet
@@ -110,7 +110,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to new timesheet
@@ -174,7 +174,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Look for any existing submitted timesheet in the list
@@ -204,7 +204,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to new timesheet
@@ -224,7 +224,7 @@ test.describe('Timesheet Management', () => {
       // Login as staff
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-staff').click();
+      await page.locator('button[value=\"staff\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Wait for timesheets list to load

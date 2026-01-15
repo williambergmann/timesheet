@@ -16,7 +16,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Click on Admin tab in sidebar
@@ -30,7 +30,7 @@ test.describe('Admin Dashboard', () => {
       // Login as trainee
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-trainee').click();
+      await page.locator('button[value=\"trainee\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Admin sidebar link should not be visible for trainee
@@ -41,7 +41,7 @@ test.describe('Admin Dashboard', () => {
       // Login as support
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-support').click();
+      await page.locator('button[value=\"support\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Support should see the admin/approvals link
@@ -61,7 +61,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -87,7 +87,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -109,7 +109,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -125,7 +125,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -144,7 +144,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -169,7 +169,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -186,7 +186,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -208,7 +208,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard
@@ -226,7 +226,7 @@ test.describe('Admin Dashboard', () => {
       // Login as admin
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
-      await page.locator('button.btn-admin').click();
+      await page.locator('button[value=\"admin\"]').click();
       await expect(page).toHaveURL(/\/app/);
       
       // Navigate to admin dashboard

@@ -121,23 +121,24 @@ jobs:
       - name: Start Docker Compose stack
         run: |
           cd docker
-          docker compose up -d --build
-          # Wait for services to be healthy
-          sleep 30
+          docker compose up -d --build --wait --wait-timeout 180
           # Check if services are running
           docker compose ps
 
       - name: Wait for application to be ready
         run: |
-          # Wait for the app to respond
-          for i in {1..30}; do
-            if curl -s http://localhost/health > /dev/null; then
+          # Double-check the app responds (should already be ready from --wait)
+          for i in {1..12}; do
+            if curl -sf http://localhost/health > /dev/null; then
               echo "Application is ready!"
-              break
+              exit 0
             fi
-            echo "Waiting for application... ($i/30)"
+            echo "Waiting for application... ($i/12)"
             sleep 5
           done
+          echo "Application failed to become ready"
+          docker compose -f docker/docker-compose.yml logs web
+          exit 1
 
       - name: Run Playwright tests
         env:
