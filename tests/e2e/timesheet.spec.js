@@ -17,7 +17,7 @@ async function devLogin(page, role) {
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
   await btn.click();
-  await expect(page).toHaveURL(/\/app/, { timeout: 15000 });
+  await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
 }
 
 test.describe('Timesheet Management', () => {

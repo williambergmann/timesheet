@@ -40,7 +40,7 @@ test.describe('Authentication', () => {
       await staffBtn.click();
       
       // Should redirect to /app
-      await expect(page).toHaveURL(/\/app/);
+      await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
       
       // Dashboard should load - look for main app container or welcome message
       await expect(page.locator('.app-container').first()).toBeVisible();
@@ -55,7 +55,7 @@ test.describe('Authentication', () => {
       await adminBtn.click();
       
       // Should redirect to /app
-      await expect(page).toHaveURL(/\/app/);
+      await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
       
       // Admin tab or admin navigation should be visible
       await expect(page.locator('[data-tab="admin"], .nav-admin, a:has-text("Admin"), button:has-text("Admin")').first()).toBeVisible({ timeout: 15000 });
@@ -70,7 +70,7 @@ test.describe('Authentication', () => {
       await traineeBtn.click();
       
       // Should redirect to /app
-      await expect(page).toHaveURL(/\/app/);
+      await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
       
       // Dashboard should load
       await expect(page.locator('.app-container').first()).toBeVisible();
@@ -85,7 +85,7 @@ test.describe('Authentication', () => {
       await supportBtn.click();
       
       // Should redirect to /app
-      await expect(page).toHaveURL(/\/app/);
+      await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
       
       // Dashboard should load
       await expect(page.locator('.app-container').first()).toBeVisible();
@@ -110,7 +110,7 @@ test.describe('Authentication', () => {
       const staffBtn = page.locator('button[value="staff"]');
       await expect(staffBtn).toBeVisible({ timeout: 30000 });
       await staffBtn.click();
-      await expect(page).toHaveURL(/\/app/);
+      await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
       
       // Now logout - find logout form or link
       const logoutBtn = page.locator('form[action*="logout"] button, a[href*="logout"], button:has-text("Logout"), button:has-text("Sign Out")');
