@@ -81,13 +81,13 @@
           <div class="dev-grid">
             <form method="POST" action="{{ url_for('auth.dev_login') }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="password" value="trainee" />
               <button
                 type="submit"
                 name="username"
                 value="trainee"
                 class="dev-login-button"
               >
-                <input type="hidden" name="password" value="trainee" />
                 <span class="role">Trainee</span>
                 <span class="desc">Training hours only</span>
               </button>
@@ -95,13 +95,13 @@
 
             <form method="POST" action="{{ url_for('auth.dev_login') }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="password" value="staff" />
               <button
                 type="submit"
                 name="username"
                 value="staff"
                 class="dev-login-button"
               >
-                <input type="hidden" name="password" value="staff" />
                 <span class="role">Staff</span>
                 <span class="desc">All hours, no approval</span>
               </button>
@@ -109,13 +109,13 @@
 
             <form method="POST" action="{{ url_for('auth.dev_login') }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="password" value="support" />
               <button
                 type="submit"
                 name="username"
                 value="support"
                 class="dev-login-button"
               >
-                <input type="hidden" name="password" value="support" />
                 <span class="role">Support</span>
                 <span class="desc">Approve trainee submissions</span>
               </button>
@@ -123,13 +123,13 @@
 
             <form method="POST" action="{{ url_for('auth.dev_login') }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="password" value="password" />
               <button
                 type="submit"
                 name="username"
                 value="admin"
                 class="dev-login-button"
               >
-                <input type="hidden" name="password" value="password" />
                 <span class="role">Admin</span>
                 <span class="desc">Full access</span>
               </button>
