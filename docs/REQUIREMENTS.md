@@ -377,13 +377,14 @@ _Items below are pending implementation. Priority to be determined._
 
 **Features:**
 
-| REQ     | Description             | Priority | Rationale                             |
-| ------- | ----------------------- | -------- | ------------------------------------- |
-| REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first |
-| REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture     |
-| REQ-047 | User theme selection    | P2       | UX polish, not blocking launch        |
-| REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below |
-| REQ-058 | Notification prompt     | P1       | Encourage users to enable reminders   |
+| REQ     | Description             | Priority | Rationale                                                      |
+| ------- | ----------------------- | -------- | -------------------------------------------------------------- |
+| REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first                          |
+| REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture                              |
+| REQ-047 | User theme selection    | P2       | UX polish, not blocking launch                                 |
+| REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below                          |
+| REQ-058 | Notification prompt     | P1       | Encourage users to enable reminders                            |
+| REQ-060 | Reject to Draft         | P2       | Return submitted timesheet to draft status for full re-editing |
 
 **REQ-057 UI Redesign Breakdown:**
 
