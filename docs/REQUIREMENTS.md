@@ -720,6 +720,95 @@ NEW (Draft) ──Submit──▶ SUBMITTED ──Approve──▶ APPROVED
 
 ---
 
+### REQ-061: Enhanced Role System with Azure AD Groups (P0)
+
+Update the role system to match Azure AD security groups with differentiated hour type permissions.
+
+**Status:** 📋 Planned (January 15, 2026)
+
+**Background:**
+The original 4-tier system (TRAINEE, STAFF, SUPPORT, ADMIN) is being replaced with a 5-tier system that maps directly to Azure AD security groups. Key changes:
+
+- SUPPORT → APPROVER (renamed)
+- STAFF → split into ENGINEER and INTERNAL (different hour type permissions)
+
+**Azure AD Group Mapping:**
+
+| Azure AD Group         | Role     | Allowed Hour Types             | Approval Rights                 |
+| ---------------------- | -------- | ------------------------------ | ------------------------------- |
+| **NSTek-TimeAdmins**   | ADMIN    | All types                      | Approve ALL timesheets          |
+| **NSTek-TimeApprover** | APPROVER | All types                      | Approve TRAINEE + ENGINEER only |
+| **NSTek-TimeEngineer** | ENGINEER | Field, PTO, Holiday, Unpaid    | None                            |
+| **NSTek-TimeInternal** | INTERNAL | Internal, PTO, Holiday, Unpaid | None                            |
+| **NSTek-TimeTrainee**  | TRAINEE  | Training only                  | None                            |
+
+**Hour Type Permissions by Role:**
+
+| Role         | Field | Internal | Training | PTO | Holiday | Unpaid |
+| ------------ | ----- | -------- | -------- | --- | ------- | ------ |
+| **ADMIN**    | ✅    | ✅       | ✅       | ✅  | ✅      | ✅     |
+| **APPROVER** | ✅    | ✅       | ✅       | ✅  | ✅      | ✅     |
+| **ENGINEER** | ✅    | ❌       | ❌       | ✅  | ✅      | ✅     |
+| **INTERNAL** | ❌    | ✅       | ❌       | ✅  | ✅      | ✅     |
+| **TRAINEE**  | ❌    | ❌       | ✅       | ❌  | ❌      | ❌     |
+
+**Approval Matrix:**
+
+| Approver Role | Can Approve TRAINEE | Can Approve ENGINEER | Can Approve INTERNAL | Can Approve APPROVER | Can Approve ADMIN |
+| ------------- | ------------------- | -------------------- | -------------------- | -------------------- | ----------------- |
+| **ADMIN**     | ✅                  | ✅                   | ✅                   | ✅                   | ✅                |
+| **APPROVER**  | ✅                  | ✅                   | ❌                   | ❌                   | ❌                |
+| **ENGINEER**  | ❌                  | ❌                   | ❌                   | ❌                   | ❌                |
+| **INTERNAL**  | ❌                  | ❌                   | ❌                   | ❌                   | ❌                |
+| **TRAINEE**   | ❌                  | ❌                   | ❌                   | ❌                   | ❌                |
+
+**Implementation Tasks:**
+
+1. **Backend (`app/models/user.py`):**
+
+   - Update `UserRole` enum: `TRAINEE`, `INTERNAL`, `ENGINEER`, `APPROVER`, `ADMIN`
+   - Update `get_allowed_hour_types()` for each role
+   - Update `can_approve()` logic for APPROVER limitations
+
+2. **Database Migration:**
+
+   - Migrate `SUPPORT` → `APPROVER`
+   - Migrate `STAFF` → `ENGINEER` or `INTERNAL` (manual assignment or default to INTERNAL)
+   - Add new role enum values
+
+3. **Frontend (`static/js/timesheet.js`):**
+
+   - Update hour type dropdown filtering for new roles
+   - Update role display names in UI
+
+4. **Admin Panel (`static/js/admin.js`, `app/routes/admin.py`):**
+
+   - Update approval logic for APPROVER role limitations
+   - Filter which timesheets APPROVER can see/approve
+
+5. **Documentation:**
+   - Update `docs/USER_SEED_DATA.md` with new group mappings
+   - Update dev login test accounts
+
+**Migration Notes:**
+
+- Existing `STAFF` users should be reviewed and assigned to either `ENGINEER` or `INTERNAL`
+- `SUPPORT` users automatically become `APPROVER`
+- `TRAINEE` and `ADMIN` roles remain unchanged
+
+**Acceptance Criteria:**
+
+- [ ] `UserRole` enum updated with 5 roles: TRAINEE, INTERNAL, ENGINEER, APPROVER, ADMIN
+- [ ] Hour type restrictions enforced per role (backend validation)
+- [ ] Hour type dropdown shows only allowed types per role (frontend)
+- [ ] APPROVER can only approve TRAINEE and ENGINEER timesheets
+- [ ] ADMIN can approve all timesheets
+- [ ] Database migration script for SUPPORT → APPROVER
+- [ ] Dev login accounts updated for all 5 roles
+- [ ] Azure AD group names documented in USER_SEED_DATA.md
+
+---
+
 **Technical Improvements:**
 
 | REQ     | Description                | Priority | Rationale                              |
@@ -2347,6 +2436,8 @@ Add end-to-end browser tests for critical user flows.
 | REQ-057     | 📋 Planned  | UI Redesign (Premium)                | See REQ-057 breakdown: gradient buttons, SVG icons, dark theme polish                                           |
 | REQ-058     | 📋 Planned  | Notification prompt popup            | Mint green banner (`#86efac`) prompting users to enable notifications                                           |
 | REQ-059     | ✅ Complete | Un-approve with confirmation         | `static/js/admin.js` — adds confirmation dialog before un-approving timesheets                                  |
+| REQ-060     | 📋 Planned  | Reject to Draft                      | Return submitted timesheet to draft with "Needs Review" badge                                                   |
+| REQ-061     | 📋 Planned  | Enhanced Role System                 | 5-tier roles (ADMIN, APPROVER, ENGINEER, INTERNAL, TRAINEE) mapped to Azure AD groups                           |
 
 ---
 
@@ -2357,4 +2448,4 @@ _Document maintained as the authoritative source for feature requirements. For o
 - _Testing: [`TESTING.md`](TESTING.md)_
 - _Roadmap: [`roadmap.md`](roadmap.md)_
 
-_Last updated: January 14, 2026_
+_Last updated: January 15, 2026_

@@ -4,25 +4,33 @@ This document explains how to seed the Timesheet application with user data expo
 
 ## Overview
 
-The application uses a four-tier role system:
+The application uses a **five-tier role system** mapped to Azure AD security groups:
 
-| Role        | Permissions                                         |
-| ----------- | --------------------------------------------------- |
-| **ADMIN**   | Full access: all hour types, approve all timesheets |
-| **SUPPORT** | All hour types, can approve trainee timesheets only |
-| **STAFF**   | All hour types, no approval rights                  |
-| **TRAINEE** | Training hours only, no approval rights             |
+| Role         | Azure AD Group     | Allowed Hour Types             | Approval Rights                 |
+| ------------ | ------------------ | ------------------------------ | ------------------------------- |
+| **ADMIN**    | NSTek-TimeAdmins   | All types                      | Approve ALL timesheets          |
+| **APPROVER** | NSTek-TimeApprover | All types                      | Approve TRAINEE + ENGINEER only |
+| **ENGINEER** | NSTek-TimeEngineer | Field, PTO, Holiday, Unpaid    | None                            |
+| **INTERNAL** | NSTek-TimeInternal | Internal, PTO, Holiday, Unpaid | None                            |
+| **TRAINEE**  | NSTek-TimeTrainee  | Training only                  | None                            |
+
+**Hour Type Restrictions:**
+
+- **ENGINEER**: Cannot log Internal or Training hours
+- **INTERNAL**: Cannot log Field or Training hours
+- **TRAINEE**: Can only log Training hours
 
 ## Current Role Assignments
 
-Based on organizational requirements:
+Based on organizational requirements (pending migration to new system):
 
-| Role            | Users                                          |
-| --------------- | ---------------------------------------------- |
-| **ADMIN** (3)   | Deven Patterson, Melissa Skow, Megan Patterson |
-| **SUPPORT** (1) | Dominic Simonetti                              |
-| **STAFF** (104) | All other @northstar-tek.com users             |
-| **TRAINEE** (0) | To be assigned later via Azure AD groups       |
+| Role         | Count | Users                                          |
+| ------------ | ----- | ---------------------------------------------- |
+| **ADMIN**    | 3     | Deven Patterson, Melissa Skow, Megan Patterson |
+| **APPROVER** | 1     | Dominic Simonetti                              |
+| **ENGINEER** | TBD   | Members of NSTek-TimeEngineer group            |
+| **INTERNAL** | TBD   | Members of NSTek-TimeInternal group            |
+| **TRAINEE**  | TBD   | Members of NSTek-TimeTrainee group             |
 
 ## Files
 
