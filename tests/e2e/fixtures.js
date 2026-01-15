@@ -32,7 +32,7 @@ const test = playwrightTest.test.extend({
       await page.goto('/login');
       
       // Wait for page to load
-      await page.waitForLoadState('networkidle');
+      
       
       // Click the dev login button for the role
       const buttonSelector = `button[name="username"][value="${user.username}"], input[name="username"][value="${user.username}"]`;
@@ -65,7 +65,7 @@ const test = playwrightTest.test.extend({
    */
   staffPage: async ({ page }, use) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    
     
     // Click Staff login button - wait for it to be visible first
     const staffBtn = page.locator('button[value="staff"]');
@@ -81,7 +81,7 @@ const test = playwrightTest.test.extend({
    */
   adminPage: async ({ page }, use) => {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    
     
     // Click Admin login button - wait for it to be visible first
     const adminBtn = page.locator('button[value="admin"]');

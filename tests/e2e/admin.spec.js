@@ -10,10 +10,10 @@ const { test, expect } = require('./fixtures');
 
 /**
  * Helper function to login with explicit wait for button visibility
+ * Note: We don't use waitForLoadState('networkidle') because SSE connections prevent it
  */
 async function devLogin(page, role) {
   await page.goto('/login');
-  await page.waitForLoadState('networkidle');
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
   await btn.click();
@@ -66,7 +66,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Wait for admin timesheets list to load
       await page.waitForTimeout(1000);
@@ -89,7 +89,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Find status filter
       const statusFilter = page.locator('#admin-filter-status');
@@ -108,7 +108,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Find user filter
       const userFilter = page.locator('#admin-filter-user');
@@ -121,7 +121,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Find hour type filter
       const hourTypeFilter = page.locator('#admin-filter-hourtype');
@@ -137,7 +137,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Apply a filter
       await page.locator('#admin-filter-status').selectOption({ value: 'SUBMITTED' });
@@ -159,7 +159,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Check stat cards are visible
       await expect(page.locator('#stat-card-pending')).toBeVisible();
@@ -173,7 +173,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Click "Pending Review" stat card
       await page.locator('#stat-card-pending').click();
@@ -192,7 +192,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Click "This Week" button
       await page.locator('#admin-this-week-btn').click();
@@ -207,7 +207,7 @@ test.describe('Admin Dashboard', () => {
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Click "Pay Period" button
       await page.locator('#admin-pay-period-btn').click();

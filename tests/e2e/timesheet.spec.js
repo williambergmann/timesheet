@@ -13,7 +13,7 @@ const { test, expect } = require('./fixtures');
  */
 async function devLogin(page, role) {
   await page.goto('/login');
-  await page.waitForLoadState('networkidle');
+  
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
   await btn.click();
@@ -41,7 +41,7 @@ test.describe('Timesheet Management', () => {
       
       // Navigate to new timesheet via sidebar
       await page.locator('a[data-view="editor"]').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Check for week selection input
       await expect(page.locator('#week-start')).toBeVisible();
@@ -175,7 +175,7 @@ test.describe('Timesheet Management', () => {
       await devLogin(page, 'staff');
       
       // Look for any existing submitted timesheet in the list
-      await page.waitForLoadState('networkidle');
+      
       await page.waitForTimeout(1000); // Let list load
       
       const submittedCard = page.locator('.timesheet-card:has(.status-submitted), .timesheet-card .status-badge:has-text("Submitted")');
@@ -183,7 +183,7 @@ test.describe('Timesheet Management', () => {
       if (await submittedCard.count() > 0) {
         // Click the card to open it
         await submittedCard.first().click();
-        await page.waitForLoadState('networkidle');
+        
         
         // Read-only notice should be visible
         await expect(page.locator('#readonly-notice')).toBeVisible();
@@ -203,7 +203,7 @@ test.describe('Timesheet Management', () => {
       
       // Navigate to new timesheet
       await page.locator('#create-timesheet-btn').click();
-      await page.waitForLoadState('networkidle');
+      
       
       // Look for attachment upload area
       await expect(page.locator('#upload-zone')).toBeVisible();
@@ -219,7 +219,7 @@ test.describe('Timesheet Management', () => {
       await devLogin(page, 'staff');
       
       // Wait for timesheets list to load
-      await page.waitForLoadState('networkidle');
+      
       await page.waitForTimeout(1000);
       
       // Check that the timesheets view is visible

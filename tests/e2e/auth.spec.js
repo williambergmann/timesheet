@@ -33,7 +33,6 @@ test.describe('Authentication', () => {
     
     test('staff login redirects to dashboard', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       // Wait for and click the Staff login button
       const staffBtn = page.locator('button[value="staff"]');
@@ -49,7 +48,6 @@ test.describe('Authentication', () => {
     
     test('admin login provides admin access', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       // Wait for and click the Admin login button
       const adminBtn = page.locator('button[value="admin"]');
@@ -65,7 +63,6 @@ test.describe('Authentication', () => {
     
     test('trainee login has limited access', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       // Wait for and click the Trainee login button
       const traineeBtn = page.locator('button[value="trainee"]');
@@ -81,7 +78,6 @@ test.describe('Authentication', () => {
     
     test('support login can access support dashboard', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       // Wait for and click the Support login button
       const supportBtn = page.locator('button[value="support"]');
@@ -110,7 +106,6 @@ test.describe('Authentication', () => {
     test('logout clears session and redirects to login', async ({ page }) => {
       // First, login
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       const staffBtn = page.locator('button[value="staff"]');
       await expect(staffBtn).toBeVisible({ timeout: 30000 });
@@ -136,7 +131,6 @@ test.describe('Authentication', () => {
     test('rate limiting headers are present', async ({ page, request }) => {
       // First, login to get an authenticated session
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
       
       // Make a request and check for rate limit headers
       const response = await request.get('/auth/me');

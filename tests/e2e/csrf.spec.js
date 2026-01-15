@@ -12,7 +12,7 @@ const { test, expect } = require('./fixtures');
  */
 async function devLogin(page, role) {
   await page.goto('/login');
-  await page.waitForLoadState('networkidle');
+  
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
   await btn.click();
