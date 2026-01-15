@@ -804,6 +804,19 @@ async function rejectTimesheetAdmin(id) {
 }
 
 async function unapproveTimesheetAdmin(id) {
+    // Show confirmation dialog (REQ-059)
+    const proceed = await showConfirmDialog({
+        title: 'Un-approve Timesheet',
+        message: 'Are you sure you want to un-approve this timesheet?\n\nThis will allow the employee to edit and resubmit it.',
+        icon: '↩️',
+        okText: 'Un-approve',
+        cancelText: 'Cancel'
+    });
+    
+    if (!proceed) {
+        return;
+    }
+    
     try {
         await API.unapproveTimesheet(id);
         showToast('Timesheet un-approved', 'success');

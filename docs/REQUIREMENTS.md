@@ -809,6 +809,37 @@ Add quick filter for current week's timesheets or the current pay period (biweek
 
 ---
 
+### REQ-059: Un-approve Timesheet with Confirmation (P1) ✅
+
+Allow admins to un-approve a previously approved timesheet, returning it to editable state.
+
+**Status: ✅ IMPLEMENTED (January 14, 2026)**
+
+**Features:**
+
+- ✅ "Un-approve" button shown on APPROVED timesheets in Admin Dashboard
+- ✅ Confirmation dialog before un-approving ("Are you sure?")
+- ✅ Changes timesheet status from APPROVED back to SUBMITTED
+- ✅ Allows employee to edit and resubmit the timesheet
+- ✅ Toast notification confirms action
+
+**Implementation Notes:**
+
+- ✅ Button only visible when timesheet status is `APPROVED`
+- ✅ Uses `showConfirmDialog()` for confirmation (custom modal, not browser confirm)
+- ✅ API endpoint: `POST /api/admin/timesheets/{id}/unapprove`
+- ✅ Support users can only un-approve trainee timesheets (REQ-041)
+
+**Acceptance Criteria:**
+
+- [x] Admin sees "Un-approve" button on approved timesheets
+- [x] Clicking button shows confirmation dialog
+- [x] Clicking "Cancel" does nothing
+- [x] Clicking "Un-approve" reverts status to SUBMITTED
+- [x] Success toast shown after un-approval
+
+---
+
 ### REQ-006: Biweekly Pay Period Confirmation (P2)
 
 Add confirmation step at end of pay period.
@@ -2142,6 +2173,7 @@ Add end-to-end browser tests for critical user flows.
 | REQ-056     | ✅ Complete | Future week submission warning       | `static/js/app.js` lines 295-321 — warns on Submit if week ends after today, shows confim dialog                |
 | REQ-057     | 📋 Planned  | UI Redesign (Premium)                | See REQ-057 breakdown: gradient buttons, SVG icons, dark theme polish                                           |
 | REQ-058     | 📋 Planned  | Notification prompt popup            | Mint green banner (`#86efac`) prompting users to enable notifications                                           |
+| REQ-059     | ✅ Complete | Un-approve with confirmation         | `static/js/admin.js` — adds confirmation dialog before un-approving timesheets                                  |
 
 ---
 
@@ -2152,4 +2184,4 @@ _Document maintained as the authoritative source for feature requirements. For o
 - _Testing: [`TESTING.md`](TESTING.md)_
 - _Roadmap: [`roadmap.md`](roadmap.md)_
 
-_Last updated: January 13, 2026_
+_Last updated: January 14, 2026_
