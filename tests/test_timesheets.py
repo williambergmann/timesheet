@@ -90,17 +90,17 @@ class TestTimesheetCreate:
     def test_create_timesheet_specific_week(self, auth_client):
         """Test creating a timesheet for a specific week."""
         response = auth_client.post("/api/timesheets", json={
-            "week_start": "2025-01-05"  # A Sunday
+            "week_start": "2025-01-06"  # A Monday
         })
         assert response.status_code == 201
         
         data = response.get_json()
-        assert data["week_start"] == "2025-01-05"
+        assert data["week_start"] == "2025-01-06"
 
     def test_create_timesheet_auto_populate(self, auth_client):
         """Test creating a timesheet with auto-populated entries."""
         response = auth_client.post("/api/timesheets", json={
-            "week_start": "2025-01-05",
+            "week_start": "2025-01-06",  # A Monday
             "auto_populate": True
         })
         assert response.status_code == 201

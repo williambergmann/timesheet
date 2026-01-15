@@ -337,19 +337,19 @@ class TestConfirmPayPeriod:
         )
         assert response.status_code == 400
 
-    def test_confirm_pay_period_must_start_sunday(self, admin_client):
-        """Test that pay period must start on Sunday."""
-        # Monday start
+    def test_confirm_pay_period_must_start_monday(self, admin_client):
+        """Test that pay period must start on Monday."""
+        # Sunday start (should fail)
         response = admin_client.post(
             "/api/admin/pay-periods/confirm",
-            json={"start_date": "2026-01-06", "end_date": "2026-01-19"},
+            json={"start_date": "2026-01-04", "end_date": "2026-01-17"},
         )
         assert response.status_code == 400
-        assert "must start on Sunday" in response.get_json()["error"]
+        assert "must start on Monday" in response.get_json()["error"]
 
     def test_confirm_pay_period_must_span_14_days(self, admin_client):
         """Test that pay period must span 14 days."""
-        # Only 7 days
+        # Only 7 days (Monday to following Sunday)
         response = admin_client.post(
             "/api/admin/pay-periods/confirm",
             json={"start_date": "2026-01-05", "end_date": "2026-01-11"},
@@ -361,8 +361,8 @@ class TestConfirmPayPeriod:
         """Test that already confirmed pay period cannot be re-confirmed."""
         with app.app_context():
             period = PayPeriod(
-                start_date=date(2025, 11, 2),
-                end_date=date(2025, 11, 15),
+                start_date=date(2025, 11, 3),  # A Monday
+                end_date=date(2025, 11, 16),
                 confirmed_by=sample_admin["id"],
             )
             db.session.add(period)
@@ -370,15 +370,15 @@ class TestConfirmPayPeriod:
 
         response = admin_client.post(
             "/api/admin/pay-periods/confirm",
-            json={"start_date": "2025-11-02", "end_date": "2025-11-15"},
+            json={"start_date": "2025-11-03", "end_date": "2025-11-16"},
         )
         assert response.status_code == 400
         assert "already confirmed" in response.get_json()["error"]
 
     def test_confirm_pay_period_with_pending_timesheets(self, admin_client, app, sample_user):
         """Test that pay period with pending timesheets cannot be confirmed."""
-        start = date(2025, 10, 5)  # A Sunday
-        end = date(2025, 10, 18)
+        start = date(2025, 10, 6)  # A Monday
+        end = date(2025, 10, 19)
 
         # Create a submitted (not approved) timesheet in this period
         with app.app_context():
@@ -392,15 +392,15 @@ class TestConfirmPayPeriod:
 
         response = admin_client.post(
             "/api/admin/pay-periods/confirm",
-            json={"start_date": "2025-10-05", "end_date": "2025-10-18"},
+            json={"start_date": "2025-10-06", "end_date": "2025-10-19"},
         )
         assert response.status_code == 400
         assert "All timesheets must be approved" in response.get_json()["error"]
 
     def test_confirm_pay_period_success(self, admin_client, app, sample_user, sample_admin):
         """Test successfully confirming a pay period."""
-        start = date(2025, 9, 7)  # A Sunday
-        end = date(2025, 9, 20)
+        start = date(2025, 9, 8)  # A Monday
+        end = date(2025, 9, 21)
 
         # Create an approved timesheet in this period
         with app.app_context():
@@ -415,13 +415,13 @@ class TestConfirmPayPeriod:
 
         response = admin_client.post(
             "/api/admin/pay-periods/confirm",
-            json={"start_date": "2025-09-07", "end_date": "2025-09-20"},
+            json={"start_date": "2025-09-08", "end_date": "2025-09-21"},
         )
         assert response.status_code == 201
 
         data = response.get_json()
-        assert data["start_date"] == "2025-09-07"
-        assert data["end_date"] == "2025-09-20"
+        assert data["start_date"] == "2025-09-08"
+        assert data["end_date"] == "2025-09-21"
 
 
 # ============================================================================

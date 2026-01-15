@@ -401,14 +401,14 @@ _Items below are pending implementation. Priority to be determined._
 
 **Features:**
 
-| REQ     | Description             | Priority | Rationale                                                      |
-| ------- | ----------------------- | -------- | -------------------------------------------------------------- |
-| REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first                          |
-| REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture                              |
-| REQ-047 | User theme selection    | P2       | UX polish, not blocking launch                                 |
-| REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below                          |
-| REQ-058 | Notification prompt     | P1       | Encourage users to enable reminders                            |
-| REQ-060 | Reject to Draft         | P2       | Return submitted timesheet to draft status for full re-editing |
+| REQ     | Description             | Priority | Rationale                                                                |
+| ------- | ----------------------- | -------- | ------------------------------------------------------------------------ |
+| REQ-024 | Travel mileage tracking | P1       | Larger feature, needs UI design first                                    |
+| REQ-025 | Expanded expense types  | P2       | Dependent on REQ-024 architecture                                        |
+| REQ-047 | User theme selection    | P2       | UX polish, not blocking launch                                           |
+| REQ-057 | UI Redesign (Premium)   | P2       | Modern aesthetic, see breakdown below                                    |
+| REQ-058 | Notification prompt     | P1       | Encourage users to enable reminders                                      |
+| REQ-060 | Reject to Draft         | P1       | Reject timesheets with red "Needs Review" badge; see detailed spec below |
 
 **REQ-057 UI Redesign Breakdown:**
 
@@ -571,6 +571,154 @@ A mint green notification prompt banner that encourages users to enable notifica
 - [ ] Banner only shows if user has no notifications enabled
 - [ ] Dismiss button stores preference for 30 days in localStorage
 - [ ] Dark text (`#1a1a1a`) on light mint background for readability
+
+---
+
+### REQ-060: Reject to Draft (P2)
+
+Allow admins to **reject** a submitted timesheet, returning it to the employee for review and correction. Rejected timesheets display a red "NEEDS REVIEW" badge to clearly distinguish them from other statuses.
+
+**Status:** 📋 Planned
+
+**User Story:**
+As an admin, I want to reject a submitted timesheet and optionally provide a reason, so the employee knows they need to review and correct it before resubmitting.
+
+**New Status: `REJECTED`**
+
+| Status   | Display Label  | Badge Color | Editable by Employee | Counts as "Action Needed" |
+| -------- | -------------- | ----------- | -------------------- | ------------------------- |
+| REJECTED | "Needs Review" | Red         | ✅ Yes               | ✅ Yes                    |
+
+**Status Flow:**
+
+```
+NEW (Draft) ──Submit──▶ SUBMITTED ──Approve──▶ APPROVED
+                            │
+                            ├──Reject──▶ REJECTED ──Resubmit──▶ SUBMITTED
+                            │                │
+                            └──Un-approve────┘ (if needs correction)
+```
+
+**UI Components:**
+
+1. **Admin Panel - Reject Button:**
+
+   - Add "Reject" button alongside existing "Approve" and "Un-approve" buttons
+   - Button styling: Red/danger variant (`btn-danger`)
+   - Only visible for `SUBMITTED` or `NEEDS_APPROVAL` status timesheets
+
+2. **Reject Confirmation Dialog:**
+
+   ```
+   ┌─────────────────────────────────────────────────────────────┐
+   │  ⚠️ Reject Timesheet                                        │
+   ├─────────────────────────────────────────────────────────────┤
+   │  Are you sure you want to reject this timesheet?            │
+   │  It will be returned to the employee for review.            │
+   │                                                              │
+   │  ┌─────────────────────────────────────────────────────────┐ │
+   │  │ Add a note for the employee (optional):                 │ │
+   │  │ ┌─────────────────────────────────────────────────────┐ │ │
+   │  │ │ Please correct the hours on Wednesday...            │ │ │
+   │  │ └─────────────────────────────────────────────────────┘ │ │
+   │  └─────────────────────────────────────────────────────────┘ │
+   │                                                              │
+   │                              [Cancel]   [Reject Timesheet]   │
+   └─────────────────────────────────────────────────────────────┘
+   ```
+
+3. **"Needs Review" Badge (Red):**
+
+   - CSS class: `.status-REJECTED`
+   - Background: `rgba(239, 68, 68, 0.1)` (red tint)
+   - Text color: `--color-danger` / `#ef4444`
+   - Display text: "Needs Review"
+
+4. **Employee View:**
+   - Rejected timesheets appear in "My Timesheets" with red "Needs Review" badge
+   - Clicking opens the timesheet in **editable** mode (not read-only)
+   - Admin notes (if any) displayed prominently at top of form
+   - Save Draft and Submit buttons are visible/enabled
+
+**Implementation Details:**
+
+1. **Backend (`app/models/timesheet.py`):**
+
+   ```python
+   class TimesheetStatus:
+       NEW = "NEW"
+       SUBMITTED = "SUBMITTED"
+       APPROVED = "APPROVED"
+       NEEDS_APPROVAL = "NEEDS_APPROVAL"
+       REJECTED = "REJECTED"  # NEW
+       ALL = [NEW, SUBMITTED, APPROVED, NEEDS_APPROVAL, REJECTED]
+   ```
+
+2. **Database Migration:**
+
+   - No schema change needed (status is stored as String(20))
+   - The new `REJECTED` value fits within existing column constraints
+
+3. **Admin Route (`app/routes/admin.py`):**
+
+   ```python
+   @admin_bp.route('/api/admin/timesheets/<id>/reject', methods=['POST'])
+   @login_required
+   @admin_required
+   def reject_timesheet(id):
+       # Validate timesheet exists and is in rejectable state
+       # Optionally save admin_notes from request body
+       # Set status to REJECTED
+       # Return success response
+   ```
+
+4. **CSS (`static/css/components.css`):**
+
+   ```css
+   .status-REJECTED {
+     background: rgba(239, 68, 68, 0.1);
+     color: var(--color-danger);
+   }
+   ```
+
+5. **JavaScript (`static/js/timesheet.js`):**
+
+   ```javascript
+   formatStatus(status) {
+       const labels = {
+           'NEW': 'Draft',
+           'SUBMITTED': 'Submitted',
+           'APPROVED': 'Approved',
+           'NEEDS_APPROVAL': 'Needs Upload',
+           'REJECTED': 'Needs Review',  // NEW
+       };
+       return labels[status] || status;
+   }
+   ```
+
+6. **CSS Variables (`static/css/main.css`):**
+
+   ```css
+   --status-rejected: #ef4444;
+   ```
+
+7. **Admin Dashboard Stats:**
+   - `REJECTED` timesheets count toward "Action Needed" totals
+   - Include in admin filtering options
+
+**Acceptance Criteria:**
+
+- [ ] New `REJECTED` status added to `TimesheetStatus` class
+- [ ] "Reject" button visible in admin panel for submitted timesheets
+- [ ] Clicking "Reject" shows confirmation dialog with optional note textarea
+- [ ] Rejected timesheets display red "Needs Review" badge
+- [ ] Rejected timesheets are editable by the employee (not read-only)
+- [ ] Admin notes saved and displayed to employee on rejected timesheets
+- [ ] Rejected timesheets count in "Action Needed" admin stats
+- [ ] Employee can resubmit a rejected timesheet (status → SUBMITTED)
+- [ ] Status filter in admin panel includes "Rejected" option
+
+---
 
 **Technical Improvements:**
 
