@@ -22,6 +22,22 @@ async function devLogin(page, role) {
 
 test.describe('Timesheet Management', () => {
   
+  // Run warmup first to initialize test users in the database
+  test.describe.configure({ mode: 'serial' });
+  
+  test('warmup - initialize test user', async ({ page }) => {
+    test.setTimeout(180000); // 3 minutes for cold start
+    await page.goto('/login');
+    const btn = page.locator('button[value="staff"]');
+    await expect(btn).toBeVisible({ timeout: 30000 });
+    
+    await Promise.all([
+      page.waitForURL('**/app**', { timeout: 120000, waitUntil: 'domcontentloaded' }),
+      btn.click(),
+    ]);
+    console.log('Warmup: staff user initialized');
+  });
+  
   test.describe('Create Timesheet', () => {
     
     test('can create a new timesheet for current week', async ({ page }) => {
