@@ -19,6 +19,7 @@
 | [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | 🔴 Open     | P2       | Jan 13   |
 | [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
 | [BUG-009](#bug-009-delete-button-not-working)                   | Delete Button Not Working                    | ✅ Resolved | P1       | Jan 14   |
+| [BUG-010](#bug-010-needs_approval-missing-request-button)       | NEEDS_APPROVAL Missing Request Button        | ✅ Resolved | P1       | Jan 14   |
 
 ---
 
@@ -177,6 +178,33 @@ Replaced `confirm()` with custom `showConfirmDialog()` modal that:
 - [x] Delete button shows confirmation modal
 - [x] Clicking "Delete" removes the timesheet
 - [x] Clicking "Cancel" keeps the timesheet
+
+---
+
+### BUG-010: NEEDS_APPROVAL Missing Request Button ✅
+
+**Status:** 🟢 Resolved  
+**Severity:** Medium (P1)  
+**Reported:** January 14, 2026  
+**Resolved:** January 14, 2026
+
+**Description:**
+Timesheets with `NEEDS_APPROVAL` status were missing the "Request Attachment" button that `SUBMITTED` timesheets have. This made it impossible to re-request attachments from users who already had pending attachment requests.
+
+**Root Cause:**
+The condition for showing the button only checked for `SUBMITTED` status, not `NEEDS_APPROVAL`.
+
+**Fix:**
+Added `NEEDS_APPROVAL` to the condition: `timesheet.status === 'SUBMITTED' || timesheet.status === 'NEEDS_APPROVAL'`
+
+**Affected Files:**
+
+- `static/js/admin.js` - `renderTimesheetDetail()` function
+
+**Acceptance Criteria:**
+
+- [x] NEEDS_APPROVAL timesheets show "Request Attachment" button
+- [x] Button works the same as for SUBMITTED timesheets
 
 ---
 

@@ -699,7 +699,7 @@ function showAdminTimesheetDetail(timesheet) {
                 ${timesheet.status === 'SUBMITTED' || timesheet.status === 'NEEDS_APPROVAL' ? `
                     <button class="btn btn-primary" onclick="approveTimesheetAdmin('${timesheet.id}')">Approve Timesheet</button>
                 ` : ''}
-                ${timesheet.status === 'SUBMITTED' ? `
+                ${timesheet.status === 'SUBMITTED' || timesheet.status === 'NEEDS_APPROVAL' ? `
                     <button class="btn btn-secondary" onclick="rejectTimesheetAdmin('${timesheet.id}')">Request Attachment</button>
                 ` : ''}
                 ${timesheet.status === 'APPROVED' ? `
