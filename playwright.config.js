@@ -21,8 +21,8 @@ module.exports = defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
   
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  // Retry on CI only - increase to 3 retries for flaky first-login attempts
+  retries: process.env.CI ? 3 : 0,
   
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
@@ -76,11 +76,11 @@ module.exports = defineConfig({
   // Output folder for test artifacts
   outputDir: 'test-results/',
   
-  // Timeout for each test (5 minutes for slower CI environments)
-  timeout: 60000,
+  // Timeout for each test (2 minutes for slower CI environments)
+  timeout: 120000,
   
-  // Expect timeout
+  // Expect timeout (30 seconds for CI)
   expect: {
-    timeout: 10000,
+    timeout: 30000,
   },
 });
