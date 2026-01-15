@@ -300,6 +300,9 @@ async function submitTimesheet() {
         if (!newId) return;
     }
     
+    // Track if user has already confirmed any dialog (to avoid double-confirming)
+    let userConfirmedWarning = false;
+    
     // Check if field hours are entered but no attachments
     if (TimesheetModule.hasFieldHours() && !TimesheetModule.hasAttachments()) {
         const proceed = confirm(
@@ -320,6 +323,7 @@ async function submitTimesheet() {
             showToast('Please upload an approval document for Field Hours', 'warning');
             return;
         }
+        userConfirmedWarning = true;
     }
 
     // Check reimbursement items missing attachments (REQ-021)
@@ -344,6 +348,7 @@ async function submitTimesheet() {
             showToast('Please attach receipts for reimbursement items', 'warning');
             return;
         }
+        userConfirmedWarning = true;
     }
 
     // BUG-002: Validate reimbursement items have valid amounts
@@ -370,7 +375,6 @@ async function submitTimesheet() {
     
     // REQ-056: Check if submitting for a future week
     const weekStart = document.getElementById('week-start').value;
-    let alreadyConfirmed = false;
     
     if (weekStart) {
         const startDate = new Date(weekStart + 'T00:00:00');
@@ -396,13 +400,13 @@ async function submitTimesheet() {
                 showToast('Timesheet saved as draft. Submit when the week is complete.', 'info');
                 return;
             }
-            alreadyConfirmed = true; // User already confirmed for future week
+            userConfirmedWarning = true;
         }
     }
     
-    // Final confirmation for current/past week submissions
-    // (Skip if user already confirmed for future week above)
-    if (!alreadyConfirmed && !confirm('Are you sure you want to submit this timesheet?')) {
+    // Final confirmation for submissions
+    // (Skip if user already confirmed any warning dialog above)
+    if (!userConfirmedWarning && !confirm('Are you sure you want to submit this timesheet?')) {
         return;
     }
     
