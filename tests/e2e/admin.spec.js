@@ -8,16 +8,25 @@
  */
 const { test, expect } = require('./fixtures');
 
+/**
+ * Helper function to login with explicit wait for button visibility
+ */
+async function devLogin(page, role) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  const btn = page.locator(`button[value="${role}"]`);
+  await expect(btn).toBeVisible({ timeout: 30000 });
+  await btn.click();
+  await expect(page).toHaveURL(/\/app/, { timeout: 15000 });
+}
+
 test.describe('Admin Dashboard', () => {
   
   test.describe('Dashboard Access', () => {
     
     test('admin can access admin dashboard', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Click on Admin tab in sidebar
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -28,10 +37,7 @@ test.describe('Admin Dashboard', () => {
     
     test('non-admin cannot see admin dashboard', async ({ page }) => {
       // Login as trainee
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"trainee\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'trainee');
       
       // Admin sidebar link should not be visible for trainee
       await expect(page.locator('a[data-view="admin"]')).not.toBeVisible();
@@ -39,10 +45,7 @@ test.describe('Admin Dashboard', () => {
     
     test('support user can access trainee approvals', async ({ page }) => {
       // Login as support
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"support\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'support');
       
       // Support should see the admin/approvals link
       const adminLink = page.locator('.sidebar-link[data-view="admin"]');
@@ -59,10 +62,7 @@ test.describe('Admin Dashboard', () => {
     
     test('admin sees timesheets in admin dashboard', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -85,10 +85,7 @@ test.describe('Admin Dashboard', () => {
     
     test('status filter is available', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -107,10 +104,7 @@ test.describe('Admin Dashboard', () => {
     
     test('user filter is available', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -123,10 +117,7 @@ test.describe('Admin Dashboard', () => {
     
     test('hour type filter is available', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -142,10 +133,7 @@ test.describe('Admin Dashboard', () => {
     
     test('reset filters button works', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -167,10 +155,7 @@ test.describe('Admin Dashboard', () => {
     
     test('stat cards are displayed', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -184,10 +169,7 @@ test.describe('Admin Dashboard', () => {
     
     test('clicking stat card filters by status', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -206,10 +188,7 @@ test.describe('Admin Dashboard', () => {
     
     test('this week button filters to current week', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();
@@ -224,10 +203,7 @@ test.describe('Admin Dashboard', () => {
     
     test('pay period button filters to pay period', async ({ page }) => {
       // Login as admin
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"admin\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'admin');
       
       // Navigate to admin dashboard
       await page.locator('.sidebar-link[data-view="admin"]').click();

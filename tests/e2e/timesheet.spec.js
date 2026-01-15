@@ -8,16 +8,25 @@
  */
 const { test, expect } = require('./fixtures');
 
+/**
+ * Helper function to login with explicit wait for button visibility
+ */
+async function devLogin(page, role) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  const btn = page.locator(`button[value="${role}"]`);
+  await expect(btn).toBeVisible({ timeout: 30000 });
+  await btn.click();
+  await expect(page).toHaveURL(/\/app/, { timeout: 15000 });
+}
+
 test.describe('Timesheet Management', () => {
   
   test.describe('Create Timesheet', () => {
     
     test('can create a new timesheet for current week', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Click "New Timesheet" button (id from index.html)
       await page.locator('#create-timesheet-btn').click();
@@ -28,10 +37,7 @@ test.describe('Timesheet Management', () => {
     
     test('timesheet form has required fields', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Navigate to new timesheet via sidebar
       await page.locator('a[data-view="editor"]').click();
@@ -50,10 +56,7 @@ test.describe('Timesheet Management', () => {
     
     test('can add time entries and save draft', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Navigate to new timesheet
       await page.locator('#create-timesheet-btn').click();
@@ -108,10 +111,7 @@ test.describe('Timesheet Management', () => {
     
     test('can submit timesheet with entries', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Navigate to new timesheet
       await page.locator('#create-timesheet-btn').click();
@@ -172,10 +172,7 @@ test.describe('Timesheet Management', () => {
     
     test('submitted timesheet shows read-only notice', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Look for any existing submitted timesheet in the list
       await page.waitForLoadState('networkidle');
@@ -202,10 +199,7 @@ test.describe('Timesheet Management', () => {
     
     test('attachment section is visible', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Navigate to new timesheet
       await page.locator('#create-timesheet-btn').click();
@@ -222,10 +216,7 @@ test.describe('Timesheet Management', () => {
     
     test('dashboard shows timesheet list or empty state', async ({ page }) => {
       // Login as staff
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
-      await page.locator('button[value=\"staff\"]').click();
-      await expect(page).toHaveURL(/\/app/);
+      await devLogin(page, 'staff');
       
       // Wait for timesheets list to load
       await page.waitForLoadState('networkidle');

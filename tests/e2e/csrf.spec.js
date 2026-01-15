@@ -7,16 +7,23 @@
  */
 const { test, expect } = require('./fixtures');
 
+/**
+ * Helper function to login with explicit wait for button visibility
+ */
+async function devLogin(page, role) {
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+  const btn = page.locator(`button[value="${role}"]`);
+  await expect(btn).toBeVisible({ timeout: 30000 });
+  await btn.click();
+  await expect(page).toHaveURL(/\/app/, { timeout: 15000 });
+}
+
 test.describe('CSRF Protection', () => {
   
   test('API POST without CSRF token returns 400', async ({ page, request }) => {
     // First, login to get an authenticated session
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    const staffForm = page.locator('form[action="/auth/dev-login"]').filter({ hasText: 'Staff' });
-    await staffForm.locator('button').click();
-    await expect(page).toHaveURL(/\/app/);
+    await devLogin(page, 'staff');
     
     // Get cookies from page context
     const cookies = await page.context().cookies();
@@ -40,12 +47,7 @@ test.describe('CSRF Protection', () => {
   
   test('protected endpoints require CSRF token', async ({ page }) => {
     // Login
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    const staffForm = page.locator('form[action="/auth/dev-login"]').filter({ hasText: 'Staff' });
-    await staffForm.locator('button').click();
-    await expect(page).toHaveURL(/\/app/);
+    await devLogin(page, 'staff');
     
     // Verify CSRF token meta tag exists
     const csrfMeta = page.locator('meta[name="csrf-token"]');
@@ -58,3 +60,4 @@ test.describe('CSRF Protection', () => {
   });
   
 });
+

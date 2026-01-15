@@ -67,8 +67,10 @@ const test = playwrightTest.test.extend({
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     
-    // Click Staff login button
-    await page.locator('form[action="/auth/dev-login"]').filter({ hasText: 'Staff' }).locator('button').click();
+    // Click Staff login button - wait for it to be visible first
+    const staffBtn = page.locator('button[value="staff"]');
+    await playwrightTest.expect(staffBtn).toBeVisible({ timeout: 30000 });
+    await staffBtn.click();
     await page.waitForURL('**/app**', { timeout: 10000 });
     
     await use(page);
@@ -81,8 +83,10 @@ const test = playwrightTest.test.extend({
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     
-    // Click Admin login button
-    await page.locator('form[action="/auth/dev-login"]').filter({ hasText: 'Admin' }).locator('button').click();
+    // Click Admin login button - wait for it to be visible first
+    const adminBtn = page.locator('button[value="admin"]');
+    await playwrightTest.expect(adminBtn).toBeVisible({ timeout: 30000 });
+    await adminBtn.click();
     await page.waitForURL('**/app**', { timeout: 10000 });
     
     await use(page);

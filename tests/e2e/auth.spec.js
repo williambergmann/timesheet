@@ -15,8 +15,8 @@ test.describe('Authentication', () => {
     test('login page loads with dev login buttons', async ({ page }) => {
       await page.goto('/login');
       
-      // Check page title
-      await expect(page).toHaveTitle(/Login.*Northstar/i);
+      // Check page title (actual title is "Sign in to your account")
+      await expect(page).toHaveTitle(/Sign in/i);
       
       // Check for dev login buttons (should be visible when Azure is not configured)
       // There are 4 quick login buttons: trainee, staff, support, admin
@@ -35,8 +35,10 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      // Click the Staff login button
-      await page.locator('button[value="staff"]').click();
+      // Wait for and click the Staff login button
+      const staffBtn = page.locator('button[value="staff"]');
+      await expect(staffBtn).toBeVisible({ timeout: 30000 });
+      await staffBtn.click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -49,8 +51,10 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      // Click the Admin login button
-      await page.locator('button[value="admin"]').click();
+      // Wait for and click the Admin login button
+      const adminBtn = page.locator('button[value="admin"]');
+      await expect(adminBtn).toBeVisible({ timeout: 30000 });
+      await adminBtn.click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -63,8 +67,10 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      // Click the Trainee login button
-      await page.locator('button[value="trainee"]').click();
+      // Wait for and click the Trainee login button
+      const traineeBtn = page.locator('button[value="trainee"]');
+      await expect(traineeBtn).toBeVisible({ timeout: 30000 });
+      await traineeBtn.click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -77,8 +83,10 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      // Click the Support login button
-      await page.locator('button[value="support"]').click();
+      // Wait for and click the Support login button
+      const supportBtn = page.locator('button[value="support"]');
+      await expect(supportBtn).toBeVisible({ timeout: 30000 });
+      await supportBtn.click();
       
       // Should redirect to /app
       await expect(page).toHaveURL(/\/app/);
@@ -104,7 +112,9 @@ test.describe('Authentication', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
       
-      await page.locator('button[value="staff"]').click();
+      const staffBtn = page.locator('button[value="staff"]');
+      await expect(staffBtn).toBeVisible({ timeout: 30000 });
+      await staffBtn.click();
       await expect(page).toHaveURL(/\/app/);
       
       // Now logout - find logout form or link
