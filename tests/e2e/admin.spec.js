@@ -16,7 +16,17 @@ async function devLogin(page, role) {
   await page.goto('/login');
   const btn = page.locator(`button[value="${role}"]`);
   await expect(btn).toBeVisible({ timeout: 30000 });
-  await btn.click();
+  
+  // Capture the navigation/response after clicking
+  const [response] = await Promise.all([
+    page.waitForResponse(resp => resp.url().includes('/dev-login') || resp.url().includes('/app'), { timeout: 30000 }),
+    btn.click(),
+  ]);
+  
+  // Log debug info
+  console.log(`DevLogin: Response URL=${response.url()}, Status=${response.status()}`);
+  
+  // Wait for final navigation to /app
   await expect(page).toHaveURL(/\/app/, { timeout: 60000 });
 }
 
