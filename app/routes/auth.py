@@ -184,11 +184,16 @@ def dev_login():
     """
     Development login with username/password.
     
-    Four-tier test accounts (REQ-002/REQ-017):
+    Five-tier test accounts (REQ-061):
     - trainee/trainee: Trainee role (Training hours only)
-    - staff/staff: Staff role (all hours, no approval)
-    - support/support: Support role (all hours, approve trainees)
+    - internal/internal: Internal role (Internal, PTO, Holiday, Unpaid)
+    - engineer/engineer: Engineer role (Field, PTO, Holiday, Unpaid)
+    - approver/approver: Approver role (all hours, approve trainee/engineer)
     - admin/password: Admin role (full access)
+    
+    Legacy accounts (backwards compatible):
+    - staff/staff: Maps to Internal role
+    - support/support: Maps to Approver role
     """
     from ..models import User, UserRole
     from ..extensions import db
@@ -197,32 +202,47 @@ def dev_login():
     username = request.form.get("username", "").strip().lower()
     password = request.form.get("password", "")
     
-    # Four-tier test account credentials (REQ-001)
+    # Five-tier test account credentials (REQ-061)
     TEST_ACCOUNTS = {
         "trainee": {
             "password": "trainee",
             "role": UserRole.TRAINEE,
             "display_name": "Test Trainee"
         },
-        "staff": {
-            "password": "staff",
-            "role": UserRole.STAFF,
-            "display_name": "Test Staff"
+        "internal": {
+            "password": "internal",
+            "role": UserRole.INTERNAL,
+            "display_name": "Test Internal"
         },
-        "support": {
-            "password": "support",
-            "role": UserRole.SUPPORT,
-            "display_name": "Test Support"
+        "engineer": {
+            "password": "engineer",
+            "role": UserRole.ENGINEER,
+            "display_name": "Test Engineer"
+        },
+        "approver": {
+            "password": "approver",
+            "role": UserRole.APPROVER,
+            "display_name": "Test Approver"
         },
         "admin": {
             "password": "password",
             "role": UserRole.ADMIN,
             "display_name": "Admin User"
         },
-        # Legacy account for backwards compatibility
+        # Legacy accounts for backwards compatibility
+        "staff": {
+            "password": "staff",
+            "role": UserRole.INTERNAL,  # Maps to new INTERNAL role
+            "display_name": "Test Staff"
+        },
+        "support": {
+            "password": "support",
+            "role": UserRole.APPROVER,  # Maps to new APPROVER role
+            "display_name": "Test Support"
+        },
         "user": {
             "password": "user",
-            "role": UserRole.STAFF,
+            "role": UserRole.INTERNAL,
             "display_name": "Test User"
         },
     }

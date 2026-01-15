@@ -193,7 +193,7 @@ class TestDevLogin:
             assert sess["user"]["role"] == "trainee"
 
     def test_dev_login_staff_success(self, client, app):
-        """Test successful staff login."""
+        """Test successful staff login (maps to internal role for backwards compat)."""
         response = client.post(
             "/auth/dev-login",
             data={"username": "staff", "password": "staff"},
@@ -202,10 +202,10 @@ class TestDevLogin:
         assert response.status_code == 302
 
         with client.session_transaction() as sess:
-            assert sess["user"]["role"] == "staff"
+            assert sess["user"]["role"] == "internal"  # REQ-061: staff -> internal
 
     def test_dev_login_support_success(self, client, app):
-        """Test successful support login."""
+        """Test successful support login (maps to approver role for backwards compat)."""
         response = client.post(
             "/auth/dev-login",
             data={"username": "support", "password": "support"},
@@ -214,7 +214,7 @@ class TestDevLogin:
         assert response.status_code == 302
 
         with client.session_transaction() as sess:
-            assert sess["user"]["role"] == "support"
+            assert sess["user"]["role"] == "approver"  # REQ-061: support -> approver
 
     def test_dev_login_admin_success(self, client, app):
         """Test successful admin login."""
@@ -230,7 +230,7 @@ class TestDevLogin:
             assert sess["user"]["is_admin"] is True
 
     def test_dev_login_legacy_user_success(self, client, app):
-        """Test successful legacy 'user' login for backwards compatibility."""
+        """Test successful legacy 'user' login (maps to internal role)."""
         response = client.post(
             "/auth/dev-login",
             data={"username": "user", "password": "user"},
@@ -239,7 +239,7 @@ class TestDevLogin:
         assert response.status_code == 302
 
         with client.session_transaction() as sess:
-            assert sess["user"]["role"] == "staff"
+            assert sess["user"]["role"] == "internal"  # REQ-061: user -> internal
 
     def test_dev_login_invalid_username(self, client, app):
         """Test login with invalid username."""

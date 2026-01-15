@@ -11,11 +11,19 @@ Usage:
     Or import and use programmatically:
     from scripts.seed_users import process_users_csv, generate_sql_inserts
     
-Role Assignments:
+Role Assignments (REQ-061):
     - ADMIN: Deven Patterson, Melissa Skow, Megan Patterson
-    - SUPPORT: Dominic Simonetti
-    - STAFF: All other @northstar-tek.com users
-    - TRAINEE: Assigned later via Azure AD groups
+    - APPROVER: Dominic Simonetti
+    - ENGINEER: Assigned via NSTek-TimeEngineer group
+    - INTERNAL: Default for all other @northstar-tek.com users
+    - TRAINEE: Assigned via NSTek-TimeTrainee group
+
+Azure AD Group Mapping:
+    - NSTek-TimeAdmins   -> admin
+    - NSTek-TimeApprover -> approver  
+    - NSTek-TimeEngineer -> engineer
+    - NSTek-TimeInternal -> internal
+    - NSTek-TimeTrainee  -> trainee
 
 Note: Only @northstar-tek.com emails are included to avoid duplicates.
 """
@@ -32,9 +40,13 @@ ADMIN_USERS = {
     'megan patterson',
 }
 
-SUPPORT_USERS = {
+APPROVER_USERS = {
     'dominic simonetti',
 }
+
+ENGINEER_USERS = set()  # Populate from NSTek-TimeEngineer group membership
+
+TRAINEE_USERS = set()  # Populate from NSTek-TimeTrainee group membership
 
 # Service accounts and non-person entries to exclude
 EXCLUDE_USERS = {
@@ -54,15 +66,19 @@ EXCLUDE_USERS = {
 
 
 def get_role(display_name: str) -> str:
-    """Determine user role based on display name."""
+    """Determine user role based on display name (REQ-061)."""
     name_lower = display_name.lower().strip()
     
     if name_lower in ADMIN_USERS:
         return 'admin'
-    elif name_lower in SUPPORT_USERS:
-        return 'support'
+    elif name_lower in APPROVER_USERS:
+        return 'approver'
+    elif name_lower in ENGINEER_USERS:
+        return 'engineer'
+    elif name_lower in TRAINEE_USERS:
+        return 'trainee'
     else:
-        return 'staff'
+        return 'internal'  # Default role
 
 
 def should_include_user(display_name: str, email: str) -> bool:
