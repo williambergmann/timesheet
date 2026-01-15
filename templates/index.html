@@ -1061,6 +1061,23 @@ endblock %} {% block extra_css %}
 
 <!-- Toast Container -->
 <div id="toast-container" class="toast-container"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="confirm-modal" class="modal-overlay hidden">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <span class="modal-icon" id="confirm-modal-icon">⚠️</span>
+      <h3 class="modal-title" id="confirm-modal-title">Confirm</h3>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-modal-message">Are you sure?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" id="confirm-modal-cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirm-modal-ok">OK</button>
+    </div>
+  </div>
+</div>
 {% endblock %} {% block extra_js %}
 <script>
   window.currentUser = {{ user|tojson }};

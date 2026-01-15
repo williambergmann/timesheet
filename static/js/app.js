@@ -290,6 +290,83 @@ async function saveDraft() {
     }
 }
 
+// ==========================================
+// Custom Confirmation Dialog
+// ==========================================
+
+/**
+ * Show a custom confirmation dialog that returns a Promise.
+ * Unlike browser confirm(), this modal won't auto-dismiss.
+ * @param {Object} options - Dialog options
+ * @param {string} options.title - Dialog title
+ * @param {string} options.message - Dialog message
+ * @param {string} options.icon - Emoji icon (default: ⚠️)
+ * @param {string} options.okText - OK button text (default: OK)
+ * @param {string} options.cancelText - Cancel button text (default: Cancel)
+ * @returns {Promise<boolean>} - Resolves true if OK clicked, false if Cancel
+ */
+function showConfirmDialog({ title = 'Confirm', message = 'Are you sure?', icon = '⚠️', okText = 'OK', cancelText = 'Cancel' }) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const iconEl = document.getElementById('confirm-modal-icon');
+        const titleEl = document.getElementById('confirm-modal-title');
+        const messageEl = document.getElementById('confirm-modal-message');
+        const okBtn = document.getElementById('confirm-modal-ok');
+        const cancelBtn = document.getElementById('confirm-modal-cancel');
+        
+        // Set content
+        iconEl.textContent = icon;
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        okBtn.textContent = okText;
+        cancelBtn.textContent = cancelText;
+        
+        // Clean up function
+        const cleanup = () => {
+            modal.classList.add('hidden');
+            okBtn.removeEventListener('click', handleOk);
+            cancelBtn.removeEventListener('click', handleCancel);
+            modal.removeEventListener('click', handleOverlayClick);
+            document.removeEventListener('keydown', handleKeydown);
+        };
+        
+        // Handlers
+        const handleOk = () => {
+            cleanup();
+            resolve(true);
+        };
+        
+        const handleCancel = () => {
+            cleanup();
+            resolve(false);
+        };
+        
+        const handleOverlayClick = (e) => {
+            if (e.target === modal) {
+                handleCancel();
+            }
+        };
+        
+        const handleKeydown = (e) => {
+            if (e.key === 'Escape') {
+                handleCancel();
+            } else if (e.key === 'Enter') {
+                handleOk();
+            }
+        };
+        
+        // Attach handlers
+        okBtn.addEventListener('click', handleOk);
+        cancelBtn.addEventListener('click', handleCancel);
+        modal.addEventListener('click', handleOverlayClick);
+        document.addEventListener('keydown', handleKeydown);
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        okBtn.focus();
+    });
+}
+
 // Prevent multiple simultaneous submissions
 let isSubmitting = false;
 
@@ -328,12 +405,13 @@ async function doSubmitTimesheet() {
     
     // Check if field hours are entered but no attachments
     if (TimesheetModule.hasFieldHours() && !TimesheetModule.hasAttachments()) {
-        const proceed = confirm(
-            '⚠️ Field Hours Require Approval Document\n\n' +
-            'You have entered Field Hours but haven\'t uploaded an approval document.\n\n' +
-            'Click "Cancel" to go back and add an attachment.\n' +
-            'Click "OK" to submit anyway (you\'ll need to upload later).'
-        );
+        const proceed = await showConfirmDialog({
+            title: 'Field Hours Require Approval',
+            message: 'You have entered Field Hours but haven\'t uploaded an approval document.\n\nClick "Cancel" to go back and add an attachment.\nClick "OK" to submit anyway (you\'ll need to upload later).',
+            icon: '📎',
+            okText: 'Submit Anyway',
+            cancelText: 'Add Attachment'
+        });
         
         if (!proceed) {
             // Scroll to attachments section
@@ -354,12 +432,13 @@ async function doSubmitTimesheet() {
         ? TimesheetModule.getMissingReimbursementTypes()
         : [];
     if (missingReimbursement.length > 0) {
-        const proceed = confirm(
-            '⚠️ Reimbursement Attachments Required\n\n' +
-            `Missing attachments for: ${missingReimbursement.join(', ')}\n\n` +
-            'Click "Cancel" to add receipts.\n' +
-            'Click "OK" to submit anyway (you\'ll need to upload later).'
-        );
+        const proceed = await showConfirmDialog({
+            title: 'Missing Receipts',
+            message: `Missing attachments for: ${missingReimbursement.join(', ')}\n\nClick "Cancel" to add receipts.\nClick "OK" to submit anyway (you'll need to upload later).`,
+            icon: '🧾',
+            okText: 'Submit Anyway',
+            cancelText: 'Add Receipts'
+        });
 
         if (!proceed) {
             const attachmentsSection = document.getElementById('upload-zone');
@@ -408,14 +487,13 @@ async function doSubmitTimesheet() {
         today.setHours(0, 0, 0, 0); // Normalize to midnight
         
         if (weekEnd > today) {
-            const proceed = confirm(
-                '⚠️ Future Week Timesheet\n\n' +
-                'This timesheet is for a week that hasn\'t ended yet.\n\n' +
-                `Week ends: ${weekEnd.toLocaleDateString()}\n` +
-                `Today is: ${today.toLocaleDateString()}\n\n` +
-                'Click "Cancel" to save as draft and submit later.\n' +
-                'Click "OK" to submit now.'
-            );
+            const proceed = await showConfirmDialog({
+                title: 'Future Week Timesheet',
+                message: `This timesheet is for a week that hasn't ended yet.\n\nWeek ends: ${weekEnd.toLocaleDateString()}\nToday is: ${today.toLocaleDateString()}\n\nClick "Cancel" to save as draft and submit later.\nClick "OK" to submit now.`,
+                icon: '📅',
+                okText: 'Submit Now',
+                cancelText: 'Save Draft'
+            });
             
             if (!proceed) {
                 // Actually save the draft before returning
@@ -429,8 +507,15 @@ async function doSubmitTimesheet() {
     
     // Final confirmation for submissions
     // (Skip if user already confirmed any warning dialog above)
-    if (!userConfirmedWarning && !confirm('Are you sure you want to submit this timesheet?')) {
-        return;
+    if (!userConfirmedWarning) {
+        const proceed = await showConfirmDialog({
+            title: 'Submit Timesheet',
+            message: 'Are you sure you want to submit this timesheet?',
+            icon: '🚀',
+            okText: 'Submit',
+            cancelText: 'Cancel'
+        });
+        if (!proceed) return;
     }
     
     try {
