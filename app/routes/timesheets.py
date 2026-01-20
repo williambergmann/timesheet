@@ -163,20 +163,29 @@ def get_timesheet(timesheet_id):
     Returns:
         dict: Timesheet with entries
     """
-    user_id = session["user"]["id"]
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        user_id = session["user"]["id"]
 
-    timesheet = Timesheet.query.filter_by(id=timesheet_id, user_id=user_id).first()
+        timesheet = Timesheet.query.filter_by(id=timesheet_id, user_id=user_id).first()
 
-    if not timesheet:
-        return {"error": "Timesheet not found"}, 404
+        if not timesheet:
+            return {"error": "Timesheet not found"}, 404
 
-    data = timesheet.to_dict()
-    period = get_confirmed_pay_period(timesheet.week_start)
-    data["pay_period_confirmed"] = period is not None
-    data["pay_period_confirmed_at"] = (
-        period.confirmed_at.isoformat() if period else None
-    )
-    return data
+        data = timesheet.to_dict()
+        period = get_confirmed_pay_period(timesheet.week_start)
+        data["pay_period_confirmed"] = period is not None
+        data["pay_period_confirmed_at"] = (
+            period.confirmed_at.isoformat() if period else None
+        )
+        return data
+    except Exception as e:
+        logger.error(f"BUG-011: Error getting timesheet {timesheet_id}: {type(e).__name__}: {e}")
+        import traceback
+        logger.error(f"BUG-011 Traceback: {traceback.format_exc()}")
+        raise
 
 
 @timesheets_bp.route("/<timesheet_id>", methods=["PUT"])
