@@ -1935,3 +1935,88 @@
   min-width: 100px;
 }
 
+/* ============================================
+   REQ-058: Notification Prompt Banner
+   ============================================ */
+.notification-prompt {
+  background: #86efac;
+  border: 2px solid #6ee79a;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: #1a1a1a;
+  font-size: var(--font-size-sm);
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-prompt-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.notification-prompt-icon {
+  font-size: 1rem;
+}
+
+.notification-prompt-link {
+  color: #1a1a1a;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.notification-prompt-link:hover {
+  opacity: 0.8;
+}
+
+.notification-prompt-dismiss {
+  position: absolute;
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: #1a1a1a;
+  font-size: 1.4rem;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+.notification-prompt-dismiss:hover {
+  opacity: 1;
+}
+
+/* Highlight effect for settings section navigation */
+.highlight-section {
+  animation: highlightPulse 2s ease-out;
+}
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 0 4px rgba(134, 239, 172, 0.6);
+    background: rgba(134, 239, 172, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(134, 239, 172, 0);
+    background: transparent;
+  }
+}

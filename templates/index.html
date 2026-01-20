@@ -128,6 +128,16 @@ endblock %} {% block extra_css %}
         </div>
       </div>
 
+      <!-- REQ-058: Notification Prompt Banner -->
+      <div id="notification-prompt" class="notification-prompt hidden">
+        <div class="notification-prompt-content">
+          <span class="notification-prompt-icon">🔔</span>
+          <span>Never miss a timesheet!</span>
+          <a href="#settings" class="notification-prompt-link" id="notification-prompt-link">Turn on notifications</a>
+        </div>
+        <button type="button" class="notification-prompt-dismiss" id="notification-prompt-dismiss" aria-label="Dismiss">×</button>
+      </div>
+
       <div id="timesheets-list" class="timesheets-grid">
         <div class="loading">Loading timesheets...</div>
       </div>

@@ -897,4 +897,83 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof SettingsModule !== 'undefined') {
         SettingsModule.init();
     }
+
+    // ==========================================
+    // REQ-058: Notification Prompt Banner
+    // ==========================================
+    initNotificationPrompt();
 });
+
+/**
+ * REQ-058: Initialize the notification prompt banner
+ * Shows a mint green banner encouraging users to enable notifications
+ * if they haven't enabled any notification channels yet.
+ */
+async function initNotificationPrompt() {
+    const prompt = document.getElementById('notification-prompt');
+    const dismissBtn = document.getElementById('notification-prompt-dismiss');
+    const link = document.getElementById('notification-prompt-link');
+    
+    if (!prompt) return;
+    
+    // Check if user dismissed the prompt within the last 30 days
+    const dismissedAt = localStorage.getItem('notification_prompt_dismissed');
+    if (dismissedAt) {
+        const dismissedDate = new Date(parseInt(dismissedAt, 10));
+        const daysSinceDismiss = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceDismiss < 30) {
+            // Still within the 30-day cooldown, don't show
+            return;
+        }
+    }
+    
+    // Fetch user settings to check notification status
+    try {
+        const settings = await API.getUserSettings();
+        
+        // Check if ANY notification channel is enabled with valid data
+        const hasEmail = settings.email_opt_in && Array.isArray(settings.notification_emails) && settings.notification_emails.length > 0;
+        const hasSMS = settings.sms_opt_in && Array.isArray(settings.notification_phones) && settings.notification_phones.length > 0;
+        const hasTeams = settings.teams_opt_in && settings.teams_account;
+        
+        if (!hasEmail && !hasSMS && !hasTeams) {
+            // No notifications enabled, show the prompt
+            prompt.classList.remove('hidden');
+        }
+    } catch (error) {
+        // If settings fetch fails, don't show the prompt (fail silently)
+        console.warn('Failed to check notification settings:', error);
+    }
+    
+    // Handle dismiss button click
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            prompt.classList.add('hidden');
+            // Store dismiss timestamp for 30-day cooldown
+            localStorage.setItem('notification_prompt_dismissed', Date.now().toString());
+        });
+    }
+    
+    // Handle link click - navigate to settings and scroll to notifications
+    if (link) {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Navigate to settings view
+            showSettingsView();
+            
+            // Wait for view transition, then scroll to notifications section
+            setTimeout(() => {
+                const notificationsSection = document.getElementById('settings-notifications-section');
+                if (notificationsSection) {
+                    notificationsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Add a brief highlight effect
+                    notificationsSection.classList.add('highlight-section');
+                    setTimeout(() => notificationsSection.classList.remove('highlight-section'), 2000);
+                }
+            }, 100);
+        });
+    }
+}
