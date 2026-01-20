@@ -2,7 +2,7 @@
 
 > **Purpose:** Track known bugs and issues requiring fixes.
 >
-> **Last Updated:** January 14, 2026
+> **Last Updated:** January 20, 2026
 
 ---
 
@@ -20,6 +20,9 @@
 | [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
 | [BUG-009](#bug-009-delete-button-not-working)                   | Delete Button Not Working                    | ✅ Resolved | P1       | Jan 14   |
 | [BUG-010](#bug-010-needs_approval-missing-request-button)       | NEEDS_APPROVAL Missing Request Button        | ✅ Resolved | P1       | Jan 14   |
+| [BUG-011](#bug-011-500-error-opening-existing-timesheets)       | 500 Error Opening Existing Timesheets        | 🔴 Open     | P0       | Jan 20   |
+| [BUG-012](#bug-012-drafts-saved-with-0-hours)                   | Drafts Saved with 0 Hours Despite Entry      | 🔴 Open     | P0       | Jan 20   |
+| [BUG-013](#bug-013-new-timesheet-already-exists-error)          | New Timesheet "Already Exists" Error         | 🔴 Open     | P1       | Jan 20   |
 
 ---
 
@@ -85,6 +88,148 @@ Force hide the mobile nav above 768px using `!important`:
 - [ ] Mobile menu auto-closes when window is resized above 768px
 - [ ] Hamburger button state resets (not showing X anymore)
 - [ ] No visual artifacts when transitioning between breakpoints
+
+---
+
+### BUG-011: 500 Error Opening Existing Timesheets
+
+**Status:** 🔴 Open  
+**Severity:** Critical (P0)  
+**Reported:** January 20, 2026  
+**Related:** REQ-061 (Role System)
+
+**Description:**
+When clicking on any existing timesheet card in the "My Timesheets" section, the application returns a 500 Internal Server Error. Users cannot view or edit their previously created timesheets.
+
+**Steps to Reproduce:**
+
+1. Log in to https://timecards.northstar-tek.com/app
+2. Navigate to "My Timesheets"
+3. Click on any timesheet card (e.g., Week of Jan 12 or Jan 19)
+4. **Expected:** Timesheet opens in the editor
+5. **Actual:** Toast shows "An unexpected error occurred", nothing happens
+
+**Console Error:**
+
+```
+GET /api/timesheets/<id> → 500 Internal Server Error
+```
+
+**Suspected Root Cause:**
+Likely related to the REQ-061 role system migration. The backend may be failing when trying to:
+
+1. Serialize the user's role (new `internal` value not handled properly)
+2. Load the timesheet entries with the updated model
+3. Check permissions based on the new role enum
+
+**Affected Files (to investigate):**
+
+- `app/routes/timesheets.py` - `get_timesheet()` endpoint
+- `app/models/user.py` - `UserRole` enum, `to_dict()` method
+- `app/models/timesheet.py` - `to_dict()` method
+
+**Acceptance Criteria:**
+
+- [ ] Clicking on a timesheet card opens the timesheet for viewing/editing
+- [ ] All existing timesheets accessible regardless of user role
+- [ ] No 500 errors in server logs for timesheet GET requests
+
+---
+
+### BUG-012: Drafts Saved with 0 Hours Despite Entry
+
+**Status:** 🔴 Open  
+**Severity:** Critical (P0)  
+**Reported:** January 20, 2026  
+**Related:** BUG-011
+
+**Description:**
+When saving or submitting a new timesheet with hours entered (e.g., 40 hours of Internal), the draft is created but saved with 0 total hours. The hour entries are lost during the save process.
+
+**Steps to Reproduce:**
+
+1. Log in and click "New Timesheet"
+2. Select week (e.g., Jan 26, 2026)
+3. Add "Internal Hours" row
+4. Enter 8 hours for Mon-Fri (40 total)
+5. Click "Submit" or "Save Draft"
+6. **Expected:** Timesheet saved with 40 hours
+7. **Actual:** Timesheet saved with 0 hours, submission fails with 500 error
+
+**Evidence:**
+After failed save, the timesheet appears in "My Timesheets" list showing "0h" total despite 40 hours being entered.
+
+**Suspected Root Cause:**
+The server is failing after creating the timesheet record but before (or during) saving the hour entries. Possible causes:
+
+1. Transaction rollback on entries but not on timesheet
+2. Entries API failing silently
+3. Role-based validation rejecting hour type entries for `internal` role
+
+**Database State:**
+
+- Timesheet record exists with correct week_start
+- Entries table may be empty or have incomplete data
+
+**Affected Files (to investigate):**
+
+- `app/routes/timesheets.py` - `create_timesheet()`, `update_entries()`
+- `app/models/timesheet_entry.py` - Entry creation logic
+
+**Acceptance Criteria:**
+
+- [ ] Hours entered in the form are saved to the database
+- [ ] Total hours displayed matches sum of entries
+- [ ] Both save and submit work correctly for all hour types
+
+---
+
+### BUG-013: New Timesheet "Already Exists" Error
+
+**Status:** 🔴 Open  
+**Severity:** High (P1)  
+**Reported:** January 20, 2026  
+**Related:** BUG-011
+
+**Description:**
+When using "New Timesheet" for a week that already has a draft (which the user cannot open due to BUG-011), the application shows "Timesheet already exists for week of YYYY-MM-DD" error on Save Draft.
+
+**Steps to Reproduce:**
+
+1. Log in and navigate to "New Timesheet"
+2. Select a week that already has a draft (e.g., Jan 12, 2026)
+3. Enter hours and click "Save Draft"
+4. **Expected:** Should either open existing draft OR merge/update entries
+5. **Actual:** Error "Timesheet already exists for week of 2026-01-12"
+
+**User Impact:**
+Combined with BUG-011, this creates a deadlock:
+
+- User cannot open existing draft (500 error)
+- User cannot create new timesheet for same week (already exists)
+- User is stuck with no way to submit timesheet for that week
+
+**Screenshot:**
+![Already exists error toast](../assets/bug-013-already-exists.png)
+
+**Workaround (Admin):**
+Delete the broken draft from the database:
+
+```sql
+DELETE FROM timesheets WHERE id = '<timesheet-id>' AND status = 'draft';
+```
+
+**Fix Options:**
+
+1. **Fix BUG-011 first** - If users can open existing drafts, this becomes non-issue
+2. **Detect and redirect** - If timesheet exists, open it instead of showing error
+3. **Upsert logic** - Update existing draft instead of failing
+
+**Acceptance Criteria:**
+
+- [ ] BUG-011 fixed (primary solution)
+- [ ] User never gets stuck unable to submit for a week
+- [ ] Clear path to edit existing draft for any week
 
 ---
 
