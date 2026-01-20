@@ -871,6 +871,13 @@ document.addEventListener('DOMContentLoaded', () => {
             touchStartX = 0;
             touchStartY = 0;
         }, { passive: true });
+
+        // BUG-007: Auto-close mobile nav when resizing to desktop width
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeMenu();
+            }
+        });
     }
 
     // ==========================================

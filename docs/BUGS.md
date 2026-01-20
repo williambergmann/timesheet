@@ -16,7 +16,7 @@
 | [BUG-004](#bug-004-draft-timesheets-missing-savesubmit-buttons) | Draft Timesheets Missing Save/Submit Buttons | ✅ Resolved | P1       | Jan 8    |
 | [BUG-005](#bug-005-leading-zero-not-removed-from-hour-inputs)   | Leading Zero Not Removed from Hour Inputs    | ✅ Resolved | P2       | Jan 11   |
 | [BUG-006](#bug-006-upload-error-on-needs_approval-status)       | Upload Error on NEEDS_APPROVAL Status        | ✅ Resolved | P1       | Jan 12   |
-| [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | 🔴 Open     | P2       | Jan 13   |
+| [BUG-007](#bug-007-hamburger-menu-persists-on-resize)           | Hamburger Menu Persists on Window Resize     | ✅ Resolved | P2       | Jan 13   |
 | [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
 | [BUG-009](#bug-009-delete-button-not-working)                   | Delete Button Not Working                    | ✅ Resolved | P1       | Jan 14   |
 | [BUG-010](#bug-010-needs_approval-missing-request-button)       | NEEDS_APPROVAL Missing Request Button        | ✅ Resolved | P1       | Jan 14   |
@@ -29,66 +29,37 @@
 
 ## 🐛 Active Issues
 
-### BUG-007: Hamburger Menu Persists on Window Resize
+### BUG-007: Hamburger Menu Persists on Window Resize ✅
 
-**Status:** 🔴 Open  
+**Status:** � Resolved  
 **Severity:** Low (P2)  
 **Reported:** January 13, 2026  
+**Resolved:** January 20, 2026  
 **Related:** Mobile UI
 
 **Description:**
 When the hamburger menu is open on mobile width and the user resizes the window to desktop width, the menu does not automatically close. It continues to widen with the viewport and lacks an X button to close it, leaving the UI in a broken state.
 
-**Steps to Reproduce:**
-
-1. Open the app at desktop width
-2. Resize the browser window to mobile width (≤768px)
-3. Click the hamburger menu button to open the mobile navigation
-4. While the menu is open, resize the window back to desktop width (>768px)
-5. **Expected:** Menu should automatically close
-6. **Actual:** Menu remains open, stretches full width, no way to close it
-
-**Screenshot:**
-![Hamburger menu stuck open on resize](../assets/bug-007-hamburger-resize.png)
-
 **Root Cause:**
-The JavaScript hamburger toggle only toggles a CSS class on click. There is no `resize` event listener to automatically close the menu when the viewport exceeds mobile breakpoint.
+The JavaScript hamburger toggle only toggled a CSS class on click. There was no `resize` event listener to automatically close the menu when the viewport exceeded mobile breakpoint.
 
-**Fix Plan:**
-
-**Option A (JavaScript - Recommended):**
-Add a resize event listener to close the mobile menu when viewport exceeds 768px:
+**Fix Applied:**
+Added resize event listener in `static/js/app.js`:
 
 ```javascript
-// In app.js or main.js
+// BUG-007: Auto-close mobile nav when resizing to desktop width
 window.addEventListener("resize", () => {
   if (window.innerWidth > 768) {
-    const mobileNav = document.getElementById("mobile-nav");
-    const hamburgerBtn = document.getElementById("hamburger-btn");
-    if (mobileNav) mobileNav.classList.add("hidden");
-    if (hamburgerBtn) hamburgerBtn.classList.remove("active");
+    closeMenu();
   }
 });
 ```
 
-**Option B (CSS Only):**
-Force hide the mobile nav above 768px using `!important`:
-
-```css
-@media (min-width: 769px) {
-  .mobile-nav {
-    display: none !important;
-  }
-}
-```
-
-**Recommendation:** Option A is preferred as it properly resets component state.
-
 **Acceptance Criteria:**
 
-- [ ] Mobile menu auto-closes when window is resized above 768px
-- [ ] Hamburger button state resets (not showing X anymore)
-- [ ] No visual artifacts when transitioning between breakpoints
+- [x] Mobile menu auto-closes when window is resized above 768px
+- [x] Hamburger button state resets (not showing X anymore)
+- [x] No visual artifacts when transitioning between breakpoints
 
 ---
 
