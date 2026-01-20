@@ -112,9 +112,17 @@ def create_app(config_class=Config):
     def set_security_headers(response):
         """Add security headers to all responses."""
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Content Security Policy - allows inline scripts/styles for app functionality
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https:; "
+            "connect-src 'self'"
+        )
         # Enable HSTS in production (uncomment when using HTTPS)
         # response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
