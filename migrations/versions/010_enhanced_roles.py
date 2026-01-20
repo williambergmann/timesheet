@@ -24,7 +24,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '010_enhanced_roles'
-down_revision = '009_add_teams_conversations'
+down_revision = '009_teams_convos'
 branch_labels = None
 depends_on = None
 
@@ -44,26 +44,16 @@ def upgrade():
     
     # Note: We keep 'staff' and 'support' as valid enum values for backwards
     # compatibility. The application code maps these to 'internal' and 'approver'
-    # respectively. A separate manual migration or script should be run to 
-    # update user roles based on Azure AD group membership.
-    
-    # Update server default to 'internal' (was 'staff')
-    op.alter_column(
-        'users',
-        'role',
-        server_default='internal'
-    )
+    # respectively.
+    #
+    # We do NOT change the server_default here because PostgreSQL requires that
+    # new enum values be committed before they can be used. The old 'staff' 
+    # default continues to work since we have backwards compatibility in the
+    # application layer.
 
 
 def downgrade():
     # PostgreSQL doesn't support removing enum values directly
-    # The old values (staff, support) are still valid, just unused
-    # Revert default to 'staff'
-    op.alter_column(
-        'users',
-        'role', 
-        server_default='staff'
-    )
-    
-    # Note: Cannot remove enum values in PostgreSQL without recreating the type
-    # This is acceptable as the old values work fine with the old code
+    # The old values (staff, support) are still valid
+    # Since we only added enum values and didn't change defaults, nothing to revert
+    pass
