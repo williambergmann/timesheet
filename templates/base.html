@@ -17,6 +17,16 @@
     {% block extra_css %}{% endblock %}
   </head>
   <body>
+    <!-- REQ-058: Notification Prompt Banner (Global) -->
+    <div id="notification-prompt" class="notification-prompt hidden">
+      <div class="notification-prompt-content">
+        <span class="notification-prompt-icon">🔔</span>
+        <span>Never miss a timesheet!</span>
+        <a href="#settings" class="notification-prompt-link" id="notification-prompt-link">Turn on notifications</a>
+      </div>
+      <button type="button" class="notification-prompt-dismiss" id="notification-prompt-dismiss" aria-label="Dismiss">×</button>
+    </div>
+
     <header class="header">
       <div class="header-content">
         <div class="logo-container">

@@ -1940,10 +1940,11 @@
    ============================================ */
 .notification-prompt {
   background: #86efac;
-  border: 2px solid #6ee79a;
-  border-radius: var(--radius-lg);
+  border-bottom: 1px solid #6ee79a;
+  border-radius: 0;
   padding: var(--spacing-sm) var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  margin: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1951,17 +1952,18 @@
   color: #1a1a1a;
   font-size: var(--font-size-sm);
   position: relative;
-  animation: fadeIn 0.3s ease-out;
+  animation: slideDown 0.3s ease-out;
+  z-index: 1100; /* Above header */
 }
 
-@keyframes fadeIn {
+@keyframes slideDown {
   from {
+    transform: translateY(-100%);
     opacity: 0;
-    transform: translateY(-10px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
   }
 }
 
