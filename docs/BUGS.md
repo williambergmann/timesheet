@@ -20,9 +20,10 @@
 | [BUG-008](#bug-008-non-field-hour-types-reset-to-field)         | Non-Field Hour Types Reset to Field          | ✅ Resolved | P0       | Jan 14   |
 | [BUG-009](#bug-009-delete-button-not-working)                   | Delete Button Not Working                    | ✅ Resolved | P1       | Jan 14   |
 | [BUG-010](#bug-010-needs_approval-missing-request-button)       | NEEDS_APPROVAL Missing Request Button        | ✅ Resolved | P1       | Jan 14   |
-| [BUG-011](#bug-011-500-error-opening-existing-timesheets)       | 500 Error Opening Existing Timesheets        | 🔴 Open     | P0       | Jan 20   |
-| [BUG-012](#bug-012-drafts-saved-with-0-hours)                   | Drafts Saved with 0 Hours Despite Entry      | 🔴 Open     | P0       | Jan 20   |
-| [BUG-013](#bug-013-new-timesheet-already-exists-error)          | New Timesheet "Already Exists" Error         | 🔴 Open     | P1       | Jan 20   |
+| [BUG-011](#bug-011-500-error-opening-existing-timesheets)       | 500 Error Opening Existing Timesheets        | ✅ Resolved | P0       | Jan 20   |
+| [BUG-012](#bug-012-drafts-saved-with-0-hours)                   | Drafts Saved with 0 Hours Despite Entry      | � Verify    | P0       | Jan 20   |
+| [BUG-013](#bug-013-new-timesheet-already-exists-error)          | New Timesheet "Already Exists" Error         | � Verify    | P1       | Jan 20   |
+| [BUG-014](#bug-014-self-signed-ssl-certificate)                 | Self-Signed SSL Certificate                  | �🔴 Open    | P1       | Jan 20   |
 
 ---
 
@@ -91,48 +92,52 @@ Force hide the mobile nav above 768px using `!important`:
 
 ---
 
-### BUG-011: 500 Error Opening Existing Timesheets
+### BUG-011: 500 Error Opening Existing Timesheets ✅
 
-**Status:** 🔴 Open  
+**Status:** � Resolved  
 **Severity:** Critical (P0)  
 **Reported:** January 20, 2026  
-**Related:** REQ-061 (Role System)
+**Resolved:** January 20, 2026  
+**Related:** Database schema mismatch
 
 **Description:**
 When clicking on any existing timesheet card in the "My Timesheets" section, the application returns a 500 Internal Server Error. Users cannot view or edit their previously created timesheets.
 
-**Steps to Reproduce:**
+**Root Cause (Confirmed):**
+Database schema mismatch in the `attachments` table. The production database had:
 
-1. Log in to https://timecards.northstar-tek.com/app
-2. Navigate to "My Timesheets"
-3. Click on any timesheet card (e.g., Week of Jan 12 or Jan 19)
-4. **Expected:** Timesheet opens in the editor
-5. **Actual:** Toast shows "An unexpected error occurred", nothing happens
+- `content_type` (but code expected `mime_type`)
+- `size` (but code expected `file_size`)
+- Missing `uploaded_at` column
 
-**Console Error:**
+The error occurred in `Timesheet.to_dict()` when iterating over attachments, which triggered SQLAlchemy to query for columns that didn't exist.
+
+**Error Message (from logs):**
 
 ```
-GET /api/timesheets/<id> → 500 Internal Server Error
+psycopg2.errors.UndefinedColumn: column attachments.mime_type does not exist
 ```
 
-**Suspected Root Cause:**
-Likely related to the REQ-061 role system migration. The backend may be failing when trying to:
+**Fix Applied:**
 
-1. Serialize the user's role (new `internal` value not handled properly)
-2. Load the timesheet entries with the updated model
-3. Check permissions based on the new role enum
+```sql
+ALTER TABLE attachments RENAME COLUMN content_type TO mime_type;
+ALTER TABLE attachments RENAME COLUMN size TO file_size;
+ALTER TABLE attachments ADD COLUMN IF NOT EXISTS uploaded_at TIMESTAMP WITHOUT TIME ZONE;
+UPDATE attachments SET uploaded_at = created_at WHERE uploaded_at IS NULL;
+```
 
-**Affected Files (to investigate):**
+**Verification:**
 
-- `app/routes/timesheets.py` - `get_timesheet()` endpoint
-- `app/models/user.py` - `UserRole` enum, `to_dict()` method
-- `app/models/timesheet.py` - `to_dict()` method
+- Tested `Timesheet.to_dict()` directly via Docker exec - SUCCESS
+- Clicked timesheet cards in browser - SUCCESS
+- No more 500 errors in logs
 
 **Acceptance Criteria:**
 
-- [ ] Clicking on a timesheet card opens the timesheet for viewing/editing
-- [ ] All existing timesheets accessible regardless of user role
-- [ ] No 500 errors in server logs for timesheet GET requests
+- [x] Clicking on a timesheet card opens the timesheet for viewing/editing
+- [x] All existing timesheets accessible regardless of user role
+- [x] No 500 errors in server logs for timesheet GET requests
 
 ---
 
@@ -227,9 +232,58 @@ DELETE FROM timesheets WHERE id = '<timesheet-id>' AND status = 'draft';
 
 **Acceptance Criteria:**
 
-- [ ] BUG-011 fixed (primary solution)
+- [x] BUG-011 fixed (primary solution)
 - [ ] User never gets stuck unable to submit for a week
 - [ ] Clear path to edit existing draft for any week
+
+**Status Update (Jan 20):** BUG-011 is now fixed. This issue may no longer occur - needs verification.
+
+---
+
+### BUG-014: Self-Signed SSL Certificate
+
+**Status:** 🔴 Open  
+**Severity:** High (P1)  
+**Reported:** January 20, 2026  
+**Related:** Production deployment
+
+**Description:**
+The production server at `https://timecards.northstar-tek.com` uses a self-signed SSL certificate, causing browsers to show security warnings. Users must manually bypass the warning to access the application.
+
+**Current State:**
+
+- Domain: `timecards.northstar-tek.com`
+- Server IP: `172.17.2.27`
+- Current certificate: Self-signed (generated during deployment)
+- Nginx: Configured with `ssl_certificate` pointing to self-signed files
+
+**Browser Warning:**
+"Your connection is not private" (Chrome) or similar warnings in other browsers.
+
+**Fix Options:**
+
+1. **Let's Encrypt (Recommended):**
+   - Free, automated certificate authority
+   - Use Certbot to obtain and auto-renew certificates
+   - Requires ports 80/443 to be accessible from internet
+
+2. **Commercial SSL Certificate:**
+   - Purchase from trusted CA (DigiCert, Comodo, etc.)
+   - Manually install and configure renewal
+
+**Required Steps:**
+
+1. Ensure DNS points `timecards.northstar-tek.com` to the server's public IP
+2. Install Certbot: `sudo apt install certbot python3-certbot-nginx`
+3. Obtain certificate: `sudo certbot --nginx -d timecards.northstar-tek.com`
+4. Test auto-renewal: `sudo certbot renew --dry-run`
+
+**Acceptance Criteria:**
+
+- [ ] No browser security warnings when accessing the application
+- [ ] SSL certificate from trusted CA (Let's Encrypt or commercial)
+- [ ] Auto-renewal configured for certificate
+- [ ] HTTPS redirect working correctly
 
 ---
 
