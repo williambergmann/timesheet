@@ -1,25 +1,188 @@
 # MCP Integration Guide
 
-> **Purpose:** Document Model Context Protocol (MCP) servers that can enhance development and operations of the Northstar Timesheet application.
+> **Purpose:** Document Model Context Protocol (MCP) servers used to enhance development and operations of the Northstar Timesheet application.
 >
-> **Status:** 📋 Reference Only (Not Actively Used)
+> **Status:** ✅ Active (Antigravity IDE)
 >
-> **Last Updated:** January 9, 2026
+> **Last Updated:** January 20, 2026
 
 ---
 
-## ⚠️ Project Status Note
+## ✅ Current MCP Configuration
 
-**This document is retained for reference only.** MCP is not currently used in this project.
+MCP servers are configured in Antigravity IDE to provide AI-assisted development capabilities.
 
-| Aspect                       | Assessment                                               |
-| ---------------------------- | -------------------------------------------------------- |
-| **For this timesheet app**   | Not needed - no MCP servers are configured               |
-| **For AI coding assistants** | Marginal value - direct APIs are preferred               |
-| **Complexity**               | Adds confusion with unimplemented features               |
-| **Future value**             | Low - DB access, Teams integration would use direct APIs |
+| MCP Server              | Status    | Description                                        |
+| ----------------------- | --------- | -------------------------------------------------- |
+| **GitKraken**           | ✅ Active | Git operations, GitHub integration (pre-installed) |
+| **Context7**            | ✅ Active | Up-to-date library documentation                   |
+| **DBHub**               | ✅ Active | PostgreSQL database access (Render production)     |
+| **Filesystem**          | ✅ Active | File access to project directory                   |
+| **Sequential-Thinking** | ✅ Active | Enhanced reasoning for complex problems            |
 
-**Recommendation:** If MCP integration becomes relevant in the future, revisit this document. For now, focus on direct API implementations (Microsoft Graph, PostgreSQL, Twilio).
+---
+
+## 🚀 Setting Up MCP Servers in Antigravity
+
+### Prerequisites
+
+1. **Node.js 18+** (required for MCP servers)
+
+   ```bash
+   node --version  # Should be v18+ or v20+
+   ```
+
+2. **Antigravity IDE** installed and running
+
+### Step 1: Check Node.js Version
+
+MCP servers require Node.js 18 or newer. If you have an older version:
+
+```bash
+# Check current version
+node --version
+
+# If older than v18, upgrade via Homebrew (macOS)
+brew install node@20
+brew link --overwrite node@20
+
+# May need permissions fix
+sudo chown -R $(whoami) /usr/local/lib/node_modules
+```
+
+### Step 2: Fix npm Cache (if needed)
+
+If you see `npm ERR! cb() never called!` errors:
+
+```bash
+sudo chown -R $(whoami) ~/.npm
+npm cache clean --force
+```
+
+### Step 3: Locate the MCP Config File
+
+Antigravity stores MCP configuration at:
+
+```
+~/Library/Application Support/Antigravity/User/mcp.json
+```
+
+You can also find this by:
+
+1. Go to **Extensions** → **MCP Servers - Installed**
+2. Click on any server → ⚙️ → **Show Configuration (JSON)**
+
+### Step 4: Configure MCP Servers
+
+Edit the `mcp.json` file with the following configuration:
+
+```json
+{
+  "servers": {
+    "GitKraken": {
+      "command": "/Users/YOUR_USERNAME/Library/Application Support/Antigravity/User/globalStorage/eamodio.gitlens/gk",
+      "type": "stdio",
+      "args": [
+        "mcp",
+        "--host=antigravity",
+        "--source=gitlens",
+        "--scheme=antigravity"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "type": "stdio",
+      "args": [
+        "--package",
+        "@upstash/context7-mcp",
+        "context7-mcp",
+        "--api-key",
+        "YOUR_CONTEXT7_API_KEY"
+      ]
+    },
+    "dbhub": {
+      "command": "npx",
+      "type": "stdio",
+      "args": [
+        "--package",
+        "@bytebase/dbhub",
+        "dbhub",
+        "--dsn",
+        "postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "type": "stdio",
+      "args": [
+        "--package",
+        "@modelcontextprotocol/server-filesystem",
+        "mcp-server-filesystem",
+        "/Users/YOUR_USERNAME/Developer/northstar"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "type": "stdio",
+      "args": [
+        "--package",
+        "@modelcontextprotocol/server-sequential-thinking",
+        "mcp-server-sequential-thinking"
+      ]
+    }
+  },
+  "inputs": []
+}
+```
+
+### Step 5: Get Required Credentials
+
+#### Context7 API Key
+
+1. Go to https://context7.com/dashboard
+2. Sign up for a free account
+3. Copy your API key
+
+#### Database Connection String (DBHub)
+
+1. Go to Render Dashboard → Your Database
+2. Click **Connect** → **External**
+3. Copy the connection string
+4. Add `?sslmode=require` to the end
+
+Example:
+
+```
+postgresql://timesheet:PASSWORD@dpg-xxx.oregon-postgres.render.com/timesheet_db?sslmode=require
+```
+
+### Step 6: Restart Antigravity
+
+After editing `mcp.json`:
+
+1. Close Antigravity completely
+2. Reopen it
+3. Go to **Extensions** → **MCP Servers - Installed**
+4. Click ⚙️ → **Start Server** for each server
+
+### Step 7: Verify Servers Are Running
+
+Click ⚙️ → **Show Output** for each server. You should see:
+
+**Context7:**
+
+```
+Context7 Documentation MCP Server v2.1.0 running on stdio
+Discovered 2 tools
+```
+
+**DBHub:**
+
+```
+DBHub v0.15.0 - Minimal Database MCP Server
+MCP server running on stdio
+Discovered 2 tools
+```
 
 ---
 
@@ -36,481 +199,159 @@ The **Model Context Protocol (MCP)** is an open standard that connects AI assist
 
 ---
 
-## 📊 Current MCP Configuration
+## 🧩 Available MCP Servers
 
-| MCP Server    | Status    | Description                               |
-| ------------- | --------- | ----------------------------------------- |
-| **GitKraken** | ✅ Active | Git operations, GitHub/GitLab integration |
+### Context7 (Library Documentation)
+
+**Purpose:** Fetches up-to-date documentation for libraries and frameworks.
+
+**Usage:** Add `use context7` to your prompts:
+
+```
+How do I set up Flask-Migrate? use context7
+```
+
+**Package:** `@upstash/context7-mcp`
+
+**API Key:** Get free at https://context7.com/dashboard
 
 ---
 
-## ⚡ Dynamic MCP (Docker MCP Toolkit)
+### DBHub (Database Access)
 
-Dynamic MCP lets agents discover and add MCP servers on-demand during a
-session, without pre-configuring every server. It is enabled automatically
-when clients connect through the Docker MCP Toolkit.
+**Purpose:** Direct PostgreSQL database access for queries and schema inspection.
 
-**Status:** Experimental (early development)
+**Tools Available:**
 
-**How it works:**
+- `execute_sql` - Run SQL queries
+- `search_objects` - Search database objects
 
-- MCP Gateway exposes management tools in every session:
-  - `mcp-find` (search catalog)
-  - `mcp-add` (add server to session)
-  - `mcp-config-set` (configure server settings)
-  - `mcp-remove` (remove server)
-  - `mcp-exec` (execute a tool by name)
-  - `code-mode` (compose tools with JavaScript; experimental)
-- Servers added dynamically are **session-scoped** and do not persist across
-  new sessions.
+**Package:** `@bytebase/dbhub`
 
-**Prerequisites:**
+**Connection String Format:**
 
-- Docker Desktop 4.50+ with MCP Toolkit enabled
-- MCP-capable client (Claude Desktop, VS Code, Claude Code)
-- Client configured to connect to the MCP Gateway
-
-**Usage examples:**
-
-```text
-What MCP servers can I use for working with SQL databases?
-Add the postgres mcp server
+```
+postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
 ```
 
-**Code mode (experimental):**
-
-- `code-mode` creates a JS tool that can coordinate multiple MCP servers.
-- Runs inside a sandbox and can only interact through MCP tools.
-- Not yet reliable for general use; focus on core dynamic tools for now.
-
-**Security notes:**
-
-- Catalog servers are built, signed, and maintained by Docker.
-- Servers run in isolated containers with restricted resources.
-- Credentials are injected and managed by the gateway.
-- Dynamic tools can add new capabilities at runtime; apply least-privilege
-  and monitor usage.
-
-**Disable/enable dynamic tools:**
-
-```bash
-docker mcp feature disable dynamic-tools
-docker mcp feature enable dynamic-tools
-```
-
-After toggling, restart connected MCP clients if they do not pick up the
-change.
-
-**References:**
-
-- https://docs.docker.com/ai/mcp-catalog-and-toolkit/dynamic-mcp/
-- https://docs.docker.com/ai/mcp-catalog-and-toolkit/catalog/
-- https://docs.docker.com/ai/mcp-catalog-and-toolkit/toolkit/
+**Note:** For Render.com databases, you MUST add `?sslmode=require` to the connection string.
 
 ---
 
-## 🧩 UI Rerun Models + MCP (Local Agent UX Pattern)
+### Filesystem (File Access)
 
-Some UI frameworks rerun the app script on each interaction, which breaks MCP's
-need for a persistent, stateful connection. The recommended pattern is to keep
-the MCP connection out of the UI loop and use the Docker MCP Gateway as a
-long-lived hub.
+**Purpose:** Controlled file system access for the AI assistant.
 
-**Key points:**
+**Package:** `@modelcontextprotocol/server-filesystem`
 
-- Avoid `stdio` transport for rerun-based UIs; prefer SSE (HTTP) to decouple the UI
-  lifecycle from the MCP session.
-- Run the Gateway as a daemon and connect to it as a client from the UI.
-- Keep the MCP session in a background worker (thread + asyncio loop) and
-  communicate with the UI via queues.
-- Use a periodic polling/fragment-style update loop to read output without
-  re-initializing the MCP client on every interaction.
-
-**Gateway (SSE) startup example:**
-
-```bash
-docker mcp gateway run --port 8080 --transport sse
-```
-
-**Recommended architecture:**
-
-- UI thread: render UI, enqueue tool requests.
-- Worker thread: maintain persistent `ClientSession`, execute MCP tool calls,
-  push results to output queue.
-- UI fragment: poll output queue and update a log/chat panel.
-
-**Why it matters:**
-
-- Dynamic tools (`mcp-add`) can be added mid-session and reflected in the UI.
-- Tool failures are isolated from the Streamlit UI process.
-- Secrets and credentials remain managed by the Gateway rather than embedded in
-  the Streamlit app.
+**Configuration:** Specify the directory path the AI can access.
 
 ---
 
-## 🚀 Recommended MCP Servers
+### Sequential-Thinking (Enhanced Reasoning)
 
-### Priority 1: High Value for This App
+**Purpose:** Enables step-by-step reasoning for complex problems.
 
-#### 1. Microsoft Graph MCP ⭐⭐⭐
+**Package:** `@modelcontextprotocol/server-sequential-thinking`
 
-**Relevance:** Azure AD auth, SharePoint storage, Teams bot, Outlook email
+---
 
-**Capabilities:**
+## 🔧 Troubleshooting
 
-- Query Azure AD users and groups (user sync)
-- Upload/download files from SharePoint (attachment storage)
-- Send Microsoft Teams messages and cards (notifications)
-- Send Outlook emails (approval notifications)
-- Read/write calendar events (holiday management)
+### "You must supply a command" Error
 
-**Requirements Addressed:**
+**Cause:** Old npx version (< 7.0) doesn't support `-y` flag.
 
-- REQ-010: SharePoint attachment sync
-- REQ-011: Email notifications
-- REQ-012: Teams bot integration
-- REQ-015: Azure AD user sync
-
-**Installation:**
-
-```bash
-# Install the MCP server
-npm install -g @anthropic/mcp-server-msgraph
-
-# Or use npx
-npx @anthropic/mcp-server-msgraph
-```
-
-**Configuration:**
+**Solution:** Use the `--package` syntax instead:
 
 ```json
-{
-  "mcpServers": {
-    "msgraph": {
-      "command": "npx",
-      "args": ["@anthropic/mcp-server-msgraph"],
-      "env": {
-        "AZURE_CLIENT_ID": "your-client-id",
-        "AZURE_CLIENT_SECRET": "your-client-secret",
-        "AZURE_TENANT_ID": "your-tenant-id"
-      }
-    }
-  }
-}
+"args": ["--package", "@package/name", "binary-name"]
 ```
 
-**Use Cases:**
+### "SSL/TLS required" Error (DBHub)
 
-```
-"List all users in Azure AD"
-"Upload this file to SharePoint document library"
-"Send a Teams message to the HR channel"
-"Create a calendar event for Christmas holiday"
-```
+**Cause:** Render.com requires SSL connections.
 
----
+**Solution:** Add `?sslmode=require` to the connection string.
 
-#### 2. PostgreSQL MCP ⭐⭐⭐
+### "cb() never called" Error
 
-**Relevance:** Direct database access for debugging, reporting, data operations
+**Cause:** Corrupted npm cache or permissions issues.
 
-**Capabilities:**
-
-- Execute SELECT queries
-- Run INSERT/UPDATE/DELETE operations
-- View table schemas
-- Export query results
-
-**Installation:**
+**Solution:**
 
 ```bash
-npm install -g @anthropic/mcp-server-postgres
+sudo chown -R $(whoami) ~/.npm
+npm cache clean --force
 ```
 
-**Configuration:**
+### "ESM module loader is experimental" Error
 
-```json
-{
-  "mcpServers": {
-    "postgres": {
-      "command": "npx",
-      "args": ["@anthropic/mcp-server-postgres"],
-      "env": {
-        "DATABASE_URL": "postgresql://timesheet:password@localhost:5432/timesheet"
-      }
-    }
-  }
-}
-```
+**Cause:** Node.js version is too old.
 
-**Use Cases:**
-
-```
-"Show me all timesheets submitted this week"
-"How many users have the TRAINEE role?"
-"Find timesheets with Field Hours but no attachments"
-"Update user X's role to SUPPORT"
-```
-
-**Security Note:**
-⚠️ Consider using read-only credentials for safety:
-
-```sql
-CREATE USER mcp_readonly WITH PASSWORD 'secure_password';
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_readonly;
-```
-
----
-
-#### 3. Twilio MCP ⭐⭐
-
-**Relevance:** SMS notifications for timesheet reminders and approvals
-
-**Capabilities:**
-
-- Send SMS messages
-- Check message delivery status
-- Manage phone number verification
-- View messaging logs
-
-**Requirements Addressed:**
-
-- REQ-011: SMS notifications
-
-**Installation:**
+**Solution:** Upgrade to Node.js 18+:
 
 ```bash
-npm install -g @anthropic/mcp-server-twilio
+brew install node@20
+brew link --overwrite node@20
 ```
 
-**Configuration:**
+### Server Not Found in Agent Tools
 
-```json
-{
-  "mcpServers": {
-    "twilio": {
-      "command": "npx",
-      "args": ["@anthropic/mcp-server-twilio"],
-      "env": {
-        "TWILIO_ACCOUNT_SID": "your-account-sid",
-        "TWILIO_AUTH_TOKEN": "your-auth-token",
-        "TWILIO_PHONE_NUMBER": "+1234567890"
-      }
-    }
-  }
-}
-```
-
-**Use Cases:**
-
-```
-"Send an SMS to +1555123456 saying 'Your timesheet was approved'"
-"Check if the message to John was delivered"
-"List all SMS sent today"
-```
-
----
-
-### Priority 2: Helpful for Operations
-
-#### 4. Docker MCP ⭐⭐
-
-**Relevance:** Container management for development and deployment
-
-**Capabilities:**
-
-- List running containers
-- View container logs
-- Restart/stop containers
-- Check container health
-- Execute commands in containers
-
-**Installation:**
-
-```bash
-npm install -g @anthropic/mcp-server-docker
-```
-
-**Configuration:**
-
-```json
-{
-  "mcpServers": {
-    "docker": {
-      "command": "npx",
-      "args": ["@anthropic/mcp-server-docker"]
-    }
-  }
-}
-```
-
-**Use Cases:**
-
-```
-"Restart the timesheet-web container"
-"Show me the last 50 lines of logs from nginx"
-"What containers are running?"
-"Execute flask db upgrade in the web container"
-```
-
----
-
-#### 5. Sentry MCP ⭐
-
-**Relevance:** Error tracking and application monitoring
-
-**Capabilities:**
-
-- List recent errors
-- View error details and stack traces
-- Query error frequency
-- Manage error assignments
-
-**Installation:**
-
-```bash
-npm install -g @anthropic/mcp-server-sentry
-```
-
-**Configuration:**
-
-```json
-{
-  "mcpServers": {
-    "sentry": {
-      "command": "npx",
-      "args": ["@anthropic/mcp-server-sentry"],
-      "env": {
-        "SENTRY_AUTH_TOKEN": "your-auth-token",
-        "SENTRY_ORG": "your-org",
-        "SENTRY_PROJECT": "timesheet"
-      }
-    }
-  }
-}
-```
-
-**Use Cases:**
-
-```
-"What errors occurred in production today?"
-"Show me the stack trace for error #12345"
-"How often is the database timeout error happening?"
-```
-
----
-
-### Priority 3: Future Considerations
-
-#### 6. Slack MCP
-
-**Note:** Currently using Microsoft Teams for company communication. Only relevant if Slack is adopted.
-
-#### 7. AWS/Azure MCP
-
-**Relevance:** Cloud infrastructure management (when deployed to cloud)
-
-**Capabilities:**
-
-- Manage Azure resources
-- Deploy to App Service
-- Configure networking
-- Manage secrets in Key Vault
-
----
-
-## 🔧 MCP Configuration File Locations
-
-### Claude Desktop App
-
-```
-~/Library/Application Support/Claude/claude_desktop_config.json
-```
-
-### VS Code / Cursor
-
-- Check extension settings for MCP configuration
-- May use `.vscode/settings.json` or global settings
-
-### Gemini Code Assist
-
-```
-~/.gemini/config.json
-```
-
----
-
-## 📋 Implementation Checklist
-
-### Adding a New MCP Server
-
-1. **Install Prerequisites**
-
-   ```bash
-   # Ensure Node.js is installed
-   node --version
-
-   # Install the MCP server globally
-   npm install -g @anthropic/mcp-server-<name>
-   ```
-
-2. **Configure Credentials**
-
-   - Store API keys securely
-   - Use environment variables, not hardcoded values
-   - Consider using a secrets manager
-
-3. **Update MCP Config**
-
-   - Add server entry to your MCP configuration file
-   - Restart your AI assistant to load new servers
-
-4. **Test Connection**
-
-   - Ask the AI to list available tools from the new server
-   - Try a simple read-only operation first
-
-5. **Document in Team**
-   - Update this file with any project-specific configuration
-   - Share credentials securely with team members
+**Note:** User-configured MCP servers may not be accessible through the agent's internal `list_resources` tool, but they still work for interactive sessions in Antigravity.
 
 ---
 
 ## 🔒 Security Best Practices
 
-1. **Principle of Least Privilege**
+1. **Never commit credentials to git**
+   - The `mcp.json` file contains API keys and database passwords
+   - It's stored in your user profile, not in the project directory
 
-   - Use read-only credentials when possible
-   - Limit database access to specific tables
-   - Restrict API scopes to minimum required
+2. **Use read-only credentials when possible**
 
-2. **Credential Management**
+   ```sql
+   CREATE USER mcp_readonly WITH PASSWORD 'secure_password';
+   GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_readonly;
+   ```
 
-   - Never commit credentials to git
-   - Use environment variables or secrets managers
-   - Rotate credentials regularly
+3. **Rotate credentials regularly**
 
-3. **Audit Logging**
-
-   - Enable audit logs for database access
-   - Monitor API usage in cloud dashboards
-   - Review MCP activity periodically
-
-4. **Network Security**
-   - Use TLS for all connections
-   - Consider IP allowlisting for production databases
-   - Use private endpoints in cloud environments
+4. **Use SSL for database connections**
+   - Always include `?sslmode=require` for cloud databases
 
 ---
 
 ## 📚 Resources
 
 - [MCP Specification](https://modelcontextprotocol.io/)
-- [Anthropic MCP Servers](https://github.com/anthropics/mcp-servers)
-- [Microsoft Graph API Documentation](https://docs.microsoft.com/graph/)
-- [Twilio API Documentation](https://www.twilio.com/docs)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [MCP Server Registry](https://github.com/mcp)
+- [Context7 Documentation](https://context7.com/docs)
+- [DBHub Documentation](https://github.com/bytebase/dbhub)
+- [Antigravity IDE](https://antigravity.ai/)
 
 ---
 
-_Document updated January 8, 2026_
+## 📋 Quick Reference
+
+### MCP Config File Location
+
+```
+~/Library/Application Support/Antigravity/User/mcp.json
+```
+
+### Start/Stop Servers
+
+Extensions → MCP Servers → ⚙️ → Start/Stop Server
+
+### View Server Output
+
+Extensions → MCP Servers → ⚙️ → Show Output
+
+### Required Node.js Version
+
+Node.js 18+ (v20 LTS recommended)
+
+---
+
+_Document updated January 20, 2026_
